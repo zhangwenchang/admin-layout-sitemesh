@@ -1,0 +1,2343 @@
+
+<style type="text/css">
+.page-search-box .form-group {
+	width: 50%;
+	float: left;
+}
+
+.page-search-box .form-group .form-control {
+	height: 30px;
+}
+
+.jingque {
+	position: absolute;
+	top: 29px;
+	left: 15px;
+	font-size: 11px;
+	line-height: 11px;
+}
+
+.jingque input {
+	position: relative;
+	top: -2px;
+}
+
+.higher-group {
+	height: 30px;
+}
+
+.relative-top6 {
+	position: relative;
+	top: 6px;
+}
+
+.edit-member-ul li {
+	list-style-type: none;
+}
+
+.edit-member-ul li .labels {
+	display: inline-block;
+	width: 112px;
+}
+
+.edit-member-ul li input, .edit-member-ul li select {
+	width: 137px;
+	margin-right: 12px;
+}
+
+</style>
+<style>
+.clearfix:after{height: 0;overflow:hidden; clear: both;display: block;}
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.modal .dataTables_wrapper .dataTables_length { position: relative; left: 0; top: 0; }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+</style>
+<section class="content">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<form class="form-horizontal page-search-box">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">会员昵称:</label>
+							<div class="col-sm-9">
+								<span class="jingque"><input type="checkbox"
+									class="btn btn-default btn-sm checkbox-toggle" id="nolike">精确查询</span>
+								<input type="text" class="form-control" id="membNickname"
+									placeholder="" aria-controls="example1">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">嘎嘎号:</label>
+							<div class="col-sm-9">
+								<!-- <input type="text" class="form-control" id="membGagano"> -->
+								<textarea rows="1" class="form-control" id="membGagano"></textarea>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">注册IP:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="membIp">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">注册邮箱:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="membEmail">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">性别 :</label>
+							<div class="col-sm-9">
+								<select name="example1_length" aria-controls="example1"
+									id="membSex" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="1">男</option>
+									<option value="2">女</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">头像审核:</label>
+							<div class="col-sm-9">
+								<select name="example1_length" id="membImgischeck"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="1">审核</option>
+									<option value="2">未审核</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">会员等级 :</label>
+							<div class="col-sm-9">
+								<select name="example1_length" id="mefiLevel"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="0">普通会员</option>
+									<option value="10">迷你会员</option>
+									<option value="20">高级会员</option>
+									<option value="30">VIP会员</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">会员状态 :</label>
+							<div class="col-sm-9">
+								<select name="example1_length" aria-controls="example1"
+									id="membIsenable" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="1">正常</option>
+									<option value="2">禁用</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">语言:</label>
+							<div class="col-sm-9">
+								<select name="example1_length" aria-controls="example1"
+									id="membLanguage" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="zh-cn">简体中文</option>
+									<option value="zh-tw">繁体中文</option>
+									<option value="en-us">英语</option>
+									<option value="ru-ru">俄语</option>
+									<option value="ja-jp">日语</option>
+									<option value="ko-kr">韩语</option>
+									<option value="es-es">西班牙</option>
+									<option value="de-de">德语</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group higher-group">
+							<label for="membNo" class="col-sm-3 control-label">注册时间:</label>
+							<div class="col-sm-9">
+								<input type="text" id="startRegistertime"> 至 <input
+									type="text" id="endRegistertime">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">推荐首页:</label>
+							<div class="col-sm-3">
+								<span class="relative-top6"><input type="checkbox"
+									id="membShowtop"></span>
+							</div>
+							<label for="membNo" class="col-sm-3 control-label">
+								重复注册IP筛选:</label>
+							<div class="col-sm-3">
+								<span class="relative-top6"><input type="checkbox"
+									id="filterip">筛选</span>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">最后登录时间:</label>
+							<div class="col-sm-9">
+								<input type="text" id="startMelotime"> 至 <input
+									type="text" id="endMelotime">
+							</div>
+						</div>	
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">会员手机号:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="mobile"
+									placeholder="" aria-controls="example1">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="machineFilter" class="col-sm-3 control-label">机器营销 :</label>
+							<div class="col-sm-9">
+								<select name="example1_length" aria-controls="example1"
+									id="machineFilter" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="1">是</option>
+									<option value="0">否</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="box-footer">
+						<button type="button" onclick="search()" class="btn btn-primary search-btn">查询</button>&nbsp;&nbsp;<b style="color:blue">批量查询嘎嘎号请以逗号分隔</b>&nbsp;&nbsp;
+					</div>
+				</form>
+				<!--   <div class="box-header">
+	          <div class="input-group">
+	          	<label>会员昵称:<input type="search" id="membNickname" class="form-control input-sm" placeholder="" aria-controls="example1"><input type="checkbox" class="btn btn-default btn-sm checkbox-toggle" id="nolike">精确查询  </label>
+	          	<label>嘎嘎号:<input type="search" id="membGagano" class="form-control input-sm" placeholder="" aria-controls="example1"></label>
+	          	<label>注册IP:<input type="search" id="membIp" class="form-control input-sm" placeholder="" aria-controls="example1"></label>
+	          	<label>注册邮箱:<input type="search" id="membEmail" class="form-control input-sm" placeholder="" aria-controls="example1"></label>
+	          	
+	          	<label>性别 
+	          	<select name="example1_length" aria-controls="example1" id="membSex" class="form-control input-sm">
+	          		<option value="">不限</option>
+	          		<option value="1">男</option>
+	          		<option value="2">女</option>
+	          	</select></label>
+	          	<label>头像审核
+	          	<select name="example1_length" id="membImgischeck" aria-controls="example1" class="form-control input-sm">
+	          		<option value="">不限</option>
+	          		<option value="1">审核</option><option value="2">未审核</option>
+	          	</select></label>
+	          	<label>会员等级 
+	          	<select name="example1_length" id="mefiLevel" aria-controls="example1" class="form-control input-sm">
+	          		<option value="">不限</option>
+	          		<option value="1">普通会员</option>
+	          		<option value="2">高级会员</option>
+	          		<option value="3">VIP会员</option>
+	          		</select></label>
+	          	<label>会员状态 
+	          	<select name="example1_length" aria-controls="example1" id="membIsenable" class="form-control input-sm">
+		          	<option value="">不限</option>
+		          	<option value="1">正常</option>
+		          	<option value="2">禁用</option>
+	          	</select></label>
+	          	<label>语言 
+	          	<select name="example1_length" aria-controls="example1" id="membLanguage" class="form-control input-sm">
+		          	<option value="">不限</option>
+		          	<option value="zh-cn">简体中文</option>
+		          	<option value="zh-tw">繁体中文</option>
+		          	<option value="en-us">英语</option>
+		          	<option value="ru-ru">德语</option>
+		          	<option value="ja-jp">日语</option>
+		          	<option value="ko-kr">韩语</option>
+		          	<option value="es-es">西班牙</option>
+	          	</select></label>
+	          	<label>注册时间<input type="text" id="startRegistertime">至<input type="text" id="endRegistertime"></label>
+	          	<label>最后登录时间<input type="text" id="startMelotime">至<input type="text" id="endMelotime"></label>
+	          	<label>推荐<input type="checkbox" id="membShowtop"></label>
+	          	<label>重复注册IP筛选<input type="checkbox" id="filterip">筛选</label>
+	          	<button type="button" onclick="search()" class="btn btn-primary">查询</button>
+	          	</div>
+	          </div> -->
+
+				<!-- /.box-header -->
+				<div class="box-body mailbox-messages">
+					<table id="memberinfo" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th>头像</th>
+								<th>昵称</th>
+								<th>GAGA号</th>
+								<th>注册时间(UTC)</th>
+								<th>最后登录时间(UTC)</th>
+								<th>注册IP</th>
+								<th>来源</th>
+								<th>性别</th>
+								<!-- <th>注册地</th> -->
+								<th>状态</th>
+								<th>首页推荐</th>
+								<th>头像重置</th>
+								<th>推广员</th>
+								<th>校园大使</th>
+								<th>推广帐号</th>
+								<th>机器营销</th>
+								<th>个性签名</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+					</table>
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</div>
+
+		<!-- /.box -->
+	</div>
+	<!-- /.col -->
+	</div>
+	<!-- /.row -->
+</section>
+<!-- /.content -->
+</div>
+
+<!-- 禁用模态框（Modal） -->
+<!--列表数据弹框  -->
+<!-- <div class="modal fade" id="listModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	在这里添加一些文本
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div>/.modal-content
+</div>/.modal
+</div> -->
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton"></div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+
+<div class="modal fade" id="Modalpage" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 60%">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabelpage"></h4>
+			</div>
+			<div class="modal-body" id="bodycontentpage">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbuttonpage"></div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+
+<div class="modal fade" id="enableModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="enableModalLabel">禁用该用户</h4>
+			</div>
+			<div class="modal-body" id="enablebodycontent">
+				<span>备注：</span><span><textarea rows="3" cols=""
+						id="disablereson"></textarea></span>
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="isenablebutton"></div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+
+<div class="modal fade" id="openenableModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="remarktitle">启用该用户</h4>
+			</div>
+			<div class="modal-body" id="openenablebodycontent">
+				<span>确定要恢复该用户继续使用嘎嘎？</span><br>
+				<br> <span>备注：</span><span id="remarks"></span>
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="openisenablebutton"></div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog"
+	aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title">提示</h4>
+			</div>
+			<div class="modal-body" id="errorbodycontent">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+
+<div class="modal fade" id="Modal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 820px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel2"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent2" style="height: 120px; overflow: auto;">
+				<div id="videoTrans" >
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_username">退款类型</label>
+						<div class="col-sm-4">
+							<select id="refund_type_re" name="refund_type_re" class="form-control">
+								<option value="1">客户拒付</option>
+								<option value="2">测试</option>
+								<option value="3">其他</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_username">退款金币</label>
+						<div class="col-sm-4">
+							<input class="form-control" id="refund_gold_re" name="refund_gold_re" type="text" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_username">退款原因</label>
+						<div class="col-sm-4">
+							<input class="form-control" id="rech_reason_re" name="rech_reason_re" type="text" />
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" id="modalbutton2" class="btn btn-primary">提交更改</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$(function() {
+
+		$('#startRegistertime').datepicker({format : 'yyyy-mm-dd'});
+		$('#endRegistertime').datepicker({format : 'yyyy-mm-dd'});
+		$('#startMelotime').datepicker({format : 'yyyy-mm-dd'});
+		$('#endMelotime').datepicker({format : 'yyyy-mm-dd'});
+
+		//$('#startRegistertime').daterangepicker({format: 'YYYY-MM-DD'});
+		//$('#startMelotime').daterangepicker({format: 'YYYY-MM-DD'}); .min '/plugins/datatables/jquery.dataTables.js', 
+		$.addFields([
+					'/plugins/datatables/dataTables.bootstrap.min.js',
+					'/plugins/iCheck/icheck.min.js',
+			        '/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js',     
+					'/plugins/datepicker/datepicker3.css',
+					'/plugins/datepicker/bootstrap-datepicker.js',
+					'/plugins/daterangepicker/daterangepicker-bs3.css',
+					'/plugins/daterangepicker/daterangepicker.js' ],
+					function() {
+					var tabs = $("#memberinfo").dataTable({
+								//"bProcessing": true,
+								// "bServerSide": true,
+								"bStateSave" : true, //保存客户端搜索条件等状态
+								"paging" : true, //是否开启本地分页
+								//"processing": true,   正在处理
+								"serverSide" : true, //加载就请求后台
+								"lengthChange" : false, //是否允许用户修改每页显示条数
+								"searching" : false, //是否启用本地搜索
+								"ordering" : true, //是否排序
+								"info" : true, //是否显示左下角表格信息
+								"autoWidth" : false, //自适应宽度
+								"pageLength" : 10,
+								//"ajax" : ctx+"/adminmember/notauditedimgList",
+								"fnServerData" : function(
+										sSource, aoData,
+										fnCallback, oSettings) { //从服务器返回数据
+									var membNickname = $(
+											"#membNickname")
+											.val();
+									var ischeck = $("#nolike")
+											.is(':checked');
+									var nolike = "";
+									if (ischeck) {
+										nolike = 1
+									}
+									//var nolike = $("#nolike").val();
+									var membGagano = $("#membGagano").val();
+									//var membCountry = $("#membCountry").val();
+									var membIp = $("#membIp").val();
+									var membEmail = $("#membEmail").val();
+									var membSex = $("#membSex").val();
+									var membImgischeck = $("#membImgischeck").val();
+									var mefiLevel = $("#mefiLevel").val();
+									var membLanguage = $("#membLanguage").val();
+									var membIsenable = $("#membIsenable").val();
+									var membShowtop = "";
+									var showischeck = $("#membShowtop").is(':checked');
+									if (showischeck) {membShowtop = "1";}
+									var startRegistertime = $("#startRegistertime").val();
+									var endRegistertime = $("#endRegistertime").val();
+									var startMelotime = $("#startMelotime").val();
+									var endMelotime = $("#endMelotime").val();
+									var filteripcheck = $("#filterip").is(':checked');
+									var filterip = "";
+									if (filteripcheck) {
+										filterip = "1";
+									}
+									aoData.push({"name" : "orderval","value" : aoData[2].value[0]["dir"]},
+												{"name" : "membNickname","value" : membNickname},
+												{"name" : "nolike","value" : nolike},
+												{"name" : "membGagano","value" : membGagano},
+													//{"name":"membCountry","value":membCountry},
+												{"name" : "membIp","value" : membIp},
+												{"name" : "membEmail","value" : membEmail},
+												{"name" : "membSex","value" : membSex},
+												{"name" : "membImgischeck","value" : membImgischeck},
+												{"name" : "mefiLevel","value" : mefiLevel},
+												{"name" : "membLanguage","value" : membLanguage},
+												{"name" : "membIsenable","value" : membIsenable},
+												{"name" : "membShowtop","value" : membShowtop},
+												{"name" : "startRegistertime","value" : startRegistertime},
+												{"name" : "endRegistertime","value" : endRegistertime},
+												{"name" : "startMelotime","value" : startMelotime},
+												{"name" : "endMelotime","value" : endMelotime},
+												{"name" : "filterip","value" : filterip},
+												{"name" : "machineFilter","value" : $("#machineFilter").val()},
+												{"name" : "mobile","value" : $('#mobile').val()}
+												)
+													layer.load(1, {
+														shade : 0.3
+													}); //加遮罩层
+													var url = (tabs) ? (ctx + "/adminmember/memberList")
+															: "#";
+													oSettings.jqXHR = $.ajax({
+														"dataType" : 'json',
+														"type" : "POST",
+														"url" : url,
+														"data" : aoData,
+														"success" : fnCallback
+													});
+												},
+												"columns" : [
+														{
+															"data" : "membGagaid",
+															"bSortable" : false
+														}, //data   我们需要的某一列数据对应的属性名
+														{
+															"data" : "membBigimg",
+															"bSortable" : false
+														},
+														{
+															"data" : "membNickname",
+															"bSortable" : false
+														},
+														{
+															"data" : "membGagano",
+															"bSortable" : false
+														},
+														{
+															"data" : "membRegistertime",
+															"bSortable" : false
+														},
+														{
+															"data" : "memberlog.meloTime",
+															"bSortable" : false
+														},
+														{
+															"data" : "membIp",
+															"bSortable" : false
+														},
+														{
+															"data" : "flag",
+															"bSortable" : false
+														},
+														{
+															"data" : "membSex",
+															"bSortable" : false
+														},
+														//{"data": "membRegistercountry","bSortable": false },
+														{
+															"data" : "membIsenable",
+															"bSortable" : false
+														},
+														{
+															"data" : "membShowtop",
+															"bSortable" : false
+														},
+														{
+															"data" : "membGagaid",
+															"bSortable" : false
+														},
+														{
+															"data" : "membGagaid",
+															"bSortable" : false
+														},
+														{
+															"data" : "cardId",
+															"bSortable" : false,"bVisible":false
+														},
+														{"data" : "sysUser.syusUsername","bSortable" : false},
+														{
+															"data" : "machineId",
+															"bSortable" : false,
+															"render" : function(data, type,full, meta) {
+																if (data) {
+																	return '是';
+																}
+																return '否';
+															}
+														},
+														{"data" : "membSignature","bSortable" : false ,"defaultContent":''}, 
+														{"data" : "membGagaid","bSortable" : false },
+														
+														],
+												"columnDefs" : [
+														/* {"targets": 0,  //表示具体需要操作的目标列，下标从 0 开始
+															"data": "membGagaid",
+															"render": function ( data, type, full, meta ) {
+															return '<input type="checkbox" value="' + data + '" title="' + data + '" name="checkbox" />';
+														}}, */
+														{
+															"targets" : 1,
+															"data" : "membBigimg",
+															"render" : function(data, type,full, meta) {
+																if (data&&data.indexOf("http") > -1) {
+																	return '<img style="width:100px;" alt="" src="'+data+'">';
+																} else {
+																	return '<img style="width:100px;" alt="" src="'+qiniu+data+'">';
+																}
+															}
+														},{
+															"targets" : 2,
+															"data" : "membNickname", //对应的属性名
+															"render" : function(data, type,full, meta) {
+																if (data == ''|| data == null) {
+																	return "";
+																}
+																var url = weburl
+																		+ "Platform/otherHome/"
+																		+ full.membGagaid;
+																var isenable = "<a href='"+url+"' target='_blank'>"
+																		+ data
+																		+ "</a><br>";
+																var html = isenable
+																		+ '<a href="javascript:void(0)" onclick="getRandomNickname('
+																		+ full.membGagaid
+																		+ ')">重置昵称</a>';
+																return html;
+															}
+														},{
+															"targets" : 4,
+															"data" : "membRegistertime",
+															"render" : function(data, type,full, meta) {
+																if (data == ''|| data == null) {
+																	return "";
+																}
+																var date = new Date(data);
+																return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+															}
+														},{
+															"targets" : 5,
+															"data" : "memberlog.meloTime",
+															"render" : function(data, type,full, meta) {
+																if (data == ''|| data == null) {
+																	data = full.membRegistertime;
+																}
+																var date = new Date(data);
+																return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+															}
+														},{
+															"targets" : 6,
+															"data" : "membIp",
+															"render" : function(data, type,full, meta) {
+																if (data == ""|| data == null) {
+																	return "";
+																} else {
+																	return data;
+																}
+															}
+														},
+														{
+															"targets" : 8,
+															"data" : "membSex",
+															"render" : function(data, type,full, meta) {
+																if (data == 2) {
+																	return '女'
+																} else if (data == 1) {
+																	return '男'
+																}
+																return '无'
+															}
+														},
+														{
+															"targets" : 9,
+															"data" : "membIsenable",
+															"render" : function(data, type,full, meta) {
+																if (data == 1) {
+																	return '启用';
+																} else {
+																	return '禁用';
+																}
+															}
+														},{
+															"targets" : 10,
+															"data" : "membShowtop",
+															"render" : function(data, type,full, meta) {
+																if (data == 1) {
+																	return '<a href="javascript:void(0)" onclick="isrecommend('
+																			+ full.membGagaid+ ',2,1)">否</a>';
+																} else {
+																	return '<a href="javascript:void(0)" onclick="isrecommend('
+																			+ full.membGagaid+ ',1,1)">是</a>';
+																}
+															}
+														},{
+															"targets" : 11,
+															"data" : "membGagaid",
+															"render" : function(data, type,full, meta) {
+																return '<a href="javascript:void(0)" onclick="resetImg('+ data+ ')">重置</a>';
+															}
+														},{
+															"targets" : 12,
+															"data" : "membGagaid",
+															"render" : function(data, type,full, meta) {
+																var sysUser = full.sysUser;
+																var staname = "";
+																if (sysUser != null
+																		&& sysUser.syusUsername) {
+																	staname = sysUser.syusUsername
+																}
+																return '<input type="text" id="'+data+'" value="'+staname+'"><br><a href="javascript:void(0)" onclick="bdstaff('
+																		+ data+ ','+ data+ ')">绑定</a>';
+															}
+														},{
+															"targets" : 13,
+															"data" : "cardId",
+															"render" : function(data, type,full, meta) {
+																
+																return '1';
+															}
+														},{
+															"targets" : 14,
+															"data" : "sysUser.stmeState",
+															"render" : function(data, type,full, meta) {
+																var sysUser = full.sysUser;
+																var stmeState = "";
+																if (sysUser != null&& sysUser.syusUsername) {
+																	stmeState = sysUser.stmeState
+																	if(stmeState==2)return '是';
+																}return '否';
+															}
+														},{
+															"targets" : 16,
+															"render" : function(data, type,full, meta) {
+																if(!data)data='';
+																return data+'<br><a href="javascript:void(0)" onclick="resetSignature('+ full.membGagaid+ ')">重置</a>';
+															}
+														},{
+															"targets" : 17,
+															"data" : "membGagaid",
+															"render" : function(data, type,full, meta) {
+																var isenable = '';
+																if (full.membIsenable == 2) {
+																	isenable = '<a href="javascript:void(0)" onclick="isenable('
+																			+ data
+																			+ ',1)">启用</a> <a href="javascript:void(0)" onclick="openremark('
+																			+ data
+																			+ ')">备注</a><br>';
+																} else {
+																	isenable = '<a href="javascript:void(0)" onclick="isenable('
+																			+ data
+																			+ ',2)">禁用</a> <a href="javascript:void(0)" onclick="editmember('
+																			+ data
+																			+ ',1)">编辑</a><br>';
+																}
+																var html = isenable
+																		+ '<a href="javascript:void(0)" onclick="recharge('
+																		+ data
+																		+ ',1)">充值</a> <a href="javascript:void(0)" onclick="comsume('
+																		+ data
+																		+ ',1)">消费</a><br>'
+																		+ '<a href="javascript:void(0)" onclick="dashang('
+																		+ data
+																		+ ',1)">打赏记录</a> <a href="javascript:void(0)" onclick="sentmail('
+																		+ data
+																		+ ',1)">站内信</a><a href="javascript:void(0)" onclick="sentemail('
+																		+ data
+																		+ ',1)">邮件</a><br>'
+																		+ '<a href="javascript:void(0)" onclick="memberlog('
+																		+ data
+																		+ ',1)">登录</a>';
+																if (full.membIsenable == 2) {
+																	html += '<a href="javascript:void(0)" onclick="editmember('
+																			+ data
+																			+ ',1)">编辑</a><br>';
+																} else {
+																	html += ' <a href="javascript:void(0)" onclick="getmember('
+																			+ data
+																			+ ',1)">详情</a><br>';
+																}
+
+																html += ' <a href="javascript:void(0)" onclick="deleteAllMsg('
+																		+ data
+																		+ ')">全信息删除</a>';
+																return html;
+															}
+														} ],
+												"fnDrawCallback" : function(oSettings) {//这个应该是重绘的回调函数
+													layer.closeAll();													
+													/* 
+													 $(".mailbox-messages input[type='checkbox']").iCheck({
+														    checkboxClass: 'icheckbox_flat-blue',
+														    radioClass: 'iradio_flat-blue'
+													});*/
+												}
+											});
+							//序号相关
+							var table = $('#memberinfo').DataTable();
+							table.on('order.dt search.dt',function() {
+								//获取页信息
+								var page = table.page.info();
+								table.column(0, {}).nodes().each(function(cell, i) {
+									cell.innerHTML = page.page* page.length + i+ 1;
+								});
+							}).draw();
+
+						})
+	});
+	function search() {
+		// $("#memberinfo").dataTable();
+		$("#memberinfo").dataTable().fnDraw(true);
+	}
+	//头像重置
+	function resetImg(id) {
+		$.ajax({
+			type : "post",
+			url : ctx + "/adminmember/batchaudit",
+			dataType : "json",
+			data : {"memids" : id,"type" : 4},
+			success : function(data) {
+				if (data.success) {
+					$("#memberinfo").dataTable().fnDraw(false);
+				} else {
+					$("#errorbodycontent").html("操作失败");
+					$('#errorModal').modal({
+						keyboard : true
+					});
+				}
+			}
+		});
+	}
+	//重置昵称
+	function getRandomNickname(id) {
+		if (!confirm("确认重置此会员昵称吗？")) {
+			return;
+		}
+		$.ajax({
+			type : "post",
+			url : ctx + "/adminmember/resetNickname",
+			dataType : "json",
+			data : {"gagaid" : id },
+			success : function(data) {
+				if (data.success) {
+					$("#memberinfo").dataTable().fnDraw(false);
+				} else {
+					$("#errorbodycontent").html("操作失败");
+					$('#errorModal').modal({
+						keyboard : true
+					});
+				}
+			}
+		});
+	}
+
+	//编辑
+	function editmember(id, type) {
+		if (type == 1) {
+			$("#ModalLabel").text("编辑会员资料");
+			$("#mailcontent").val('');
+			$.ajax({
+			type : 'post',
+			url : ctx + "/Account/opList",
+			dataType : 'json',
+			cache : true,
+			success : function(data) {
+				if (data.success) {
+					var editGoldArr = $.grep(data.obj, function(i) {
+						return i.symoId == 49;
+					}) || [];
+					var isEditGlod = Boolean(editGoldArr.length);
+					//console.log('金币权限', isEditGlod);         
+					var content = '<ul class="edit-member-ul"><li><span class="labels">金币数：</span><input type="text" id="goldnum" '
+							+ (!isEditGlod ? 'disabled="disabled"': '')
+							+ '>'
+							+ (isEditGlod ? ('<button type="button" onclick="updatemember('
+									+ id + ',1)" class="btn btn-primary">更新金币数</button>'): '')
+							+ '</li><br>'
+							+ '<li><span class="labels">性别：</span><select id="upsex"><option value="1">男</option><option value="2">女</option></select><button type="button" onclick="updatemember('
+							+ id
+							+ ',2)" class="btn btn-primary">更新性别</button></li><br>'
+							+ '<li><span class="labels">会员等级：</span><select id="uplevel"><option value="0">普通会员</option><option value="10">迷你会员</option><option value="20">高级会员</option><option value="30">VIP会员</option></select><button type="button" onclick="updatemember('
+							+ id
+							+ ',3)" class="btn btn-primary">更新等级</button></li><br>'
+							+ '<li><span class="labels">重置密码：</span><input type="text" id="uppwd" value="123456" readonly="readonly"><button type="button" onclick="updatemember('
+							+ id
+							+ ',4)" class="btn btn-primary">更新密码</button></li><br>'
+							+ '<li><span class="labels">会员过期日期：</span><input type="text" readonly id="enddate"><button type="button" onclick="updatemember('
+							+ id
+							+ ',5)" class="btn btn-primary">更新日期</button></li><br>'
+							+ '<li><span class="labels">语言：</span><span id="uplanguage"></span></li><br>'
+							+ '<li><span class="labels">邮箱：</span><input type="text" id="upemail"><button type="button" onclick="updatemember('
+							+ id
+							+ ',6)" class="btn btn-primary">更新邮箱</button></li><br>'
+							+ '<li><span class="labels">国家：</span><span id="upcountry"></span></li><br>'
+							+ '<li><span class="labels">免费翻译字符数：</span><input type="text" placeholder="请输入数字" oninput="if(value.length>4)value=value.slice(0,4)" maxlength="5" id="mffyzfnum"><button type="button" onclick="updatemember('
+							+ id
+							+ ',7)" class="btn btn-primary">更新免费字符</button></li><br>'
+							+ '<li><span class="labels">翻译包总字符：</span><span id="fyzfnumCount"></span></li><br>'
+							+ '<li><span class="labels">添加付费字符数：</span><input type="text" placeholder="请输入数字" oninput="if(value.length>4)value=value.slice(0,4)" maxlength="5" id="fyzfnum"><button type="button" onclick="updatemember('
+							+ id
+							+ ',8)" class="btn btn-primary">添加付费字符数</button></li><br>'
+							+ '<li><span class="labels">翻译VIP时长：</span><span id="fyVipsc" value="0"></span><span>分钟</span></li><br>'
+							+ '<li><span class="labels">添加翻译VIP：</span><select id="fyVip"><option value="">请选择</option><option value="10">10Min</option><option value="30">30Min</option><option value="60">60Min</option></select></p><span class="labels">数量：</span><input type="text" placeholder="请输入数字" oninput="if(value.length>4)value=value.slice(0,4)" value="0" id="fyVipNum"><button type="button" onclick="updatemember('
+							+ id
+							+ ',9)" class="btn btn-primary">更新</button></li><br>'
+					$("#bodycontent").html(content);
+					$('#enddate').datepicker({format : 'yyyy-mm-dd'});
+					$("#goldnum").blur(function() {
+						var val = $(this).val();
+						val = Number(val);
+						if (val >= 0) {
+							$(this).val(val);
+						} else {
+							$(this).val('');
+						}
+
+					});
+				$.ajax({
+						type : "post",
+						url : ctx+ "/adminmember/getmember",
+						dataType : "json",
+						data : {"gagaid" : id },
+						success : function(data) {
+							if (data.success) {
+								var endtime = data.obj.memberfinance.mefiLevelendtime;
+								var showtime = "";
+								if (endtime != null&& endtime != '') {
+									var date = new Date(endtime);
+									endtime = date.getFullYear()+ "-"+ (date.getMonth() + 1)+ "-"+ date.getDate();
+								}
+								//date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+								$("#goldnum").val(data.obj.memberfinance.mefiGold);
+								$("#upsex").val(data.obj.membSex);//.val(data.obj.membSex);
+								$("#uplevel").val(data.obj.memberfinance.mefiLevel);
+								//$("#uppwd").val(data.obj.membPassword);
+								$("#enddate").val(endtime);
+								$("#uplanguage").text(data.obj.membLanguage);
+								$("#upemail").val(data.obj.membEmail);
+								$("#upcountry").text(data.obj.country);
+								//免费翻译字符数
+								$("#mffyzfnum").val(data.obj.memberfinance.mfzfnum);
+								//字符数总和
+								$("#fyzfnumCount").text(data.obj.memberfinance.zfnum);
+								//翻译Vip剩余时间
+								if(data.obj.memberfinance.fyvipsc!=null){
+									$("#fyVipsc").text(data.obj.memberfinance.fyvipsc);
+								}else{
+									$("#fyVipsc").text('0');
+									$("#fyVip").text('0');
+								}
+								
+							}
+						}
+						})
+						$('#Modal').modal({keyboard : true});
+					} else {
+						layer.msg('获取权限失败');
+					}
+				},
+			error : function(data) {
+				layer.msg('获取权限失败');
+			}
+			});
+		}
+	}
+	$("#goldnum").blur(function() {
+		var val = $(this).val();
+		val = Number(val);
+		if (val >= 0) {
+			$(this).val(val);
+		} else {
+			$(this).val('');
+		}
+
+	});
+	//编辑会员
+	function updatemember(id, type) {
+		var golenum = "";
+		var upsex = "";
+		var uplevel = "";
+		var uppwd = "";
+		var upemail = "";
+		var enddate = "";
+		var mffyzfnum = "";
+		var fyzfnum= "";
+		var fyVip = "";
+		var fyVipNum= "";
+
+		if (type == 1) {
+			golenum = $("#goldnum").val();
+			if (golenum == '' || golenum == null) {
+				$("#errorbodycontent").html("金币不能为空");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				return;
+			}
+		} else if (type == 2) {
+			upsex = $("#upsex").val();
+		} else if (type == 3) {
+			uplevel = $("#uplevel").val();
+			$("#errorbodycontent").html(uplevel);
+			$('#errorModal').modal({
+				keyboard : true
+			});
+		} else if (type == 4) {
+			uppwd = $("#uppwd").val();
+			if (uppwd == '' || uppwd == null) {
+				$("#errorbodycontent").html("密码不能为空");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				return;
+			}
+		} else if (type == 5) {
+			enddate = $("#enddate").val();
+			if (enddate == '' || enddate == null) {
+				$("#errorbodycontent").html("日期不能为空");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				return;
+			}
+		} else if (type == 6) {
+			upemail = $("#upemail").val();
+			if (upemail == '' || upemail == null) {
+				$("#errorbodycontent").html("邮箱不能为空");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				return;
+			}
+		}else if (type == 7) {
+			mffyzfnum = $("#mffyzfnum").val();
+			if (mffyzfnum == '' || mffyzfnum <null) {
+				$("#errorbodycontent").html("免费字符数量不能为空");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				return;
+			}
+			var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+		    var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+		    if(regPos.test(mffyzfnum) || regNeg.test(mffyzfnum)) {
+		        }else{
+		        	$("#errorbodycontent").html("只能输入正整数");
+					$('#errorModal').modal({
+						keyboard : true
+					});
+					return;
+		        }
+		}else if (type == 8) {
+			fyzfnum = $("#fyzfnum").val();
+			if (fyzfnum == '' || fyzfnum <null) {
+				$("#errorbodycontent").html("翻译包数量不能为空");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				return;
+			}
+			var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+		    var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+		    if(regPos.test(fyzfnum) || regNeg.test(fyzfnum)) {
+		        }else{
+		        	$("#errorbodycontent").html("只能输入正整数");
+					$('#errorModal').modal({
+						keyboard : true
+					});
+					return;
+		        }
+		}else if (type == 9) {
+			fyVip = $("#fyVip").val();
+			fyVipNum = $("#fyVipNum").val();
+			if (fyVip == '' || fyVip <null) {
+				$("#errorbodycontent").html("翻译vip类型不能为空");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				return;
+			}
+			if (fyVipNum == '' || fyVipNum <null) {
+				$("#errorbodycontent").html("翻译vip数量不能为空");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				return;
+			}
+		}
+		$.ajax({
+			type : "post",
+			url : ctx + "/adminmember/memberupdate",
+			dataType : "json",
+			data : {
+				"gold" : golenum,
+				"sex" : upsex,
+				"level" : uplevel,
+				"enddate" : enddate,
+				"password" : uppwd,
+				"email" : upemail,
+				"membgagaid" : id,
+				"mffyzfnum" : mffyzfnum,
+				"fyzfnum" : fyzfnum,
+				"fyVip":fyVip,
+				"fyVipNum":fyVipNum
+			},
+			success : function(data) {
+				if (!data.success) {
+					if (type == 6) {
+						$("#errorbodycontent").html(data.msg);
+						$('#errorModal').modal({
+							keyboard : true
+						});
+					} else {
+						$("#errorbodycontent").html("更新失败");
+						$('#errorModal').modal({
+							keyboard : true
+						});
+					}
+				} else {
+					$("#errorbodycontent").html("更新成功");
+					$('#errorModal').modal({
+						keyboard : true
+					});
+					$("#memberinfo").dataTable().fnDraw(false);
+				}
+			}
+		});
+	}
+
+	//推广员绑定
+	var isbindComplete = true;
+	function bdstaff(id, staffnameid) {
+		var staffname = $("#" + staffnameid).val();
+		if (staffname == '') {
+			$("#errorbodycontent").html("请输入推广员名称");
+			$('#errorModal').modal({
+				keyboard : true
+			});
+			return;
+		} else {
+			if (isbindComplete) {
+				isbindComplete = false;
+				$.ajax({
+					type : "post",
+					url : ctx + "/adminmember/getStaffByName",
+					dataType : "json",
+					data : {
+						"staName" : staffname,
+					},
+					success : function(data) {
+						if (!data.success) {
+							$("#errorbodycontent").html("推广员不存在");
+							$('#errorModal').modal({
+								keyboard : true
+							});
+						} else {
+							$.post(ctx + "/adminmember/staffmember", {
+								gagaid : id,
+								staName : staffname
+							}, function(result) {
+								isbindComplete = true;
+								if (result.success) {
+
+									$("#errorbodycontent").html("绑定成功！");
+									$('#errorModal').modal({
+										keyboard : true
+									});
+									//layer.msg('绑定成功', {time: 1500});
+									$("#memberinfo").dataTable().fnDraw(false);
+
+								} else {
+									isbindComplete = true;
+									var msg = "绑定失败：未查到该用户信息";
+									if (result.msg) {
+										msg = result.msg
+									}
+									$("#errorbodycontent").html(msg);
+									$('#errorModal').modal({
+										keyboard : true
+									});
+								}
+							});
+						}
+					},
+					error : function() {
+						isbindComplete = true;
+						layer.msg('操作失败');
+					}
+				})
+			}
+		}
+	}
+
+	var stype = '';
+	var comtype = 0 ;
+	//先进行消费类型的判断   再进入消费记录里
+	function comsume(id, type) {
+		if (type == 1) {
+			$("#ModalLabelpage").text("消费类型选择");
+			$.ajax({
+				type : "post",
+				url : ctx + "/adminmember/consumntypelist",
+				dataType : "json",
+				data : {
+					"gagaid" : id,
+				},
+				success : function(data) {
+					if (data.success) {
+						//每次选择后清空
+						$('#comsumeId').html(
+								'<option value="">-- 全部 --</option>');
+						$.each(data.obj, function(index, e) {
+							$('#comsumeId').append(
+									'<option value="'+e.dctyId+'">'
+											+ e.dctyCode + '</option>');
+						});
+					} else {
+						layer.msg('获取消费类型失败');
+					}
+				}
+			})
+		}
+		if (type == 2) {
+			$('#Modalpage').modal('hide');
+		}
+
+		var content = '<span>消费类型：</span><<select id="comsumeId">'
+				+ ' <option value="">-- 请选择 --</option></select>'
+		$("#bodycontentpage").html(content);
+		stype = '';
+		$('#comsumeId').change(function() {
+			stype = $(this).val();
+		});
+		$("#modalbuttonpage").html(
+		'<button type="button" onclick="comsume1('+ id+ ',1)" class="btn btn-primary">查询  </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		$('#Modalpage').modal({keyboard : true});
+	}
+
+	//消费
+	function comsume1(id, type) {
+		if(stype){comtype=stype}
+		if (type == 1) {
+			$("#ModalLabelpage").text("消费记录");
+			var tablehtml = '<div class="box"><button type="button" class="btn btn-primary" onclick="exportExcel('+ id+ ','+comtype+')">导出</button>';
+			tablehtml += '<div class="box-body mailbox-messages">';
+			tablehtml += '<table id="consums" class="table table-bordered table-hover">';
+			tablehtml += '<thead>';
+			tablehtml += '<tr><th>序号</th><th>被充值会员昵称</th><th>GAGA号</th><th>时间</th><th>消费金币数</th><th>消费类型</th><th>升级会员[月/天]数</th><th>会员开始时间</th><th>会员结束时间</th><th>推广员</th></tr></thead></table></div></div>';
+			$("#bodycontentpage").html(tablehtml);
+			$("#modalbuttonpage").html('<button type="button" onclick="comsume1(' + id+ ',2)" class="btn btn-primary">确定  </button>');
+
+			consumlist(id);
+			$('#Modalpage').modal({
+				keyboard : true
+			});
+		}
+		if (type == 2) {
+			$('#Modalpage').modal('hide');
+		}
+	}
+	function consumlist(id) {
+		var layinx1;
+		$("#consums").dataTable({
+				
+					"bStateSave" : true,
+					"paging" : true,
+					//"processing": true,
+					"serverSide" : true,
+					"lengthChange" : false,
+					"searching" : false,
+					"ordering" : true,
+					"info" : true,
+					"autoWidth" : false,
+					"pageLength" : 10,
+					"bLengthChange" : true,
+					//"ajax" : ctx+"/adminmember/notauditedimgList",
+					"fnServerData" : function(sSource, aoData, fnCallback,oSettings) {
+						aoData.push({"name" : "gagaid","value" : id});
+						if (stype) {aoData.push({"name" : "consTypeid","value" : stype});
+						}
+						//aoData=gagaidorname; 
+						layinx1 = layer.load(1, {
+							shade : 0.3
+						});
+
+						oSettings.jqXHR = $.ajax({
+							"dataType" : 'json',
+							"type" : "POST",
+							"url" : ctx + "/adminmember/consumnlist",
+							"data" : aoData,
+							"success" : fnCallback
+						});
+					},
+					"columns" : [ {
+						"data" : "cons_id",
+						"bSortable" : false
+					}, {
+						"data" : "memb_nickname",
+						"bSortable" : false,"defaultContent":''
+					}, {
+						"data" : "memb_gagano",
+						"bSortable" : false,"defaultContent":''
+					}, {
+						"data" : "cons_time",
+						"bSortable" : false
+					}, {
+						"data" : "cons_goldreal",
+						"bSortable" : false
+					}, {
+						"data" : "cons_typechilddesc",
+						"bSortable" : false
+					}, {
+						"data" : "cons_upgrademonth",
+						"bSortable" : false
+					}, {
+						"data" : "cons_upgradestime",
+						"bSortable" : false
+					}, {
+						"data" : "cons_upgradeetime",
+						"bSortable" : false
+					} , {
+						"data" : "syus_username",
+						"bSortable" : false
+					}],
+					"columnDefs" : [
+							{
+								"targets" : 3,
+								"render" : function(data, type, full, meta) {
+									if (data == '' || data == null) {
+										return "";
+									}
+									var date = new Date(data);
+                                   // var longtime=new Date(data).getTime();
+                                   // date=new Date(longtime +8 * 60 * 60 * 1000);
+									return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+								}
+							},
+							{
+								"targets" : 4,
+								"render" : function(data, type, full, meta) {
+									if (data == '' || data == null) {
+										return "";
+									}
+									return data;
+								}
+							},
+							{
+								"targets" : 6,
+								"render" : function(data, type, full, meta) {
+									if (data == '' || data == null) {
+										return "";
+									} else {
+										return data;
+									}
+								}
+							},
+							{
+								"targets" : 7,
+								"render" : function(data, type, full, meta) {
+									if (data == '' || data == null) {
+										return "";
+									} else {
+										var date = new Date(data);
+                                     //   var longtime=new Date(data).getTime();
+                                     //   date=new Date(longtime +8 * 60 * 60 * 1000);
+										return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+									}
+								}
+							},
+							{
+								"targets" : 8,
+								"render" : function(data, type, full, meta) {
+									if (data == '' || data == null) {
+										return "";
+									} else {
+										var date = new Date(data);
+                                       // var longtime=new Date(data).getTime();
+                                       // date=new Date(longtime +8 * 60 * 60 * 1000);
+										return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+									}
+								}
+							} ],
+					"fnDrawCallback" : function(oSettings) {
+						layer.close(layinx1);
+					}
+				});
+		//序号相关
+		var table = $('#consums').DataTable();
+		table.on('order.dt search.dt', function() {
+			//获取页信息
+			//debugger
+			var page = table.page.info();
+			table.column(0, {}).nodes().each(function(cell, i) {
+				cell.innerHTML = page.page * page.length + i + 1;
+			});
+		}).draw();
+	}
+	function exportExcel(gagaid,consTypeid){
+		console.log("=="+consTypeid)
+		if (typeof(consTypeid) == "undefined"){
+			consTypeid='';
+		}
+		if(consTypeid==0)consTypeid='';
+		var length=$('select[name=consums_length]').val();
+		console.log(length)
+		 var url= ctx + "/adminmember/consumnlist?gagaid="+gagaid+"&consTypeid="+
+		 	consTypeid+"&export=1"+"&length="+length;
+	     window.open(url);
+	}
+	//充值
+	function recharge(id, type) {
+		if (type == 1) {
+			$("#ModalLabelpage").text("充值记录");
+			var tablehtml = '<div class="box">';
+			tablehtml += '<div class="box-body mailbox-messages">';
+			tablehtml += '<table id="recharges" class="table table-bordered table-hover">';
+			tablehtml += '<thead>';
+
+			tablehtml += '<tr><th>序号</th><th>该充值会员昵称</th><th>GAGA号</th><th>时间</th><th>充值成功时间</th><th>充值金币数</th><th>折扣后美元</th><th>支付方式</th><th>状态</th><th>失败原因</th><th>订单号</th><th>更改订单状态</th></tr></thead></table></div></div>';
+			$("#bodycontentpage").html(tablehtml);
+			$("#modalbuttonpage").html(
+					'<button type="button" onclick="recharge(' + id
+							+ ',2)" class="btn btn-primary">确定  </button>');
+			rechargelist(id);
+			$('#Modalpage').modal({
+				keyboard : true
+			});
+		}
+		if (type == 2) {
+			$('#Modalpage').modal('hide');
+		}
+	}
+
+	function rechargelist(id) {
+		var layinx;
+		$("#recharges")
+				.dataTable(
+						{
+							"bStateSave" : true,
+							"paging" : true,
+							//"processing": true,
+							"serverSide" : true,
+							"lengthChange" : false,
+							"searching" : false,
+							"ordering" : true,
+							"info" : true,
+							"autoWidth" : false,
+							"pageLength" : 10,
+							//"ajax" : ctx+"/adminmember/notauditedimgList",
+							"fnServerData" : function(sSource, aoData,
+									fnCallback, oSettings) {
+								aoData.push({
+									"name" : "gagaid",
+									"value" : id
+								})
+								//aoData=gagaidorname; 
+								layinx = layer.load(1, {
+									shade : 0.3
+								});
+								oSettings.jqXHR = $.ajax({
+									"dataType" : 'json',
+									"type" : "POST",
+									"url" : ctx + "/adminmember/rechargelist",
+									"data" : aoData,
+									"success" : fnCallback
+								});
+							},
+							"columns" : [ {
+								"data" : "rechId",
+								"bSortable" : false
+							}, {
+								"data" : "member.membNickname",
+								"bSortable" : false
+							}, {
+								"data" : "member.membGagano",
+								"bSortable" : false
+							}, {
+								"data" : "createDateStr",
+								"bSortable" : false
+							}, {
+								"data" : "rechSucesstime",
+								"bSortable" : false
+							}, {
+								"data" : "rechGoldreal",
+								"bSortable" : false
+							}, {
+								"data" : "rechGoldreal",
+								"bSortable" : false
+							}, {
+								"data" : "rechType",
+								"bSortable" : false
+							}, {
+								"data" : "rechState",
+								"bSortable" : false
+							}, {
+								"data" : "rechReason",
+								"bSortable" : false
+							}, {
+								"data" : "rechId",
+								"bSortable" : false
+							}, {
+								"data" : "rechId",
+								"bSortable" : false,"bVisible": false
+							} ],
+							"columnDefs" : [
+									{
+										"targets" : 4,
+										"data" : "rechSucesstime",
+										"render" : function(data, type, full,
+												meta) {
+											if (data == null || data == '') {
+												return "";
+											} else {
+												var data = data + "000"
+												var date = new Date(parseInt(data));
+												return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+											}
+										}
+									},
+									{
+										"targets" : 8,
+										"data" : "rechState",
+										"render" : function(data, type, full,
+												meta) {
+											if (data == 0) {
+												return "已下单，未支付";
+											} else if (data == 1) {
+												return "支付成功";
+											} else if (data == 2) {
+												return "支付失败";
+											} else if (data == 3) {
+												return "删除";
+											} else if (data == 4) {
+												return "交易处理中";
+											} else if (data == 5) {
+												return "退款";
+											} else {
+												return data;
+											}
+										}
+									},
+									{
+										"targets" : 9,
+										"data" : "rechReason",
+										"render" : function(data, type, full,
+												meta) {
+											if (data == '' || data == null) {
+												return "";
+											} else {
+												console.log(full.rechType)
+												if (full.rechType == 'paypal'&&full.rechState == 2) {
+													data = 'paypal提示该用户存在风险交易，未能成功支付。';
+												}
+												return data;
+											}
+										}
+									},
+									{
+										"targets" : 11,
+										"render" : function(data, type, full,
+												meta) {
+											if (full.rechState != 5) {
+												data = '<a href="javascript:void(0)" onclick="tuikuan(\''+ data+ '\',5)">退款</a>'
+											} else {
+												data = '';
+												//data = '<a href="javascript:void(0)" onclick="tuikuan(\''+ data +'\',1)">支付完成</a>'
+											}
+											return data;
+										}
+									} ],
+							"fnDrawCallback" : function(oSettings) {
+								layer.close(layinx);
+							}
+						});
+		var table = $('#recharges').DataTable();
+		table.on('order.dt search.dt', function() {
+			//获取页信息
+			//debugger
+			var page = table.page.info();
+			table.column(0, {}).nodes().each(function(cell, i) {
+				cell.innerHTML = page.page * page.length + i + 1;
+			});
+		}).draw();
+	}
+	function tuikuan(id, type) {
+		 $('#bodycontent2').html($('#videoTrans').html());
+		$('#Modal2').css("z-index", "10000");
+		$('#Modal2').modal({
+			keyboard : true
+		});
+		$('#rech_reason_re').val();
+		$('#refund_gold_re').val();
+		$('#refund_type_re').val();
+		$('#modalbutton2').unbind();
+		$('#modalbutton2').on('click', function(event) {
+			event.preventDefault();
+			if (!checkForms())
+				return;
+			$('#modalbutton2').attr('disabled', "true");
+			$.ajax({
+				type : "post",
+				url : ctx + "/adminmember/tuikuan",
+				dataType : "json",
+				data : {
+					"rechId" : id,
+					"type" : type,
+					"rech_reason":$('#rech_reason_re').val(),
+					"refund_gold":$('#refund_gold_re').val(),
+					"refund_type":$('#refund_type_re').val(),
+				},
+				success : function(data) {
+					$('#modalbutton2').removeAttr("disabled"); 
+					if (data.success) {
+						layer.msg("状态更改成功")
+						$('#Modal2').modal('hide');
+						$("#recharges").dataTable().fnDraw(true);
+					} else {
+						layer.msg("操作失败")
+						layer.msg(data.msg);
+						$('#Modal2').modal('hide');
+						$("#recharges").dataTable().fnDraw(true);
+					}
+					$("#recharges").dataTable().fnDraw(true);
+				}
+			});
+		});
+	}
+	function checkForms(){
+		var price=$('#refund_gold_re').val();
+		
+		if(!checkRe('decimal',price)){
+			layer.msg("金币输入有误！");return false;
+		}
+		return true;
+	}
+	 function checkRe(type,value){ 
+			console.log(value)
+			if(!value)return true;
+			var patt = /e/;
+			switch(type)
+			{
+			case 'number':
+				patt=/^[0-9]+$/;
+			  break;
+			case 'phone':
+				patt=/^1[34578]\d{9}$/;
+			  break;
+			case 'decimal':
+				patt=/^\d+(\.\d+)?$/
+			  break;
+			default:
+				 break;
+			}
+			return patt.test(value);  
+		}
+
+	//站内信
+	function sentmail(id, type) {
+		if (type == 1) {
+			$("#ModalLabel").text("发站内信");
+			$.ajax({
+				type : "post",
+				url : ctx + "/adminmember/getmember",
+				dataType : "json",
+				data : {
+					"gagaid" : id,
+				},
+				success : function(data) {
+					if (data.success) {
+						$("#mailreceiver").val(
+								data.obj.membNickname + "("
+										+ data.obj.membGagano + ")");
+						$("#receivergagaid").val(data.obj.membGagaid);
+					}
+				}
+			})
+			//$("#mailsender").val('GaGaHi');
+			$("#mailcontent").val('');
+			var content = '<span>发件人：</span><input type="text" id="mailsender" value="GaGaHi"><br><br>'
+					+ '<span>收件人：</span><input type="text" readonly id="mailreceiver"><input type="hidden" id="receivergagaid"><br><br>'
+					+ '<span>内容：</span><span><textarea rows="3" cols="" id="mailcontent"></textarea></span>';
+			$("#bodycontent").html(content);
+			$("#modalbutton")
+					.html(
+							'<button type="button" onclick="sentmail('
+									+ id
+									+ ',2)" class="btn btn-primary">发送  </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+			$('#Modal').modal({
+				keyboard : true
+			});
+		}
+		if (type == 2) {
+			var content = $("#mailcontent").val();
+			var gagaid = $("#receivergagaid").val();
+			if (content == '') {
+				$("#errorbodycontent").html("请输入发送内容");
+				$('#errorModal').modal({
+					keyboard : true
+				});
+				//$("#Modal").modal('hide');
+			} else {
+				//发送站内信
+				$.ajax({
+					type : "post",
+					url : ctx + "/adminmember/sentmsg",
+					dataType : "json",
+					data : {
+						"gagaid" : gagaid,
+						"content" : content
+					},
+					success : function(data) {
+						$("#errorbodycontent").html("发送成功");
+						$('#errorModal').modal({
+							keyboard : true
+						});
+						$("#Modal").modal('hide');
+					}
+				})
+			}
+		}
+	}
+	//发邮件
+	function sentemail(id, type) {
+		if (type == 1) {
+			$("#ModalLabel").text("发邮件");
+
+			$("#emailtheme").val('');
+			$("#emailconten").val('');
+			$.ajax({
+				type : "post",
+				url : ctx + "/adminmember/getmember",
+				dataType : "json",
+				data : {
+					"gagaid" : id,
+				},
+				success : function(data) {
+					if (data.success) {
+						$("#email").val(data.obj.membEmail);
+					}
+				}
+			})
+			var content = '<span>邮箱：</span><input type="text" id="email"><br><br>'
+					+ '<span>主题：</span><input type="text" id="emailtheme"><br><br>'
+					+ '<span>内容：</span><span><textarea rows="3" cols="" id="emailconten"></textarea></span>';
+			$("#bodycontent").html(content);
+			$("#modalbutton")
+					.html(
+							'<button type="button" onclick="sentemail('
+									+ id
+									+ ',2)" class="btn btn-primary">发送  </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+			$('#Modal').modal({
+				keyboard : true
+			});
+		} else {
+			//发送
+			var email = $("#email").val();
+			var emailtheme = $("#emailtheme").val();
+			var emailconten = $("#emailconten").val();
+			$.ajax({
+				type : "post",
+				url : ctx + "/adminmember/emailsent",
+				dataType : "json",
+				data : {
+					"email" : email,
+					"emailtheme" : emailtheme,
+					"emailconten" : emailconten
+				},
+				success : function(data) {
+					if (!data.success) {
+						$("#errorbodycontent").html("发送失败");
+						$('#errorModal').modal({
+							keyboard : true
+						});
+					} else {
+						$("#errorbodycontent").html("发送成功");
+						$('#errorModal').modal({
+							keyboard : true
+						});
+						$("#Modal").modal('hide');
+					}
+				}
+			})
+		}
+	}
+	//是否推荐首页
+	function isrecommend(id, showval, type) {
+		if (showval == 1) {
+			if (type == 1) {
+				$('#Modal').modal({
+					keyboard : true
+				});
+				$("#ModalLabel").text("推荐该用户");
+				$("#bodycontent").html('<span>确定要把该用户推荐到偶遇页？</span>');
+				$("#modalbutton")
+						.html(
+								'<button type="button" onclick="isrecommend('
+										+ id
+										+ ','
+										+ showval
+										+ ',2)" class="btn btn-primary">提交更改  </button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			}
+		}
+		if (showval == 2) {
+			if (type == 1) {
+				$('#Modal').modal({
+					keyboard : true
+				});
+				$("#ModalLabel").text("关闭推荐");
+				$("#bodycontent").html('<span>确定不再把该用户推荐到偶遇页？</span>');
+				$("#modalbutton")
+						.html(
+								'<button type="button" onclick="isrecommend('
+										+ id
+										+ ','
+										+ showval
+										+ ',2)" class="btn btn-primary">提交更改  </button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			}
+		}
+		if (type == 2) {
+			$.ajax({
+				type : "post",
+				url : ctx + "/adminmember/memberupdate",
+				dataType : "json",
+				data : {
+					"membgagaid" : id,
+					"membShowtop" : showval,
+					"membisenable" : isenable
+				},
+				success : function(data) {
+					if (data.success) {
+						$("#Modal").modal('hide');
+						$("#memberinfo").dataTable().fnDraw(false);
+					} else {
+						$("#errorbodycontent").html("操作失败");
+						$('#errorModal').modal({
+							keyboard : true
+						});
+					}
+				}
+			});
+		}
+	}
+	//会员禁用启用
+	function isenable(id, isenable) {
+		if (isenable == 2) {
+			var html = '<button type="button" onclick="isenablesub(' + id + ','
+					+ isenable + ')" class="btn btn-primary">提交更改  </button>';
+			$("#isenablebutton").html(html);
+			$("#disablereson").val("");
+			$('#enableModal').modal({
+				keyboard : true
+			})
+		}
+		if (isenable == 1) {
+			$("#remarktitle").text("启用该用户");
+			var html = '<button type="button" onclick="isenablesub('
+					+ id
+					+ ','
+					+ isenable
+					+ ')" class="btn btn-primary">提交更改  </button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>';
+			$("#openisenablebutton").html(html);
+			var body = '<span>确定要恢复该用户继续使用嘎嘎？</span><br><br><span>备注：</span><span id="remarks"></span>';
+			$("#openenablebodycontent").html(body);
+			$.ajax({
+				type : "post",
+				url : ctx + "/blacklist/getremarks",
+				dataType : "json",
+				data : {
+					"gagaid" : id,
+				},
+				success : function(data) {
+					if (data.success) {
+						$("#remarks").text(data.obj.sbliReason);
+					}
+				}
+			});
+			$('#openenableModal').modal({
+				keyboard : true
+			})
+		}
+	}
+	//会员启用禁用操作
+	function isenablesub(id, isenable) {
+		var disablereson = $("#disablereson").val();
+		$.ajax({
+			type : "post",
+			url : ctx + "/adminmember/memberisenable",
+			dataType : "json",
+			data : {
+				"membgagaid" : id,
+				"remarks" : disablereson,
+				"membisenable" : isenable
+			},
+			success : function(data) {
+				if (data.success) {
+					$('#enableModal').modal('hide');
+					if (isenable == 1) {
+						$('#openenableModal').modal('hide');
+					}
+					$("#memberinfo").dataTable().fnDraw(false);
+				} else {
+					$("#errorbodycontent").html("操作失败");
+					$('#errorModal').modal({
+						keyboard : true
+					});
+				}
+			}
+		});
+
+	}
+	//备注
+	function openremark(id) {
+		$("#remarktitle").text("备注");
+		var html = '<span>备注：</span><span id="remarks"></span>';
+		$("#openenablebodycontent").html(html);
+		var html = '<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>';
+		$("#openisenablebutton").html(html);
+		$.ajax({
+			type : "post",
+			url : ctx + "/blacklist/getremarks",
+			dataType : "json",
+			data : {
+				"gagaid" : id,
+			},
+			success : function(data) {
+				if (data.success) {
+
+					$("#remarks").text(data.obj.sbliReason);
+				}
+			}
+		});
+		$('#openenableModal').modal({
+			keyboard : true
+		})
+	}
+
+	//登录日志
+	function memberlog(id, type) {
+		if (type == 1) {
+			$("#ModalLabelpage").text("登录日志");
+			var tablehtml = '<div class="box">';
+			tablehtml += '<div class="box-body mailbox-messages">';
+			tablehtml += '<table id="memberlog" class="table table-bordered table-hover">';
+			tablehtml += '<thead>';
+			tablehtml += '<tr><th>序号</th><th>会员昵称</th><th>GAGA号</th><th>日期</th><th>IP</th><th>地址</th></tr></thead></table></div></div>';
+			$("#bodycontentpage").html(tablehtml);
+			$("#modalbuttonpage").html(
+					'<button type="button" onclick="memberlog(' + id
+							+ ',2)" class="btn btn-primary">确定  </button>');
+
+			logs(id);
+			$('#Modalpage').modal({
+				keyboard : true
+			});
+		}
+		if (type == 2) {
+			$('#Modalpage').modal('hide');
+		}
+	}
+
+	function logs(id) {
+		$("#memberlog").dataTable({
+			"bStateSave" : true,
+			"paging" : true,
+			//"processing": true,
+			"serverSide" : true,
+			"lengthChange" : false,
+			"searching" : false,
+			"ordering" : true,
+			"info" : true,
+			"autoWidth" : false,
+			"pageLength" : 10,
+			//"ajax" : ctx+"/adminmember/notauditedimgList",
+			"fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+				var gagaidorname = $("#gagaidorname").val();
+				aoData.push({
+					"name" : "gagaid",
+					"value" : id
+				})
+				//aoData=gagaidorname; 
+				oSettings.jqXHR = $.ajax({
+					"dataType" : 'json',
+					"type" : "POST",
+					"url" : ctx + "/adminmember/loginlog",
+					"data" : aoData,
+					"success" : fnCallback
+				});
+			},
+			"columns" : [ {
+				"data" : "meloId",
+				"bSortable" : false
+			}, {
+				"data" : "member.membNickname",
+				"bSortable" : false
+			}, {
+				"data" : "member.membGagano",
+				"bSortable" : false
+			}, {
+				"data" : "meloTime",
+				"bSortable" : false
+			}, {
+				"data" : "meloIp",
+				"bSortable" : false
+			}, {
+				"data" : "meloCountry",
+				"bSortable" : false
+			} ],
+			"columnDefs" : [ {
+				"targets" : 4,
+				"data" : "meloIp",
+				"render" : function(data, type, full, meta) {
+					if (data == null) {
+						data = ""
+					}
+					return data;
+				}
+			}, {
+				"targets" : 5,
+				"data" : "meloCountry",
+				"render" : function(data, type, full, meta) {
+					if (data == null) {
+						data = ""
+					}
+					return data;
+				}
+			} ]
+		});
+		var table = $('#memberlog').DataTable();
+		table.on('order.dt search.dt', function() {
+			//获取页信息
+			//debugger
+			var page = table.page.info();
+			table.column(0, {}).nodes().each(function(cell, i) {
+				cell.innerHTML = page.page * page.length + i + 1;
+			});
+		}).draw();
+	}
+	//详情
+	function getmember(id, type) {
+		if (type == 1) {
+			$("#ModalLabel").text("用户详情");
+			$
+					.ajax({
+						type : "post",
+						url : ctx + "/adminmember/getmember",
+						dataType : "json",
+						data : {
+							"gagaid" : id,
+						},
+						success : function(data) {
+							if (data.success) {
+								var contry = data.obj.country;
+								var language = data.obj.membLanguage;
+								var levetime = data.obj.memberfinance.mefiLevelendtime;
+								var email = data.obj.membEmail;
+								if (contry == null || contry == '') {
+									contry = "";
+								}
+								if (language == null || language == '') {
+									language = "";
+								}
+								if (levetime == null || levetime == '') {
+									levetime = "";
+								} else {
+									var date = new Date(levetime);
+									levetime = date.getFullYear() + "-"
+											+ (date.getMonth() + 1) + "-"
+											+ date.getDate();
+								}
+								if (email == null || email == '') {
+									email = "";
+								}
+								var mefiSystranslate = data.obj.memberfinance.mefiSystranslate;
+								var mefiTranslate = data.obj.memberfinance.mefiTranslate;
+								var mefiFritranslate = data.obj.memberfinance.mefiFritranslate;
+								if (mefiSystranslate == null
+										|| mefiSystranslate == '') {
+									mefiSystranslate = 0;
+								}
+								if (mefiTranslate == null
+										|| mefiTranslate == '') {
+									mefiTranslate = 0;
+								}
+								if (mefiFritranslate == null
+										|| mefiFritranslate == '') {
+									mefiFritranslate = 0;
+								}
+								var trannum = parseInt(mefiSystranslate)
+										+ parseInt(mefiTranslate)
+										+ parseInt(mefiFritranslate);
+
+								var body = '<span>金币数：'
+										+ data.obj.memberfinance.mefiGold
+										+ '</span><br><span>语言：' + language
+										+ '</span><br><span>国家：' + contry
+										+ '</span><br><span>性别：'
+										+ data.obj.showsex
+										+ '</span><br><span>邮箱：' + email
+										+ '</span><br><span>免费翻译字符数：'
+										+ data.obj.memberfinance.alltransnum
+										+ '</span><br><span>等级：'
+										+ data.obj.memberfinance.showlevel
+										+ '</span><br><span>会员过期日期：' + levetime
+										+ '</span><br>';
+								$("#bodycontent").html(body);//$("#remarks").text(data.obj.sbliReason);
+							}
+						}
+					});
+			$("#bodycontent").html('<span>确定要把该用户推荐到偶遇页？</span>');
+			$("#modalbutton").html(
+					'<button type="button" onclick="getmember(' + id
+							+ ',2)" class="btn btn-primary">确定  </button>');
+			$('#Modal').modal({
+				keyboard : true
+			});
+		}
+		if (type == 2) {
+			$('#Modal').modal('hide');
+		}
+	}
+
+	//全信息删除
+	function deleteAllMsg(id) {
+		if (!confirm("确认删除此会员相关信息吗？")) {
+			return;
+		}
+		$.ajax({
+			type : "post",
+			url : ctx + "/adminmember/deleteAllMsg",
+			dataType : "json",
+			data : {
+				"gagaid" : id,
+			},
+			success : function(data) {
+				if (data.success) {
+					$("#memberinfo").dataTable().fnDraw(false);
+				} else {
+					$("#errorbodycontent").html("操作失败");
+					$('#errorModal').modal({
+						keyboard : true
+					});
+				}
+			}
+		});
+	}
+	
+	//打赏
+	function dashang(id, type) {
+		if (type == 1) {
+			$("#ModalLabelpage").text("打赏记录");
+			var content = '<div class="box"><span>打赏对象：</span><input type="text" id="targetGagano">'
+			+'<span>打赏时间：</span><input type="text" id="startRetime"> 至 <input type="text" id="endRetime">	<button type="button" class="btn btn-primary" onclick="dashangsearch('+id+')" > 查询</button></div> ' ;
+			var tablehtml = '<div class="box">';
+			tablehtml += '<div class="box-body mailbox-messages">';
+			tablehtml += '<table id="dashangs" class="table table-bordered table-hover">';
+			tablehtml += '<thead>';
+
+			tablehtml += '<tr><th>序号</th><th>GAGA号</th><th>打赏金币</th><th>打赏对象</th><th>打赏类型</th><th>打赏时间</th></tr></thead></table></div></div>';
+			$("#bodycontentpage").html(content+tablehtml);
+			$("#modalbuttonpage").html(
+					'<button type="button" onclick="recharge(' + id + ',2)" class="btn btn-primary">确定  </button>');
+			dashanglist(id);
+			$('#Modalpage').modal({
+				keyboard : true
+			});
+		}
+		if (type == 2) {
+			$('#Modalpage').modal('hide');
+		}
+	
+	 }
+	
+	function dashanglist(id){
+		 $('#startRetime').datepicker({format: 'yyyy-mm-dd',defaultDate : new Date(),language: 'zh-CN' });
+		 $('#endRetime').datepicker({format: 'yyyy-mm-dd',defaultDate : new Date(),language: 'zh-CN' });
+		var layinx1;
+		var td=$("#dashangs").dataTable(
+				{
+					"bStateSave" : true,
+					"paging" : true,
+					//"processing": true,
+					"serverSide" : true,
+					"lengthChange" : false,
+					"searching" : false,
+					"ordering" : true,
+					"info" : true,
+					"autoWidth" : false,
+					"pageLength" : 10,
+					"bLengthChange" : true,
+					//"ajax" : ctx+"/adminmember/notauditedimgList",
+					"fnServerData" : function(sSource, aoData, fnCallback,oSettings) {
+						aoData.push(
+								{"name" : "gagaId","value" : id },
+								{"name" : "startRetime","value" :  $('#startRetime').val()  },
+								{"name" : "endRetime","value" :  $('#endRetime').val()  },
+								{"name" : "targetGagano","value" : $('#targetGagano').val() }
+						);
+						
+						//aoData=gagaidorname; 
+						layinx1 = layer.load(1, {
+							shade : 0.3
+						});
+						 var url=(td)?(ctx + "/Module/rewardList"):"#";
+						oSettings.jqXHR = $.ajax({
+							"dataType" : 'json',
+							"type" : "POST",
+							"url" : url ,
+							"data" : aoData,
+							"success" : fnCallback
+						});
+					},
+					"columns" : [ {
+						"data" : "re_id",
+						"bSortable" : false
+					}, {
+						"data" : "memb_gagano",
+						"bSortable" : false
+					}, {
+						"data" : "re_gold",
+						"bSortable" : false
+					}, {
+						"data" : "targetGagano",
+						"bSortable" : false
+					}, {
+						"data" : "re_type",
+						"bSortable" : false
+					}, {
+						"data" : "re_time",
+						"bSortable" : false
+					}],
+					"columnDefs" : [
+							{
+								"targets" : 5,
+								"render" : function(data, type, full, meta) {
+								 	if(data!=null){
+				                		var longtime=new Date(data).getTime();
+				                		date=new Date(longtime);
+				                   	 return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+				                	}
+								}
+							},{
+								"targets" : 4,
+								"render" : function(data, type, full, meta) {
+								 	if(data==1){return '聊天打赏'}
+								 	if(data==2){return '动态打赏'}
+								}
+							},
+							
+					],
+					"fnDrawCallback" : function(oSettings) {
+						layer.close(layinx1);
+					}
+				});
+		//序号相关
+		var table = $('#dashangs').DataTable();
+		table.on('order.dt search.dt', function() {
+			//获取页信息
+			//debugger
+			var page = table.page.info();
+			table.column(0, {}).nodes().each(function(cell, i) {
+				cell.innerHTML = page.page * page.length + i + 1;
+			});
+		}).draw();
+	}
+	function dashangsearch(){
+		$("#dashangs").dataTable().fnDraw(true);
+	}
+	//个性签名重置
+	function resetSignature(id) {
+		$.ajax({
+			type : "post",
+			url : ctx + "/adminmember/resetSignature",
+			dataType : "json",
+			data : {"gagaId" : id},
+			success : function(data) {
+				if (data.success) {
+					$("#memberinfo").dataTable().fnDraw(false);
+				} else {
+					$("#errorbodycontent").html("操作失败");
+					$('#errorModal').modal({
+						keyboard : true
+					});
+				}
+			}
+		});
+	}
+	
+	
+</script>
+</body>
+</html>

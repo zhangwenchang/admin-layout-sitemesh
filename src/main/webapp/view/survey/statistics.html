@@ -1,0 +1,23 @@
+<div id="App" class="right-model">
+    <div ng-controller="AppController" class="right-model-content">
+
+
+
+
+
+
+
+
+
+        <div>名字：{{name}}</div>
+        <div>价格：{{price}}</div>
+    </div>
+</div>
+<script>
+    var app=angular.module('App',[]);
+    app.controller('AppController',function($scope){
+        $scope.name='笑话';
+        $scope.price='99';
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+</script>

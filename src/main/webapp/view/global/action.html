@@ -1,0 +1,526 @@
+<style type="text/css">
+.giftReal-t td { padding: 6px; }
+.ylt1, .ylt2, .ylt3, .ylt4, .ylt5 { max-height: 100px; }
+.edit-img-box { position: relative; display: none; }
+.edit-img-box span { width: 15px; height: 15px; position: absolute; background: #f00; right: 0; text-align: center;  line-height: 16px;  color: #FFF; cursor: pointer;  }
+.edit-img-box.have { display: inline-block; }
+</style>
+<section class="content-header">
+	<h1>
+		活动配置<small></small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>全局配置</li>
+		<li class="active">活动配置</li>
+	</ol>
+</section>
+
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<!-- 头部操作菜单 -->
+				<form class="form-horizontal">
+					<div class="box-footer">
+						<button type="button" class="btn btn-primary" onclick="addAction()">添加</button>
+						<!--<button type="button" class="btn btn-primary" onclick="batchdel(false)">删除</button>
+						<button type="button" class="btn btn-primary" onclick="gotogclist()">分类管理</button>-->
+						<button type="button" class="btn btn-primary" onclick="reload()">刷新</button>									
+					</div>
+				</form>
+
+				<!-- 列头 -->
+				<div class="box-body mailbox-messages">
+					<table id="privatemodellist" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th>活动名称</th>
+								<th>开始时间</th>
+								<th>结束时间</th>
+								<th>活动折扣</th>
+								<th>是否启用</th>								
+								<th>操作</th>
+							</tr>
+						</thead>
+						
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- 编辑弹窗 -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width:820px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton"></div>
+		</div>
+	</div>
+</div>
+
+<!-- 提示弹窗 -->
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel1"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent1">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton1"></div>
+		</div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+/**
+ * 查询
+ */
+function search(){
+	$("#privatemodellist").dataTable().fnDraw(true);
+}
+
+
+function gotogclist(){
+	 window.location.href = ctx + "/welcome.html?po=48"; 
+}
+
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        $("#privatemodellist").dataTable({
+        	"bStateSave": true,
+        	"paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "info": true,
+            "autoWidth": false,
+            "ordering": true,
+            "pageLength":33,//分页长度
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	           	          
+	        	layer.load(1, {shade: 0.3});
+	        	oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",	
+	              "url": ctx+"/SysActiveConfig/list",
+	              "data": aoData,
+	              "success": fnCallback
+	        	});
+	        },
+	        "columns": [//排序、赋值
+				{"data": "sacoId","bSortable": false },				
+				{"data": "sacoRemark","bSortable": false},
+				{"data": "sacoStime","bSortable": false },
+				{"data": "sacoEtime","bSortable": false},
+				{"data": "sacoDiscount","bSortable": false },
+				{"data": "sacoIsenable","bSortable": false},
+				{"data": "sacoId","bSortable": false}
+	        ],
+	        "columnDefs": [{
+	        		"targets": 2,
+					"data": "sacoStime",
+					"render": function ( data, type, full, meta ) {
+						 //return data?(new Date(data).format('yyyy-MM-dd hh:mm:ss', true)):'';
+						 return data?(new Date(data).format('yyyy-MM-dd hh:mm:ss')):'';
+					}   
+				},{
+	        		"targets": 3,
+					"data": "sacoEtime",
+					"render": function ( data, type, full, meta ) {
+						 //return data?(new Date(data).format('yyyy-MM-dd hh:mm:ss', true)):'';
+						 return data?(new Date(data).format('yyyy-MM-dd hh:mm:ss')):'';
+					}   
+				},{//特殊数据
+	        		"targets": 5,//复选框
+					"data": "sacoId",
+					"render": function ( data, type, full, meta ) {
+						 return data==1?'启用':'禁用';
+					}   
+				},{
+	        		"targets": 6,//操作 '+'   '+'<a href="javascript:void(0)" onclick="del('+data+')">删除</a>
+					"data": "sacoId",
+					"render": function ( data, type, full, meta ) {
+						 return '<a href="javascript:void(0)" sacoId="'+data+'" sacoRemark="'+full.sacoRemark+'" sacoStime="'+full.sacoStime+'" sacoEtime="'+full.sacoEtime+'" sacoIsenable="'+full.sacoIsenable+'" sacoDiscount="'+full.sacoDiscount+'" onclick="openAdd(this)">编辑</a>';
+					}
+				}
+			],
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+            	$(".mailbox-messages input[type='checkbox']").iCheck({
+	            	checkboxClass: 'icheckbox_flat-blue',
+	                radioClass: 'iradio_flat-blue'
+	            });
+	            layer.closeAll();            	
+            	$("#privatemodellist .fa").removeClass('fa-check-square-o').addClass('fa-square-o');
+            }
+	    });
+		$(".checkbox-toggle").click(function() {//复选框全选/反选
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+			    $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+			    $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+        //序号相关
+        var table = $('#privatemodellist').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML += page.page*page.length+ i+1;
+            });
+        }).draw();
+   });
+});
+
+
+/**
+ * 刷新
+ */
+function reload(){
+	window.location.reload();//刷新当前页面.
+}
+
+/**
+ * 编辑
+ */
+function openAdd(obj){
+	var $obj = $(obj);
+	var count = "";
+	var gid = "";
+
+	count += "<table class='giftReal-t'>";
+	count +="<tr><td width='75'>ID:</td><td>"+ $obj.attr('sacoid') +"<input id='sacoid' type='hidden' value='"+ $obj.attr('sacoid') +"'></td></tr>";
+	count +="<tr><td>活动名称:</td><td><input type='text' id='sacoremark' value='" + $obj.attr('sacoremark') + "'/></td></tr>";
+	count +="<tr><td>开始时间:</td><td><input type='text' id='sacostime' value='" + new Date($obj.attr('sacostime')).format('yyyy-MM-dd hh:mm:ss') + "'></td></tr>";
+	count +="<tr><td>结束时间:</td><td><input type='text' id='sacoetime' value='" + new Date($obj.attr('sacoetime')).format('yyyy-MM-dd hh:mm:ss') + "'/></td></tr>";
+	count +="<tr><td>折扣:</td><td><input type='text' id='sacodiscount' value='" + $obj.attr('sacodiscount') + "'/></td></tr>";
+	count +="<tr><td>是否启用:</td><td><input type='checkbox' id='sacoisenable' " + ($obj.attr('sacoisenable')==1?'checked="checked"':'') + "/></tr>";
+	count += "</table>";
+	$("#ModalLabel").text("活动编辑");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(2)" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	$('#sacostime').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true,
+        startDate: $('#sacostime').val()
+      });
+	$('#sacoetime').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true,
+        startDate: $('#sacoetime').val()
+      });	
+}
+
+//添加
+function addAction() {
+	var count = "";
+	var gid = "";
+
+	count += "<table class='giftReal-t'>";
+	count +="<tr><td width='75'>ID:</td><td><input id='sacoid' type='hidden'></td></tr>";
+	count +="<tr><td>活动名称:</td><td><input type='text' id='sacoremark' /></td></tr>";
+	count +="<tr><td>开始时间:</td><td><input type='text' id='sacostime1' ></td></tr>";
+	count +="<tr><td>结束时间:</td><td><input type='text' id='sacoetime1' /></td></tr>";
+	count +="<tr><td>折扣:</td><td><input type='text' id='sacodiscount' /></td></tr>";
+	count +="<tr><td>是否启用:</td><td><input type='checkbox' id='sacoisenable' /></tr>";
+	count += "</table>";
+	$("#ModalLabel").text("活动编辑");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(1)" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	$('#sacostime1').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true
+      });
+	$('#sacoetime1').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true
+      });	
+}
+
+//调用接口
+function add(type) {		
+	var sacoid = $('#sacoid').val();
+	var sacoremark = $('#sacoremark').val();
+	var sacostime = type==2?$('#sacostime').val():$('#sacostime1').val();
+	var sacoetime = type==2?$('#sacoetime').val():$('#sacoetime1').val();
+	var sacodiscount = $('#sacodiscount').val();
+	var sacoisenable = $('#sacoisenable').is(':checked')?'1':'0';
+
+	var method = ctx + '/SysActiveConfig/' + (type==1?'addActiveConfig':'updateActiveConfig');
+	var data = {
+		'sacoRemark': sacoremark,
+		'sacoStime': sacostime,
+		'sacoEtime': sacoetime,
+		'sacoDiscount': sacodiscount,
+		'sacoIsenable': sacoisenable,
+	};
+	if (type == 2) {
+		data.sacoId = sacoid;
+	}
+	
+	$.ajax({
+	    type: "post",
+	    url: method,
+	    dataType: "json",
+	    async: false,
+	    data: data,
+	    success: function(data) {
+	        if (data.success) {
+	        	$("#privatemodellist").dataTable().fnDraw(true);
+		    	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>成功！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});
+	        } else {
+	        	layer.msg(data.msg);
+	        }
+	    },
+	    error: function(data) {
+	    	layer.msg(data.msg);
+	    }
+	});
+}
+function del(id) {
+	if (!id) {
+		return;
+		layer.msg('参数错误');
+	}
+	$.ajax({
+	    type: "post",
+	    url: ctx + '/SysActiveConfig/delActiveConfig',
+	    dataType: "json",
+	    async: false,
+	    data: {
+	    	sacoId: id
+	    },
+	    success: function(data) {
+	        if (data.success) {
+	        	$("#privatemodellist").dataTable().fnDraw(true);
+		    	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>成功！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});
+	        } else {
+	        	layer.msg(data.msg);
+	        }
+	    },
+	    error: function(data) {
+	    	layer.msg(data.msg);
+	    }
+	});
+}
+
+/**
+ * 编辑
+ */
+function openEdit(gid,ggid){
+	var count = "";
+	var giftReal = "";//被复制的对象
+	var listimg = "";
+	var gclist = "";
+	$.ajax({
+        type: "post",
+        url: ctx + "/Giftreal/openAddByGireGiftid",
+        dataType: "json",
+        async: false,
+        data: {"gid": gid,"ggid":ggid},
+        success: function(data) {
+        	if (data.success) {
+        		giftReal = data.obj.giftReal;
+        		listimg = data.obj.listimg;
+        		gclist = data.obj.gclist2;
+        	}
+        }
+    });
+	
+	var image1,image2,image3,image4,image5;//上传空间是否可用
+	var imagesrc1="<div class='edit-img-box'><span>X</span><img class='ylt1' width='120'/></div>",
+	imagesrc2="<div class='edit-img-box'><span>X</span><img class='ylt2' width='120'/></div>",
+	imagesrc3="<div class='edit-img-box'><span>X</span><img class='ylt3' width='120'/></div>",
+	imagesrc4="<div class='edit-img-box'><span>X</span><img class='ylt4' width='120'/></div>",
+	imagesrc5="<div class='edit-img-box'><span>X</span><img class='ylt5' width='120'/></div>";//上传空间是否可用
+	var lanage1,lanage2,lanage3,lanage4,lanage5,lanage6,lanage7,lanage8;//语言下拉框
+	
+	var imgHtml = '';
+	for(var i = 0;i < listimg.length;i++){
+		if(listimg[i].grimSort == "1"){
+			image1 = "disabled";
+			imagesrc1 = "<div class='edit-img-box have'><span>X</span><img class='ylt1' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";			
+		}else if(listimg[i].grimSort == "2"){
+			image2 = "disabled";
+			imagesrc2 = "<div class='edit-img-box have'><span>X</span><img class='ylt2' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "3"){
+			image3 = "disabled";
+			imagesrc3 = "<div class='edit-img-box have'><span>X</span><img class='ylt3' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "4"){
+			image4 = "disabled";
+			imagesrc4 = "<div class='edit-img-box have'><span>X</span><img class='ylt4' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "5"){
+			image5 = "disabled";
+			imagesrc5 = "<div class='edit-img-box have'><span>X</span><img class='ylt5' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}
+	}
+	imgHtml = imagesrc1 + imagesrc2 + imagesrc3 + imagesrc4 + imagesrc5;
+	switch(giftReal.gireLanage){
+		case "zh-cn":
+			lanage1 = "selected='selected'";
+		break;
+		case "zh-tw":
+			lanage2 = "selected='selected'";
+		break;
+		case "en-us":
+			lanage3 = "selected='selected'";
+		break;
+		case "de-de":
+			lanage4 = "selected='selected'";
+		break;
+		case "es-es":
+			lanage5 = "selected='selected'";
+		break;
+		case "ru-ru":
+			lanage6 = "selected='selected'";
+		break;
+		case "ja-jp":
+			lanage7 = "selected='selected'";
+		break;
+		case "ko-kr":
+			lanage8 = "selected='selected'";
+		break;
+		default:
+	}
+	
+	count += "<table><tr><td>" + imgHtml + "</td></tr></table>";
+	
+	count += "<table>";
+	count +="<tr><td>ID:</td><td>"+ ggid +"<input id='gireGiftid' type='hidden' value='"+ ggid +"'>"
+		+"<input id='gid' type='hidden' value='"+ gid +"'></td></tr>";
+	
+	count +="<tr><td>语言:</td><td><select id='gireLanage'>"
+		+"<option value='zh-cn' "+ lanage1 +">zh-cn</option>"
+		+"<option value='zh-tw' "+ lanage2 +">zh-tw</option>"
+		+"<option value='en-us' "+ lanage3 +">en-us</option>"
+		+"<option value='de-de' "+ lanage4 +">de-de</option>"
+		+"<option value='es-es' "+ lanage5 +">es-es</option>"
+		+"<option value='ru-ru' "+ lanage6 +">ru-ru</option>"
+		+"<option value='ja-jp' "+ lanage7 +">ja-jp</option>"
+		+"<option value='ko-kr' "+ lanage8 +">ko-kr</option>"
+		+"</select></td></tr>";
+
+	count +="<tr><td>类别:</td><td><select id='gireCategoryid'>";
+	if(null != gclist && gclist.length > 0){
+		for(var i = 0;i < gclist.length;i++ ){
+			var selected = "";
+			if(null != gclist && gclist[i].gicaId == giftReal.gireCategoryid 
+					&& gclist[i].gicaLanguage == giftReal.gireLanage){
+				selected = "selected='selected'";
+			}
+			count += "<option value=\""+ gclist[i].gicaId +"\" "+ selected +">"+ gclist[i].gicaName +"</option>";
+		}
+	}
+	count += "</select></td></tr>";
+	
+	count +="<tr><td>名称:</td><td><input type='text' id='gireName' value='"+ giftReal.gireName +"'/></td></tr>";
+	count +="<tr><td>默认赠言:</td><td><textarea id='gireGreeting'>"+giftReal.gireGreeting+"</textarea></td></tr>";
+	count +="<tr><td>材料:</td><td><input type='text' id='gireMaterial' value='"+ giftReal.gireMaterial +"'/></td></tr>";
+	count +="<tr><td>金币:</td><td><input type='text' id='gireGold' value='"+ giftReal.gireGold +"'/></td></tr>";
+	count +="<tr><td>排序:</td><td><input type='text' id='gireSort' value='"+ giftReal.gireSort +"'/></td></tr>";
+	var read ="";
+	if(null != giftReal.girePlatsource && $.trim(giftReal.girePlatsource).length > 0){
+		read = "readonly='readonly'";
+	}
+	count +="<tr><td>购买链接:</td><td><input type='text' id='girePlatsource' value='"+ giftReal.girePlatsource +"' "+ read +" />（第三方网站，便于后期采购）</td></tr>";
+	
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img1' onchange='upload(this,1)' "+ image1 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img2' onchange='upload(this,2)' "+ image2 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img3' onchange='upload(this,3)' "+ image3 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img4' onchange='upload(this,4)' "+ image4 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img5' onchange='upload(this,5)' "+ image5 +"/></td></tr>";
+	//编辑框
+	count +="<tr><td>商品详情:</td><td><textarea id='compose-textarea' class='form-control'>"+ giftReal.gireDescription +"</textarea></td></tr>";
+	
+	count += "</table>";
+	$("#ModalLabel").text("添加真实礼物");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(false)" class="btn btn-primary">添加 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	$("#compose-textarea").wysihtml5();//为编辑框初始化
+
+	$('.edit-img-box span').click(function() {
+		var $del = $(this);
+		var imgid = $(this).next('img').attr('gimgid')
+		var _index = $(this).next('img').attr('class').replace('ylt', '');
+		var $selBtn = $('#img' + _index);
+		if (imgid) {
+			$.ajax({
+				url: ctx + "/Giftreal/delImg",
+				type: 'post',
+				dataType: 'json',
+				data: {grimId: imgid},
+			})
+			.done(function() {
+				$del.parent().removeClass('have').find('img').removeAttr('src');
+				$selBtn.removeAttr('disabled');
+			})
+			.fail(function() {
+				layer.msg('删除图片失败');
+			});		
+		} else {
+			layer.msg('图片id不存在');
+		}
+	})
+}
+
+</script>
+

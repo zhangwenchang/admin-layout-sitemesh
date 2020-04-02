@@ -1,0 +1,97 @@
+#newInvitationApp .top_nav{
+    width: 100%;
+    height: 42px;
+    margin-bottom: 16px;
+}
+#newInvitationApp .new_echarts .echarts_top{
+    width: 100%;
+    height: 55px;
+    font-size: 18px;
+    border-bottom: solid 1px #e6e6e6;
+    /*border-bottom: none;*/
+    line-height: 36px;
+    position: relative;
+    padding-left: 1%;
+}
+#newInvitationApp #new_times{
+    width: 200px;
+    position: absolute;
+    /*top: 12px;*/
+    right: 195px;
+    font-size: 18px;
+    display: inline-block;
+    height: 35px;
+    text-align: center;
+}
+#newInvitationApp .new_echarts .echarts_top ul{
+    display: inline-block;
+    overflow: hidden;
+    position: absolute;
+    top: 0px;
+    height: 35px;
+}
+#newInvitationApp .new_echarts .echarts_top ul li{
+    float: left;
+}
+#newInvitationApp .top_nav ul{
+    width: 30%;
+    height: 100%;
+    overflow: hidden;
+}
+#newInvitationApp .top_nav ul li{
+    width: 50%;
+    height: 100%;
+    float: left;
+    /*background-color: #00a2d4;*/
+    border: solid #cccccc 1px;
+    line-height: 42px;
+    text-align: center;
+}
+#newInvitationApp .top_nav ul li .user_active{
+    background-color: #00a7d0;
+    color: #ffffff;
+}
+#newInvitationApp .top_nav ul li:first-child{
+    border-right: none;
+}
+#newInvitationApp .top_nav ul li a{
+    display: inline-block;
+    color: #0e0e0e;
+    width: 100%;
+    height: 100%;
+    font-size: 17px;
+}
+#newInvitationApp #yingxiaoType{
+    width: 150px;
+    height: 35px;
+    position: absolute;
+    right: 404px;
+}
+#newInvitationApp .type_nums{
+    width: 180px;
+    border: solid 1px #7a869d;
+   /*position: absolute;*/
+    right: 4px;
+}
+#newInvitationApp .type_nums li a{
+    display: inline-block;
+    width: 59px;
+    text-align: center;
+    height: 100%;
+    color: #0c0c0c;
+}
+#newInvitationApp .type_nums li:nth-child(2) a{
+    border-right: solid 1px #7a869d;
+    border-left: solid 1px #7a869d;
+
+}
+#newInvitationApp .type_nums li .user_active{
+    background-color: #00a7d0;
+    color: #ffffff;
+}
+/*统计表格样式*/
+#newInvitationApp .new_table .table_top{
+
+}
+
+

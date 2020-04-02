@@ -1,0 +1,378 @@
+<style type="text/css">
+.fleft-item{ float: left; margin-right: 24px; }
+.box-tools.fleft-item { position: static; right: inherit;  margin-left: 32px;  position: relative;  top: 2px;}
+</style>
+<section class="content-header">
+    <h1>字符管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>会员管理</li>
+        <li class="active">字符管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+			  <div class="box-header">
+	              <button type="button" onclick="userAdd()" class="btn btn-primary fleft-item">添加</button>
+	              <div class="box-tools fleft-item">
+	                      <div class="input-group" style="width: 200px;">
+	                        <input name="table_search" id="query_gagaNo" class="form-control input-sm pull-right" placeholder="账号" type="text">
+	                        <div class="input-group-btn">
+	                          <button class="btn btn-sm btn-default" onclick="search()"><i class="fa fa-search"></i></button>
+	                        </div>
+	                      </div>
+	              </div>
+              </div>
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th>ID</th>
+                  <th>字符类型</th>
+                  <th>字符价格</th>
+                  <th>字符总数</th>
+                  <th>已用字符</th>
+                  <th>创建时间</th>
+                  <th>操作</th>
+                  </tr>
+                  </thead>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 ], function() {
+
+        var t=$("#tableData").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 20,
+
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                aoData.push({
+                	"name": "gagaNo",
+                    "value": $("#query_gagaNo").val()
+                    })
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/adminmember/chars/pageList",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "tradeId",
+                "bSortable": false
+            }, {
+                "data": "goodsId",
+                "bSortable": false
+            }, {
+                "data": "goodsType",
+                "bSortable": false,
+                "render": function(data, type, full, meta) {
+                	switch(data){
+	                	case 2:
+	                		return "字符包";
+		                case 3:
+		            		return "VIP1500";
+		            }
+                    return data;
+                }
+            },{
+                "data": "price",
+                "bSortable": false
+            }, {
+                "data": "maxAmount",
+                "bSortable": false
+            }, {
+                "data": "usedAmount",
+                "bSortable": false
+            }, {
+                "data": "buyTime",
+                "bSortable": false,
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            }, {
+                "data": "",
+                "bSortable": false,
+                "render": function ( data, type, full, meta ) {
+                	var _html = "<a href='javascript:void(0)' onclick=editView('"+full.tradeId+"')>编辑</a>";
+                	return _html;
+       			 }
+            }],
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+    });
+});
+
+<!-- 添加字符中的角色列表 -->
+function userAdd(){
+	$('#userAddModal').modal({keyboard: true});
+}
+
+<!-- 添加字符提交  -->
+$('#userAddModal').find('[field="userAddTj"]').click(function(){	
+	var _gagaNo=$("#gagaNo").val();
+	var _goodsType=$("#goodsType").val();
+	var _maxAmount=$("#maxAmount").val();
+	var _price=$("#price").val();
+	if(!goodsType || !_maxAmount || !_price|| !_gagaNo){
+		$.msg("不能为空!");
+		return;
+	}
+	var _goodsId;
+	//通过goodsType->goodsId
+	if(_goodsType==3){
+		_goodsId="3bd1e36472024926b9a5dafbe8071e58";
+	}else{
+	}
+	$.ajax({
+		type : "post",
+		url : ctx+"/adminmember/chars/add",
+		dataType : "json",
+		data:{
+			gagaNo: _gagaNo,
+			goodsType: _goodsType,
+			maxAmount: _maxAmount,
+			price: _price,
+			goodsId: _goodsId
+		},
+		success : function(data) {
+			if(data.success){
+				$.msg("操作成功");
+				$('#userAddModal').find('[field="closeModal"]').click();
+				search();
+			}else{
+				$.msg(data.msg);
+			}
+		}
+	})
+});
+
+function search() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+
+$('#userAddModal').on('hidden.bs.modal', function (e) {
+	 var _this = $('#userAddModal');
+	 _this.find("#gagaNo").val("");
+	 _this.find("#maxAmount").val("");
+	 _this.find("#price").val(0);
+	})
+<!-- 编辑字符 -->
+function editView(_tradeId){
+	$.ajax({
+		type : "post",
+		url : ctx+"/adminmember/chars/getById",
+		dataType : "json",
+		data:{
+			tradeId: _tradeId
+		},
+		success : function(data) {
+			if(data.success){
+				var _obj = data.obj;
+				var _this = $('#editModal');
+				_this.find("#tradeId").val(_obj.tradeId);
+				_this.find("#maxAmount").val(_obj.maxAmount);
+				_this.find("#usedAmount").val(_obj.usedAmount);
+				$('#editModal').modal({keyboard: true});
+			}else{
+				$.msg("操作失败");
+			}
+		}
+	})
+}
+$('#editModal').find('[field="editTj"]').click(function(){
+	var _this = $('#editModal');
+	var _tradeId = _this.find("#tradeId").val();
+	var _usedAmount = _this.find("#usedAmount").val();
+	var _maxAmount = _this.find("#maxAmount").val();
+	$.ajax({
+		type : "post",
+		url : ctx+"/adminmember/chars/modify",
+		dataType : "json",
+		data:{
+			tradeId: _tradeId,
+			usedAmount: _usedAmount
+		},
+		success : function(data) {
+			if(data.success){
+				$.msg("操作成功");
+				$('#editModal').find('[field="closeModal"]').click();
+				search();
+			}else{
+				$.msg(data.msg);
+			}
+		}
+	})
+});
+function deleteById(_tradeId){
+	$.ajax({
+		type : "post",
+		url : ctx+"/adminmember/chars/delete",
+		dataType : "json",
+		data:{
+			tradeId: _tradeId
+		},
+		success : function(data) {
+			if(data.success){
+				$.msg("操作成功");
+				search();
+			}else{
+				$.msg(data.msg);
+			}
+		}
+	})
+}
+</script>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="userAddModal" tabindex="-1" user="dialog"
+	aria-labelledby="userAddModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="userAddModalLabel">添加字符</h4>
+			</div>
+			<div class="modal-body" id="userAddModalCon">
+				<!-- 模态内容 -->
+				<form user="form">
+					<div class="box-body">
+						<div class="form-group" field="role">
+							<label for="goodsType">类型：</label><select class="form-control"  id="goodsType">
+								<option value="3">VIP1500</option>
+		                  	</select>
+						</div>
+						<div class="form-group">
+							<label for="maxAmount">数量：</label> <input type="text"
+								class="form-control" id="maxAmount">
+						</div>
+						<div class="form-group">
+							<label for="price">总价：</label> <input type="text"
+								class="form-control" id="price" value="0">
+						</div>
+						<div class="form-group">
+							<label for="gagaNo">账号：</label> <input type="text"
+								class="form-control" id="gagaNo">
+						</div>
+					</div>
+					<!-- /.box-body -->
+
+					<div class="box-footer"></div>
+				</form>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"
+					field="closeModal">关闭</button>
+				<button type="button" class="btn btn-primary" field="userAddTj">提交</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- /.modal -->
+<!-- 编辑模态框（Modal） -->
+<div class="modal fade" id="editModal" tabindex="-1" user="dialog"
+	aria-labelledby="editModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="editModalLabel">编辑字符</h4>
+			</div>
+			<div class="modal-body" id="editModalCon">
+				<!-- 模态内容 -->
+				<form user="form">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="maxAmount">ID：</label> <input type="text"
+								class="form-control" id="tradeId" readonly="readonly">
+						</div>
+						<div class="form-group">
+							<label for="maxAmount">数量：</label> <input type="text"
+								class="form-control" id="maxAmount" readonly="readonly">
+						</div>
+						<div class="form-group">
+							<label for="maxAmount">已用数量：</label> <input type="text"
+								class="form-control" id="usedAmount">
+						</div>
+					</div>
+					<!-- /.box-body -->
+
+					<div class="box-footer"></div>
+				</form>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"
+					field="closeModal">关闭</button>
+				<button type="button" class="btn btn-primary" field="editTj">提交</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>

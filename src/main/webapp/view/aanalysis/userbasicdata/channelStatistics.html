@@ -1,0 +1,573 @@
+<div id="channelApp" class="right-model">
+    <div ng-controller="AppController" class="right-model-content">
+        <div class="channelTable">
+            <header>
+                <span>统计渠道</span>
+                <span id="channelInput"><input type="text" id="channelTime" value="" readonly></span>
+                <span class="blue" onclick="exportTable('tableData','渠道数据')">导出</span>
+            </header>
+            <div class="userDataTable">
+
+                <table id="tableData" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>统计渠道</th>
+                        <th>注册量</th>
+                        <th>充值量（$）</th>
+                        <th>消费量（金币）</th>
+                        <th>活跃量</th>
+                        <th>留存率</th>
+                        <th>自然用户</th>
+                        <th>非自然用户</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tr class="uesrData" ng-repeat="items in getChannelData.channelTableDatas">
+
+                        <td>{{items.memb_channel}}</td>
+                        <td>{{items.regnum}}</td>
+                        <td>{{items.rech}}</td>
+                        <td>{{items.cons}}</td>
+                        <td>{{items.timeActUserNum}}</td>
+                        <td>{{ getChannelData.retentionRate[$index]}}</td>
+                        <td>{{items.realuser}}</td>
+                        <td>{{items.regnum-items.realuser}}</td>
+                        <td class="doItname">
+                            <span ng-repeat="doIt in getChannelData.channelActive" ng-click="doItClick(doIt.type,items.memb_channel)">{{doIt.name}}</span>
+                        </td>
+                    </tr>
+                </table>
+                <div id="pagination"></div>
+            </div>
+            <!--消费充值明细表格-->
+            <div class="ReachDetail" ng-show="getChannelData.ReachDetail.length!=0">
+                <table id="ReachDetail" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>充值金额</th>
+                    </tr>
+                    </thead>
+                    <tr class="uesrData" ng-repeat="reachData in getChannelData.ReachDetail">
+                        <td>{{reachData.datet}}</td>
+                        <td>{{reachData.totalgold}}</td>
+                    </tr>
+                </table>
+                <div id="pagination_01"></div>
+            </div>
+            <div class="ConsumDetail" ng-show="getChannelData.ConsumDetail.length!=0">
+                <table id="ConsumDetail" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>消费金额</th>
+                        <th>红包</th>
+                        <th>会员升级</th>
+                        <th>翻译</th>
+                        <th>翻译字符包</th>
+                        <th>模糊图</th>
+                        <th>礼物</th>
+                        <th>一键异性50位</th>
+                        <th>小视频</th>
+                        <!--<th>首页展示</th>-->
+                        <th>打赏</th>
+                    </tr>
+                    </thead>
+                    <tr class="uesrData" ng-repeat="consumData in getChannelData.ConsumDetail">
+                        <td>{{consumData.datet}}</td>
+                        <td>{{consumData.totalGold}}</td>
+                        <td>{{consumData.hb}}</td>
+                        <td>{{consumData.hysj}}</td>
+                        <td>{{consumData.fy}}</td>
+                        <td>{{consumData.fyb}}</td>
+                        <td>{{consumData.mht}}</td>
+                        <td>{{consumData.lw}}</td>
+                        <td>{{consumData.yjyx50}}</td>
+                        <td>{{consumData.xsp}}</td>
+                        <!--<td>{{consumData.}}</td>-->
+                        <td>{{consumData.ds}}</td>
+                    </tr>
+                </table>
+                <div id="pagination_02"></div>
+            </div>
+        </div>
+        <!--趋势对比图-->
+        <div class="channelEcharts">
+            <p class="echartsTitle">渠道趋势对比</p>
+            <ul class="typeNav">
+                <li ng-repeat="item in getChannelData.echartsNav" ng-click="userTypeClick($index)"
+                    ng-class="item.isClick? 'clickActive':''">{{item.name}}
+                </li>
+            </ul>
+            <div id="channel_ebox">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    app.controller('AppController', function ($scope, $http) {
+        $scope.getChannelData = {
+            echartsNav: [
+                {
+                    name: "新增用户",
+                    isClick: true
+                },
+                {
+                    name: "活跃用户",
+                    isClick: false
+                },
+                {
+                    name: "启动次数",
+                    isClick: false
+                }
+            ],
+            channelActive: [
+                {name: '充值明细', type: 1},
+                {name: '消费明细', type: 2}
+            ],
+            channelTableDatas: [],//表格数据
+            retentionRate: [],//留存率
+            chanelLineDatas: [],//折线图数据
+            ReachDetail:[],//充值明细
+            ConsumDetail:[]//消费明细
+
+        };
+        //    时间选择插件
+        var daterangepickerBox = $("#channelTime");
+        var defaultDateObj = new Date();
+        var currentYear = defaultDateObj.getFullYear();
+        var currentMonth = defaultDateObj.getMonth() + 1;
+        var defaultStartDate = currentYear + '-' + currentMonth + '-01';
+        var isOverYear = (currentMonth + 1) > 12;
+        var defaultEndDate = (isOverYear ? (currentYear + 1) : currentYear) + '-' + (isOverYear ? '01' : currentMonth + 1) + '-01';
+        var channelDatas = {
+            startTime: defaultStartDate,
+            endTime: defaultEndDate,
+            start: 1,
+            length:10,
+        }
+
+        function channelData() {
+        	 layer.load(1, {shade: 0.3});
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + "/useBase/getChannlDetail",
+                data: channelDatas,
+                cache: false,
+            }).then(function (resData) {
+             	 layer.closeAll();
+                console.log(resData)
+                $scope.getChannelData.channelTableDatas = resData.data.data;
+                $scope.getChannelData.retentionRate.splice(0, $scope.getChannelData.retentionRate.length)
+
+                for (var ins in  $scope.getChannelData.channelTableDatas) {
+                    var retentionPercent = Math.round(Number($scope.getChannelData.channelTableDatas[ins].retainNum) / Number($scope.getChannelData.channelTableDatas[ins].regnum) * 10000) / 100.00 + "%";
+                    $scope.getChannelData.retentionRate.push(retentionPercent);
+                }
+                var totalPages = Math.ceil(Number(resData.data.recordsTotal) / Number(resData.data.length))
+                // $('#pagination').empty();
+                $('#pagination').pagination({
+                    pageCount: totalPages,
+                    totalData: resData.data.recordsTotal,
+                    showData: resData.data.length,
+                    isHide: false,
+                    jump: true,
+                    coping: true,
+                    keepShowPN: true,
+                    current: 1,
+                    count: 5,
+                    prevContent: '<上一页',
+                    nextContent: '下一页>',
+                    jumpIptCls: 'jump-ipt',
+                    jumpBtn: '确定',
+                    callback: function (api) {
+                        console.log(api)
+                        channelDatas.start = Number(api.getCurrent());
+                        layer.load(1, {shade: 0.3});  
+                        $http({
+                            method: 'post',
+                            dataType: "json",
+                            // headers: {'Content-Type': 'application/json'},
+                            url: ctx + "/useBase/getChannlDetail",
+                            data: channelDatas,
+                            cache: false,
+                        }).then(function (data) {
+                        	layer.closeAll();
+                            $scope.getChannelData.channelTableDatas = data.data.data;
+                            $scope.getChannelData.retentionRate.splice(0, $scope.getChannelData.retentionRate.length);
+
+                            for (var index in  $scope.getChannelData.channelTableDatas) {
+                                // Math.round(Number($scope.userSex.dataTable(index).man) / Number($scope.userSex.dataTable(index).total) * 10000) / 100.00 + "%";
+                                var retentionPercent = Math.round(Number($scope.getChannelData.channelTableDatas[ins].retainNum) / Number($scope.getChannelData.channelTableDatas[ins].regnum) * 10000) / 100.00 + "%";
+                                $scope.getChannelData.retentionRate.push(retentionPercent);
+                            }
+                        	layer.closeAll();
+                        }, function () {
+                            console.log("分页请求错误");
+                            alert("分页请求错误");
+                            layer.closeAll();
+                        })
+                    }
+                })
+                if (Number(resData.data.recordsTotal) > Number(resData.data.length)) {
+                    $('#pagination').css("display", "block");
+                } else {
+                    $('#pagination').css("display", "none");
+                }
+                layer.closeAll();
+            }, function () {
+            	layer.closeAll();
+            })
+        }
+
+        channelData();
+        //表格操作点击事件
+        var doItData = {
+            startTime:channelDatas.startTime,
+            endTime:channelDatas.endTime,
+            start: 1,
+            length:10,
+            channel:""
+        }
+        $scope.doItClick = function (dataIns,channelName) {
+            // console.log(dataIns);
+            // console.log(channelName);
+            doItData.channel = channelName;
+            if (dataIns==1){//充值明细
+                doItData.start=1;
+                layer.load(1, {shade: 0.3});  	
+                $http({
+                    method: 'post',
+                    dataType: "json",
+                    // headers: {'Content-Type': 'application/json'},
+                    url: ctx + "/useBase/getChannelReachDetail",
+                    data: doItData,
+                    cache: false,
+                }).then(function (resData) {
+                	layer.closeAll();
+                    console.log(resData);
+                    $scope.getChannelData.ReachDetail=resData.data.data;
+                    var teachPages = Math.ceil(Number(resData.data.recordsTotal) / Number(resData.data.length));
+                    console.log(teachPages);
+                    $('#pagination_01').pagination({
+                        pageCount: teachPages,
+                        totalData: resData.data.recordsTotal,
+                        showData: resData.data.length,
+                        isHide: false,
+                        jump: true,
+                        coping: true,
+                        keepShowPN: true,
+                        current: 1,
+                        count: 5,
+                        prevContent: '<上一页',
+                        nextContent: '下一页>',
+                        jumpIptCls: 'jump-ipt',
+                        jumpBtn: '确定',
+                        callback: function (api) {
+                            console.log(api)
+                            doItData.start = Number(api.getCurrent());
+                            $http({
+                                method: 'post',
+                                dataType: "json",
+                                // headers: {'Content-Type': 'application/json'},
+                                url: ctx + "/useBase/getChannelReachDetail",
+                                data: doItData,
+                                cache: false,
+                            }).then(function (data) {
+                                $scope.getChannelData.ReachDetail = data.data.data;
+                            }, function () {
+                                console.log("分页请求错误");
+                                alert("分页请求错误");
+                            })
+                        }
+                    })
+                    if (Number(resData.data.recordsTotal) > Number(resData.data.length)) {
+                        $('#pagination_01').css("display", "block");
+                    } else {
+                        $('#pagination_01').css("display", "none");
+                    }
+                    layer.closeAll();
+                },function (errData) {
+                	layer.closeAll();
+                })
+            }else {//消费明细
+                doItData.start=1;
+                layer.load(1, {shade: 0.3});  	
+                $http({
+                    method: 'post',
+                    dataType: "json",
+                    // headers: {'Content-Type': 'application/json'},
+                    url: ctx + "/useBase/getChannelConsumDetail",
+                    data: doItData,
+                    cache: false,
+                }).then(function (resData) {
+                	layer.closeAll();
+                    console.log(resData);
+                    $scope.getChannelData.ConsumDetail=resData.data.data;
+                    var consumPages = Math.ceil(Number(resData.data.recordsTotal) / Number(resData.data.length));
+                    console.log(consumPages)
+                    // debugger;
+                    $('#pagination_02').pagination({
+                        pageCount: consumPages,
+                        totalData: resData.data.recordsTotal,
+                        showData: resData.data.length,
+                        isHide: false,
+                        jump: true,
+                        coping: true,
+                        keepShowPN: true,
+                        current: 1,
+                        count: 5,
+                        prevContent: '<上一页',
+                        nextContent: '下一页>',
+                        jumpIptCls: 'jump-ipt',
+                        jumpBtn: '确定',
+                        callback: function (api) {
+                            console.log(api)
+                            doItData.start = Number(api.getCurrent());
+                            layer.load(1, {shade: 0.3});  	
+                            $http({
+                                method: 'post',
+                                dataType: "json",
+                                // headers: {'Content-Type': 'application/json'},
+                                url: ctx + "/useBase/getChannelConsumDetail",
+                                data: doItData,
+                                cache: false,
+                            }).then(function (data) {
+                            	layer.closeAll();
+                                $scope.getChannelData.ConsumDetail = data.data.data;
+                            }, function () {
+                                console.log("分页请求错误");
+                            	layer.closeAll();
+                            })
+                        }
+                    })
+                    if (Number(resData.data.recordsTotal) > Number(resData.data.length)) {
+                        $('#pagination_02').css("display", "block");
+                    } else {
+                        $('#pagination_02').css("display", "none");
+                    }
+                    layer.closeAll();
+                },function (errData) {
+                	layer.closeAll();
+                })
+            }
+        }
+
+        //统计折现图配置
+        var myChart = echarts.init(document.getElementById("channel_ebox"));
+
+        function channelEoption(data, selecteds) {
+            console.log(data)
+            var option = {
+                title: {
+                    text: '对比趋势图'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: function () {
+                        var legenDatas = [];
+                        legenDatas.splice(0, legenDatas.length)
+                        for (var ins in data) {
+                            var legData = data[ins].channel;
+                            legenDatas.push(legData)
+                        }
+                        // console.log(legenDatas)
+                        return legenDatas;
+                    }(),
+                    bottom: '5%',
+                    selected: selecteds
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '30%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: function () {
+                        var xAxisDatas = [];
+                        xAxisDatas.splice(0, xAxisDatas.length)
+                        for (var ins in data) {
+                            for (var index in data[ins].result) {
+                                var xAxisData = data[ins].result[index].datet;
+                                xAxisDatas.push(xAxisData)
+                            }
+                        }
+
+                        // console.log(xAxisDatas);
+
+                        function show(arr) {
+                            for (var i = 0; i < arr.length; i++) {
+                                if (arr.indexOf(arr[i]) != i) {
+                                    arr.splice(i, 1);//删除数组元素后数组长度减1后面的元素前移
+                                    i--;//数组下标回退
+                                }
+                            }
+
+                        }
+
+                        show(xAxisDatas)
+                        xAxisDatas.sort(function (a, b) {
+                            return a - b;
+                        })
+                        // console.log(xAxisDatas)
+                        return xAxisDatas;
+                    }(),
+
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: function () {
+                    var serisDo = [];
+                    serisDo.splice(0, serisDo.length)
+                    for (var ins in data) {
+                        var itemData = {
+                            name: data[ins].channel,
+                            type: 'line',
+                            stack: data[ins].channel,
+                            data: function () {
+                                var yAjaxDatas = [];
+                                yAjaxDatas.splice(0, yAjaxDatas.length)
+                                for (var index in data[ins].result) {
+                                    var showDatas = data[ins].result[index].num;
+                                    yAjaxDatas.push(showDatas)
+                                }
+                                return yAjaxDatas
+                            }(),
+                        };
+                        serisDo.push(itemData)
+                    }
+                    return serisDo
+                }()
+            };
+            myChart.setOption(option);
+            window.onresize = function () {
+                myChart.resize();
+            };
+        };
+        //qu渠道对比请求
+        var channelLinereq = {
+            types: 1,
+            startTime: defaultStartDate,
+            endTime: defaultEndDate
+        }
+        $scope.channelLineAjax = function channelLineAjax() {
+        	 layer.load(1, {shade: 0.3});  
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + "/useBase/getChannlTu",
+                data: channelLinereq,
+                cache: false,
+            }).then(function (resData) {
+            	layer.closeAll();
+                console.log(resData.data.obj);
+                var selecteds = {};
+                for (var i = 3; i < resData.data.obj.length; i++) {
+                    var sel = resData.data.obj[i].channel;
+                    selecteds[sel] = false;
+                }
+                console.log(selecteds)
+                channelEoption(resData.data.obj, selecteds);
+                layer.closeAll();
+            }, function () {
+            	layer.closeAll();
+            })
+        };
+        $scope.channelLineAjax();
+        daterangepickerBox.daterangepicker({
+            timePicker: false,
+            timePickerIncrement: 10,
+            format: 'YYYY-MM-DD',
+            opens: 'right',
+            timePicker12Hour: false,
+            timePicker: false,
+            showDropdowns: true,
+            startDate: defaultStartDate,
+            endDate: defaultEndDate
+        }, function (start, end, label) {
+            // console.log(daterangepickerBox.val())
+            // console.log(this.startDate.format(this.locale.format));
+            // console.log(this.endDate.format(this.locale.format));
+            var starInit = this.startDate.format(this.locale.format);
+            var endInit = this.endDate.format(this.locale.format);
+            var timeIndex = starInit.indexOf('T');
+            var startTimes = starInit.substr(0, timeIndex);
+            var endTimes = endInit.substr(0, timeIndex);
+            channelLinereq.startTime = startTimes;
+            channelLinereq.endTime = endTimes;
+            channelDatas.startTime = startTimes;
+            channelDatas.endTime = endTimes;
+            channelData();
+            $scope.channelLineAjax();
+            doItData.startTime = startTimes;
+            doItData.endTime = endTimes;
+            $scope.getChannelData.ConsumDetail=[];
+            $scope.getChannelData.ReachDetail=[];
+            // $scope.doItClick('','');
+        });
+        daterangepickerBox.data('daterangepicker').setStartDate(daterangepickerBox.daterangepicker);
+
+
+        //统计图导航点击
+        $scope.userTypeClick = function ($index) {
+            var clickUser = $scope.getChannelData.echartsNav;
+            for (var index in clickUser) {
+                if ($index == index) {
+                    clickUser[index].isClick = true;
+                } else {
+                    clickUser[index].isClick = false;
+                }
+            }
+            ;
+            channelLinereq.types = $index + 1;
+            $scope.channelLineAjax();
+            // console.log($index+1);
+        }
+
+
+    });
+    angular.bootstrap(document.getElementById('channelApp'), ['App']);
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+
+
+</script>

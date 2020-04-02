@@ -1,0 +1,108 @@
+<style>
+.table>tbody>tr>td.vertical-middle {vertical-align: middle}
+</style>
+
+<section class="content-header">
+    <h1>GAGAPC代理商统计<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>财务统计</li>
+        <li class="active">GAGAPC代理商统计</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          
+           <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">统计区间:</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="starttime">至<input type="text" id="endtime">(备注：查询条件中的日期使用说明，开始日期为包含即“>=”，结束日期为不包含即“<”。)
+                  </div>
+                </div>
+                
+                   <div class="form-group">
+                  <label for="departmentId" class="col-sm-2 control-label">部门：</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" id="departmentId">
+                    <option value="">-- 请选择 --</option>
+                  </select>
+                  </div>
+                </div>
+                
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+                 <button type="button" id="search" class="btn btn-primary">查询</button>
+               </div>
+               
+              <!-- /.box-footer -->
+            </form>
+          
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages" id="goldsumlistPC">
+       
+              </div>
+              <!-- /.box-body -->
+            </div>
+          
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<script type="text/javascript">
+$(function() {
+	var firstDay = firstDate("yyyy-MM-dd");
+	var now = new Date();
+	var nowdate = now.format("yyyy-MM-dd");
+	$('#starttime').val(firstDay);
+	$('#endtime').val(nowdate);
+	$('#starttime').datepicker({format: 'yyyy-mm-dd'});
+	$('#endtime').datepicker({format: 'yyyy-mm-dd'});
+    ajaxData(); 
+    $("#search").click(function(){
+        ajaxData();
+    });
+    function ajaxData(){
+
+    	var starttime = $("#starttime").val()+" 00:00:00";
+    	var endtime = $("#endtime").val()+" 00:00:00";
+        var departmentId=$("#departmentId").val();
+        var data ={"starttime":starttime,"endtime":endtime,"departmentId":departmentId};
+        layer.load(1, {shade: 0.3});
+        $.post(ctx+"/promoter/promoterList",data,function(reg){
+        	console.log(reg);
+            layer.closeAll();
+	      	var str =reg.obj;
+	    	$('#goldsumlistPC').html(str);
+        });
+    }
+    
+    //动态获取下拉框内容       放在fnDrawCallback外面可不清缓存,保留选择值
+    $.post(ctx+"/Promotion/departList", function (data){
+		if (data.success) {
+			//每次选择后清空
+			$('#departmentId').html('<option value="">-- 请选择 --</option>');
+			$.each(data.obj, function(index,e) {
+				$('#departmentId').append('<option value="'+e.sydeId+'">'+e.sydeName+'</option>');
+			});
+		} else {
+			layer.msg('获取部门失败');
+		}
+	}); 
+    function format(id,data){
+        if(data){
+             $("#"+id).text(data);
+        }else{
+             $("#"+id).text("0");
+        }
+    };
+});
+</script>
+

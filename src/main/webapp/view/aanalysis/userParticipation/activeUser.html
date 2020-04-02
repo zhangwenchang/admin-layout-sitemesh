@@ -1,0 +1,502 @@
+
+<div ng-controller="AppController" class="user-participation">
+
+    <div class="right-model">
+        <div class="right-model-content">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        活跃用户趋势(天)
+                    </div>
+                    <div class="title-content-right">
+						<span>
+							<input type="text" id="starttime1" class="startTime" readonly ng-model="Date1" ng-change="changeVal()">至
+                            <input type="text" id="endtime1" class="startTime" readonly ng-model="Date2" ng-change="changeVal()">
+						</span>
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="activeUserDay" style="height:400px"></div>
+            </div>
+
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        活跃用户概况
+                    </div>
+
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="summaryResult" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>昨日活跃用户</th>
+                            <th>过去7天活跃用户</th>
+                            <th>昨日活跃/过去7天活跃</th>
+                            <th>过去30天活跃用户</th>
+                            <th>昨日活跃/过去30天活跃</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{summaryResult.past1DayActiveUserCount}}</td>
+                            <td>{{summaryResult.past7DayActiveUserCount}}</td>
+                            <td>{{summaryResult.past7DayPercent}}</td>
+                            <td>{{summaryResult.past30DayActiveUserCount}}</td>
+                            <td>{{summaryResult.past30DayPercent}}</td>
+
+                        </tr>
+                    </tbody>
+
+
+                </table>
+            </div>
+            <div class="title-border" style="margin-top: 20px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        活跃用户明细(天)
+                    </div>
+                    <div class="title-content-right">
+                        <span class="blue exportBtn" onclick="exportTable('activeOne','活跃用户明细(天)')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="activeOne" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>活跃用户(占比)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="x in tableDayData">
+                            <td>{{x.statisticDate}}</td>
+                            <td>{{x.activeUserCount}}({{x.activeUserPercent}})</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+            <div class="div-bg">
+
+            </div>
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        活跃用户趋势(时)
+                    </div>
+                    <div class="title-content-right">
+
+                        <input type="text" class="form-control pull-right" id="dateHour" style="width:700px" ng-model="changeHour" ng-blur="changeValHour()">
+
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content" ng-show="visible">
+                <div style="height:400px" id="activeUserHour"></div>
+            </div>
+
+
+            <div class="title-border" style="margin-top: 20px;" ng-show="visible">
+                <div class="title-content">
+                    <div class="title-content-left" style="margin-top: 7px;">
+                        活跃用户明细(时)
+                    </div>
+                    <div class="title-content-right">
+                        <span class="blue exportBtn" onclick="exportTable('activeTwo','活跃用户明细(时)')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages" ng-show="visible">
+                <table class="table table-bordered table-hover" id="activeTwo">
+                    <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>活跃量</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="x in tableHourData">
+                        <td>{{x.statisticDate}}</td>
+                        <td>{{x.activeUserCount}}</td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+    app.controller('AppController',function($scope,$http){
+        $scope.visible = false;
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.Date1 = firstDay;
+        $scope.Date2 = nowdate;
+
+        $('#starttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#endtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+
+        // var defaultDateObj = new Date();
+        // var currentYear = defaultDateObj.getFullYear();
+        // var currentMonth = defaultDateObj.getMonth() + 1;
+        var defaultStartDate = firstDay + ' 00:00';
+        // var isOverYear = (currentMonth + 1) > 12;
+        var defaultEndDate = nowdate + ' 00:00';
+        $scope.changeHour =  firstDay + ' 00:00 - ' + nowdate + ' 00:00';
+        $('#dateHour').daterangepicker({
+            timePicker: true,
+            timePicker12Hour: false,
+            timePickerSeconds: false,
+            timePickerIncrement: 60,
+            format: 'YYYY-MM-DD HH:mm',
+            opens: 'right',
+            startDate: defaultStartDate,
+            endDate: defaultEndDate,
+            startView:0
+        });
+        $('#dateHour').data('daterangepicker').setStartDate(defaultStartDate);
+
+
+        initPage($scope,$http);
+        $scope.getChartDate();
+        $scope.getChartHour();
+        $scope.visible = true;
+
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http){
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+
+        $scope.getChartDate = function(){
+            var dateData = {
+                startTime:$scope.Date1,
+                endTime:$scope.Date2,
+                type:"day"
+
+            };
+            layer.load(1, {shade: 0.3});
+            $http.post(ctx + "/participate/activeUser",dateData)
+                .then(function(data){
+                	layer.closeAll();
+                    if(data.data.success == false){
+
+                    }else{
+
+                        var xLineData = data.data.obj.xList;
+                        var yLineData = data.data.obj.yList;
+                        lineChartDay(xLineData,yLineData);
+                        $scope.tableDayData = data.data.obj.tableList;
+                        $scope.summaryResult = data.data.obj.summaryResult;
+
+                        //分页
+                        // var totalPages;
+                        // if(totalPages % 10 == 0){
+                        //     totalPages = totalPages / 10;
+                        // }else{
+                        //     totalPages = parseInt(totalPages / 10) + 1;
+                        // }
+                        //
+                        // $('#userPages').pagination({
+                        //     pageCount: totalPages,
+                        //     totalData: resData.data.recordsTotal,
+                        //     showData: resData.data.length,
+                        //     isHode: true,
+                        //     jump: true,
+                        //     coping: true,
+                        //     keepShowPN: true,
+                        //     current: 1,
+                        //     count: 3,
+                        //     prevContent: '<上一页',
+                        //     nextContent: '下一页>',
+                        //     jumpIptCls: '跳转到',
+                        //     jumpBtn: '确定',
+                        //     callback: function (api) {
+                        //         console.log(api)
+                        //         var pageData = {
+                        //             start: api.getCurrent(),
+                        //             length: 10,
+                        //         }
+                        //         $http({
+                        //             method: 'post',
+                        //             dataType: "json",
+                        //             // headers: {'Content-Type': 'application/json'},
+                        //             url: ctx + "/participate/userIncrease",
+                        //             data: JSON.stringify(pageData),
+                        //             cache: false,
+                        //         }).then(function (data) {
+                        //             console.log(data)
+                        //         }, function () {
+                        //             console.log("pageError");
+                        //         })
+                        //     }
+                        // })
+
+
+
+
+
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+        }
+
+
+        $scope.getChartHour = function(){
+
+            //debugger;
+            var changeHourArr = $scope.changeHour.split(' - ');
+            var changeHourStart = changeHourArr[0];
+            var changeHourEnd = changeHourArr[1];
+            hourStart = changeHourStart.split(':')[0];
+            hourEnd = changeHourEnd.split(':')[0];
+
+
+
+            var dateData = {
+                startTime:hourStart,
+                endTime:hourEnd,
+                type:"hour"
+
+            };
+            $http.post(ctx + "/participate/activeUser",dateData)
+                .then(function(data){
+                    if(data.data.success == false){
+
+                    }else{
+
+                        var xLineData = data.data.obj.xList;
+                        var yLineData = data.data.obj.yList;
+                        lineChartHour(xLineData,yLineData);
+                        $scope.tableHourData = data.data.obj.tableList;
+
+                    }
+
+
+                },function(data){
+
+                })
+
+        }
+
+
+        $scope.changeVal =function(){
+            if($scope.Date1 == ''){
+                $scope.Date1 = firstDay;
+            }
+            if($scope.Date2 == ''){
+                $scope.Date2 = nowdate;
+            }
+            if($scope.Date1 > $scope.Date2){
+                alert("开始时间不能大于结束时间!");
+                $scope.Date1 = firstDay;
+                $scope.Date2 = nowdate;
+            }
+            $scope.getChartDate();
+
+
+        }
+
+
+
+        $scope.changeValHour =function(){
+            // if($scope.Date1 > $scope.Date2){
+            //     alert("开始时间不能大于结束时间!");
+            //     return;
+            // }
+            $scope.getChartHour();
+            $scope.visible = true;
+
+
+        }
+
+
+
+
+
+
+    }
+    function lineChartDay(xLineData,yLineData){
+        var myChartDay = echarts.init(document.getElementById('activeUserDay'));
+        var colors = ['#5793f3'];
+
+        var option = {
+            color: colors,
+
+            tooltip: {
+                trigger: 'none',
+                axisPointer: {
+                    type: 'cross'
+                }
+            },
+            // legend: {
+            //     data: ['今日', '昨日', '7天前', '30天前']
+            // },
+            grid: {
+                top: 70,
+                bottom: 70
+            },
+
+            xAxis: {
+                type: 'category',
+                show: true,
+                // boundaryGap: false,
+                data: xLineData
+
+            },
+
+
+            yAxis: [{
+                type: 'value',
+                axisLine: {
+                    show: false
+
+                },
+                axisTick: {
+                    show: false
+                }
+            }],
+            series: [
+                {
+                    name: '今日',
+                    type: 'line',
+
+                    data: yLineData
+                }
+            ]
+        };
+
+        myChartDay.setOption(option);
+
+
+        window.onresize = function() {
+            $('.addUserMain-content').width('100%');
+            myChartDay.resize();
+        };
+
+    }
+
+
+    function lineChartHour(xLineData,yLineData){
+        var myChartHour= echarts.init(document.getElementById('activeUserHour'));
+        var colors = ['#5793f3'];
+
+        var option = {
+            color: colors,
+
+            tooltip: {
+                trigger: 'none',
+                axisPointer: {
+                    type: 'cross'
+                }
+            },
+            // legend: {
+            //     data: ['今日', '昨日', '7天前', '30天前']
+            // },
+            grid: {
+                top: 70,
+                bottom: 70
+            },
+
+            xAxis: {
+                type: 'category',
+                show: true,
+                // boundaryGap: false,
+                data: xLineData
+
+            },
+
+
+            yAxis: [{
+                type: 'value',
+                axisLine: {
+                    show: false
+
+                },
+                axisTick: {
+                    show: false
+                }
+            }],
+            series: [
+                {
+                    name: '今日',
+                    type: 'line',
+
+                    data: yLineData
+                }
+            ]
+        };
+
+        myChartHour.setOption(option);
+
+
+        window.onresize = function() {
+            $('.addUserMain-content').width('100%');
+            myChartHour.resize();
+        };
+
+    }
+
+
+
+
+    function exportTable(tableid) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,"活跃用户明细.xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = "活跃用户明细.csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+</script>
+

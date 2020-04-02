@@ -1,0 +1,499 @@
+<section class="content-header">
+    <h1>角色管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>系统设置</li>
+        <li class="active">角色管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+              <div class="box-header">
+              <button type="button" onclick="roleAdd()" class="btn btn-primary">添加</button>
+              <button type="button" onclick="batchDel()" class="btn btn-primary">删除</button>
+              </div>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>                  
+                  <th>角色</th>
+                  <th>部门</th>
+                  <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+var departIdTmp='',roleIdTmp='',roleNameTmp='';
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 , '/plugins/ztree/js/jquery.ztree.core.min.js'
+                 , '/plugins/ztree/js/jquery.ztree.excheck.min.js'
+                 ], function() {
+        console.log(1);
+
+        var t=$("#tableData").dataTable({
+            "bStateSave": true,	//保存状态
+            "paging": false,
+            "processing": true,
+            "serverSide": true,	//开启服务器模式
+            "lengthChange": false,	//是否允许用户改变每页显示条数
+            "searching": false, //是否开启本地搜索
+            "ordering": true,	//开启排序
+            "info": true,	//显示左下角页面信息
+            "autoWidth": false,	//自适应宽度
+            "pageLength": 100,
+
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var gagaidorname = $("#gagaidorname").val();
+                aoData.push({
+                        "name": "noorname",
+                        "value": gagaidorname
+                    })
+                    //aoData=gagaidorname; 
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/Account/roleList",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "syroId",
+                "bSortable": false
+            }, {
+                "data": "syroId",
+                "bSortable": false
+            }, {
+                "data": "syroName",
+                "bSortable": false
+            }, {
+                "data": "syroDepartname",
+                "bSortable": false
+            }, {
+                "data": "syroId",
+                "bSortable": false
+            }],
+           "columnDefs": [{
+                "targets": 1,
+                "render": function(data, type, full, meta) {                	
+                    return '<input type="checkbox" value="' + data + '" title="' + data + '" name="roleId" />';
+                }
+            },{
+                "targets": 4,
+                "data": "syroId",
+                "render": function(data, type, full, meta) {
+                	var lnks='<a href="javascript:permission('+data+');">权限</a>';
+                	lnks+=' <a href="javascript:upd('+data+', \''+full.syroName+'\', '+full.syroDepartid+');">编辑</a>';
+                	lnks+=' <a href="javascript:del('+data+');">删除</a>';
+                    return lnks;
+                }
+            } ],
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+    });
+});
+
+function roleAdd(){
+	//获取部门信息
+	doPost("Account/departList", {},roleHd,errorHd);
+	//弹出层
+	
+	
+}
+
+function roleHd(data){
+	  if(data.success){
+		//初始化部门信息
+		var html = template('departTmp', data);	
+		$('#roleAddModal').find('[field="depart"]').html(html);
+		  $('#roleAddModal').modal({keyboard: true});
+	  }else{
+		$.msg(data.msg);
+	  }	  
+}
+function errorHd(xreq){	 
+	  $.msg(xreq.statusText+"["+xreq.status+"]");
+}
+
+//添加角色
+$('#roleAddModal').find('[field="roleAddTj"]').click(function(){	
+	var roleName=$.trim($("#roleName").val());
+	var departId=$("#departId").val();
+	if(roleName==''){
+		$.msg("请正确填写角色名称");
+		return;
+	}
+	if(departId==''){
+		$.msg("请正确选择部门信息");
+		return;
+	}
+	//角色信息保存
+	
+	doPost("Account/roleAdd", {"syroName":roleName,"syroDepartid":departId},roleAddHd,errorHd);	
+});
+
+function roleAddHd(data){
+	if(data.success){
+		$('#roleAddModal').find('[field="closeModal"]').click();
+		$("#roleName").val("");
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+
+//删除角色
+function del(id){
+	var t=confirm("确定要删除角色吗？");
+	if(t){
+		doPost("Account/roleDel", {"syroIds[]":[id]},roleDelHd,errorHd);
+	}
+} 
+function roleDelHd(data){
+	if(data.success){
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}	
+}
+
+//批量删除
+function batchDel(){
+	var chk_value =[]; 
+	$('input[name="roleId"]:checked').each(function(){ 
+	chk_value.push($(this).val()); 
+	}); 
+	if(chk_value.length==0){
+		$.msg("请选择要删除的角色");
+	}else{
+		var t=confirm("确定要删除选定的角色吗？");
+		if(t){
+			doPost("Account/roleDel", {"syroIds[]":chk_value},roleDelHd,errorHd);
+		}		
+	}
+}
+
+//编辑
+function upd(id, name, departId){
+	//编辑
+	roleIdTmp=id;
+	roleNameTmp=name;
+	departIdTmp=departId;
+	doPost("Account/departList", {},roleUpdHd,errorHd);
+}
+function roleUpdHd(data){
+	 if(data.success){
+		//初始化部门信息
+		var html = template('departTmp', data);	
+		$('#roleUpdModal').find('[field="depart"]').html(html);
+		 $("#departId  option[value='"+departIdTmp+"']").attr("selected",true);
+		 $("#roleNameUpd").val(roleNameTmp);
+		  $('#roleUpdModal').modal({keyboard: true});
+	  }else{
+		$.msg(data.msg);
+	  }	  
+}
+
+/*编辑角色提交*/
+$('#roleUpdModal').find('[field="roleUpdTj"]').click(function(){	
+	var roleName=$.trim($("#roleNameUpd").val());
+	var departId=$("#departId").val();
+	if(roleName==''){
+		$.msg("请正确填写角色名称");
+		return;
+	}
+	if(departId==''){
+		$.msg("请正确选择部门信息");
+		return;
+	}
+
+	doPost("Account/roleUpd", {"syroId":roleIdTmp, "syroName":roleName,"syroDepartid":departId},roleUpdSaveHd,errorHd);	
+});
+
+function roleUpdSaveHd(data){
+	if(data.success){
+		$('#roleUpdModal').find('[field="closeModal"]').click();
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+/* end编辑角色提交*/
+
+/*角色模块提交*/
+ 
+//权限设置
+function permission(roleId){
+	//获取权限
+	roleIdTmp=roleId;
+	doPost("Account/rolePermissList", {"syroId":roleId},rolePermHd,errorHd);
+}
+
+function rolePermHd(data){
+	if(!data.success){
+		$.msg("角色模块列表获取出错！");
+	}
+
+	var setting = {
+			view: {
+				fontCss: getFont,
+				nameIsHTML: true				
+			},
+			check: {
+				enable: true
+			},
+			data: {
+				simpleData: {
+					enable: true
+				}
+			}
+		};
+	
+	function getFont(treeId, node) {
+		return node.font ? node.font : {};
+	}
+
+		var zNodes =[
+			{ id:1, pId:0, name:"随意勾选 1", open:true},
+			{ id:11, pId:1, name:"随意勾选 1-1", open:true},
+			{ id:111, pId:11, name:"随意勾选 1-1-1"},
+			{ id:112, pId:11, name:"随意勾选 1-1-2"},
+			{ id:12, pId:1, name:"随意勾选 1-2", open:true},
+			{ id:121, pId:12, name:"随意勾选 1-2-1"},
+			{ id:122, pId:12, name:"随意勾选 1-2-2"},
+			{ id:2, pId:0, name:"随意勾选 2", checked:true, open:true},
+			{ id:21, pId:2, name:"随意勾选 2-1"},
+			{ id:22, pId:2, name:"随意勾选 2-2", open:true},
+			{ id:221, pId:22, name:"随意勾选 2-2-1", checked:true},
+			{ id:222, pId:22, name:"随意勾选 2-2-2"},
+		];
+		var nodes=data.obj;		
+		for(var i=0;i<nodes.length;i++){
+			nodes[i].id=nodes[i].symoId;
+			nodes[i].name=nodes[i].symoName;
+			nodes[i].pId=nodes[i].symoParentid;
+			if(nodes[i].symoParentid==null)nodes[i].open=true;
+			if(nodes[i].symoValue==1)nodes[i].checked=true;
+			if(nodes[i].symoIsmenu!=1){nodes[i].font={"color":"red"};}
+		}
+		
+	$.fn.zTree.init($("#treeDemo"), setting, nodes);
+	$('#rolePermissModal').modal({keyboard: true});
+}
+ 
+$('#rolePermissModal').find('[field="rolePermissTj"]').click(function(){
+	//获取权限模块列表
+	var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+	var nodes = treeObj.getCheckedNodes();
+	var arr = new Array();
+	for(var i=0;i<nodes.length;i++){
+		arr.push(nodes[i].id);
+	}	
+	doPost("Account/rolePermissUpd", {"syroId":roleIdTmp, "modIds[]":arr},roleUpdPermissSaveHd,errorHd);
+});
+
+function roleUpdPermissSaveHd(data){
+	alert(data.msg);
+}
+/* end 角色模块提交*/
+
+//刷新表格
+function refreshdata() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+</script>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="roleAddModal" tabindex="-1" role="dialog" 
+   aria-labelledby="roleAddModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="roleAddModalLabel">
+               添加角色
+            </h4>
+         </div>
+         <div class="modal-body" id="roleAddModalCon">
+           <!-- 模态内容 -->
+           <form role="form">
+	<div class="box-body">
+		<div class="form-group">
+			<label for="roleName">角色</label> <input type="text"
+				class="form-control" id="roleName" placeholder="角色名称">
+		</div>
+		<div class="form-group" field="depart">			
+		</div>
+	</div>
+	<!-- /.box-body -->
+
+	<div class="box-footer">		
+	</div>
+</form>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" field="closeModal">关闭
+            </button>
+            <!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+            <button type="button" class="btn btn-primary" field="roleAddTj">提交</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->
+
+<script id="departTmp" type="text/html">
+		<label for="depart">部门</label>
+				<select class="form-control"  id="departId">
+                    {{each obj as value i}}
+						<option value="{{value.sydeId}}">{{value.sydeName}}</option>
+                    {{/each}}
+                  </select>
+</script>
+
+<!-- 角色编辑 -->
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="roleUpdModal" tabindex="-1" role="dialog" 
+   aria-labelledby="roleUpdModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="roleUpdModalLabel">
+               编辑角色
+            </h4>
+         </div>
+         <div class="modal-body" id="roleUpdModalCon">
+           <!-- 模态内容 -->
+           <form role="form">
+	<div class="box-body">
+		<div class="form-group">
+			<label for="roleName">角色</label> <input type="text"
+				class="form-control" id="roleNameUpd" placeholder="角色名称">
+		</div>
+		<div class="form-group" field="depart">
+		</div>
+	</div>
+	<!-- /.box-body -->
+
+	<div class="box-footer">		
+	</div>
+</form>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" field="closeModal">关闭
+            </button>
+            <!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+            <button type="button" class="btn btn-primary" field="roleUpdTj">提交</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->
+
+<!-- 权限设置 -->
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="rolePermissModal" tabindex="-1" role="dialog" 
+   aria-labelledby="rolePermissModalLabel" aria-hidden="true">
+   <div class="modal-dialog" >
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="rolePermissModalLabel">
+               权限设置
+            </h4>
+         </div>
+         <!-- scroll -->
+         <style type="text/css">
+         <!--
+         ul.ztree {border: 0px solid #617775;width:100%;height:360px;overflow-y:scroll;overflow-x:auto;}
+         -->
+         </style>
+         <div class="modal-body" id="rolePermissModalCon" >
+           <!-- 模态内容 -->
+           <ul id="treeDemo" class="ztree" ></ul>
+           <!-- /模态内容 -->
+         </div>
+         <span style="color:#999999">备注：红色标注项为非菜单权限项</span>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" field="closeModal">关闭
+            </button>
+            <!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+            <button type="button" class="btn btn-primary" field="rolePermissTj">提交</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->

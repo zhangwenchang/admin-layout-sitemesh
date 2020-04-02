@@ -1,0 +1,644 @@
+
+<div ng-controller="AppController" class="user-participation">
+    <div class="right-top">
+        <ul class="ul-li ul-li-revenue">
+            <li ng-class="bluebgStatus == 1 ? 'blue-bg' : '' " ng-click="revenueChange(1)">推广员数量-全部</li>
+            <li class="border-none" ng-click="revenueChange(2)" ng-class="bluebgStatus == 2 ? 'blue-bg' : '' ">单团队数量显示</li>
+        </ul>
+    </div>
+    <div class="right-model">
+        <div class="right-model-content right-model-content1" style="display: block">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        推广员数量
+                    </div>
+                    <div class="title-content-right">
+
+                        <span>
+							<input type="text" id="revenueStarttime1" class="startTime" readonly ng-model="revenueStarttime1" ng-change="revenueChangeVal1()">至
+                            <input type="text" id="revenueEndtime1" class="startTime" readonly ng-model="revenueEndtime1" ng-change="revenueChangeVal1()">
+						</span>
+
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="revenueChart" style="height:450px;margin-top: 30px;"></div>
+            </div>
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        推广员数量明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('revenueTable','推广员数量明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="revenueTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th ng-repeat="item in allAgent">{{item.syde_name}}</th>
+                        <th>合计</th>
+
+                    </tr>
+                    <tr ng-repeat="x in dataObj11">
+
+                        <td>{{x.d_date}}</td>
+                        <td>{{x["郑州营销"]}}</td>
+                        <td>{{x["洛阳畅游"]}}</td>
+                        <td>{{x["郑州兼职"]}}</td>
+                        <td>{{x["曹战防团队"]}}</td>
+                        <td>{{x["gaga代理--新乡团队"]}}</td>
+                        <td>{{x.total}}</td>
+
+                    </tr>
+                    </thead>
+
+
+                </table>
+            </div>
+
+        </div>
+
+
+
+        <div class="right-model-content right-model-content2" style="display:none">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        推广员数量
+                    </div>
+                    <div class="title-content-right">
+                        <select name="" id="revenueSel2" class="select-value" style="width: 300px;" ng-click="revenueSel2()">
+                            <option value="">全部</option>
+                            <option value="{{item.syde_id}}" ng-repeat="item in allAgent">{{item.syde_name}}</option>
+                            <!--<option value="">洛阳畅游</option>-->
+                            <!--<option value="">商丘点创</option>-->
+                        </select>
+                        <span>
+							<input type="text" id="singleStarttime1" class="startTime" readonly ng-model="singleStarttime1" ng-change="revenueChangeVal2()">至
+                            <input type="text" id="singleEndtime1" class="startTime" readonly ng-model="singleEndtime1" ng-change="revenueChangeVal2()">
+						</span>
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="singleChart" style="height:400px"></div>
+            </div>
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        推广员数量明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('singleTable','推广员数量明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="singleTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>人数</th>
+                    </tr>
+                    <tr ng-repeat="x in dataObj2">
+
+                        <td>{{x.d_date}}</td>
+                        <td>{{x.d_num}}</td>
+
+                    </tr>
+                    </thead>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<script>
+    app.controller('AppController',function($scope,$http){
+        $scope.bluebgStatus = 1;
+
+
+        var revenueSelId2 = 0;
+        var revenueSelName2 = '全部';
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.revenueStarttime1 = firstDay;
+        $scope.revenueEndtime1 = nowdate;
+
+        $scope.singleStarttime1 = firstDay;
+        $scope.singleEndtime1 = nowdate;
+
+        $('#revenueStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#revenueEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        $('#singleStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#singleEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        initPage($scope,$http);
+        $scope.getAllAgent();
+
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http) {
+        var allAgentName = [];
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+
+
+        $scope.getAllAgent = function(){
+            $http.post(ctx + "/useBase/getAllAgent")
+                .then(function(data){
+                    if(data.data.success == false){
+
+                    }else if(data.data.obj == []){
+                        return;
+                    }else{
+
+                        $scope.allAgent = data.data.obj;
+                        for(var i = 0;i<data.data.obj.length;i++){
+                            allAgentName.push(data.data.obj[i].syde_name);
+
+                        }
+                        console.log(allAgentName);
+
+                        revenueSelId2 = 0;
+                        revenueSelName2 = '全部';
+
+                        if($scope.bluebgStatus == 1){
+                            $scope.revenue();
+                        }else if($scope.bluebgStatus == 2){
+                            $scope.revenueSingle();
+                        }
+
+                    }
+
+                },function(data){
+
+                })
+
+
+        };
+
+
+        $scope.revenueChange = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgStatus = 1;
+                    $(".right-model-content1").css("display","block").siblings().css("display","none");
+                    $scope.revenue();
+                    break;
+                case 2:
+                    $scope.bluebgStatus = 2;
+                    $(".right-model-content2").css("display","block").siblings().css("display","none");
+                    $scope.revenueSingle();
+                    break;
+
+            }
+
+        };
+
+
+        $scope.revenueSel2 = function(e){
+            revenueSelId2 = $('#revenueSel2 option:selected').val();
+            revenueSelName2 = $('#revenueSel2 option:selected').text();
+            if(revenueSelId2 == ''){
+                revenueSelId2 = 0;
+                revenueSelName2 = '全部';
+            }
+            $scope.revenueSingle();
+
+        };
+
+
+        $scope.revenueChangeVal1 =function(){
+            if($scope.revenueStarttime1 == ''){
+                $scope.revenueStarttime1 = firstDay;
+            }
+            if($scope.revenueEndtime1 == ''){
+                $scope.revenueEndtime1 = nowdate;
+            }
+            if($scope.revenueStarttime1 > $scope.revenueEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.revenueStarttime1 = firstDay;
+                $scope.revenueEndtime1 = nowdate;
+
+            }
+            $scope.revenue();
+
+
+        }
+
+        $scope.revenueChangeVal2 =function(){
+            if($scope.singleStarttime1 == ''){
+                $scope.singleStarttime1 = firstDay;
+            }
+            if($scope.singleEndtime1 == ''){
+                $scope.singleEndtime1 = nowdate;
+            }
+            if($scope.singleStarttime1 > $scope.singleEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.singleStarttime1 = firstDay;
+                $scope.singleEndtime1 = nowdate;
+
+            }
+            $scope.revenueSingle();
+
+
+        }
+
+        $scope.revenue = function(){
+
+            var dateData1 = {
+                startTime:$scope.revenueStarttime1,
+                endTime:$scope.revenueEndtime1
+            };
+
+            layer.load(1,{shade: 0.3});
+            $http.post(ctx + "/useBase/getSysUserNumTotal",dateData1)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj1 =  data.data.obj;
+
+                        var xLineData = [];
+                        var y1LineData = [];
+                        var y2LineData = [];
+                        var y3LineData = [];
+                        var y4LineData = [];
+                        var y5LineData = [];
+
+                        for(var i = 0;i<dataObj1[4].length; i++){
+                            xLineData.push(dataObj1[4][i].d_date);
+                            y1LineData.push(dataObj1[4][i].d_num);
+                        }
+                        for(var i = 0;i<dataObj1[7].length; i++){
+
+                            y2LineData.push(dataObj1[7][i].d_num);
+                        }
+                        for(var i = 0;i<dataObj1[10].length; i++){
+
+                            y3LineData.push(dataObj1[10][i].d_num);
+                        }
+                        for(var i = 0;i<dataObj1[11].length; i++){
+
+                            y4LineData.push(dataObj1[11][i].d_num);
+                        }
+                        for(var i = 0;i<dataObj1[25].length; i++){
+
+                            y5LineData.push(dataObj1[25][i].d_num);
+                        }
+
+                        $scope.lineChart1(xLineData,y1LineData,y2LineData,y3LineData,y4LineData,y5LineData);
+
+                        $scope.dataObj1 = dataObj1;
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+            var dateData11 = {
+                startTime:$scope.revenueStarttime1,
+                endTime:$scope.revenueEndtime1,
+                start:1
+            };
+
+            $http.post(ctx + "/useBase/getTuiguangDetail",dateData11)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj11 =  data.data.data;
+
+                        $scope.dataObj11 = dataObj11;
+
+
+                    }
+                    layer.closeAll();
+
+                },function(data){
+                    layer.closeAll();
+                })
+
+
+
+
+
+
+        }
+
+
+        $scope.revenueSingle = function(){
+
+            var dateData = {
+                startTime:$scope.singleStarttime1,
+                endTime:$scope.singleEndtime1,
+                syus_depart:revenueSelId2
+
+            };
+
+
+            layer.load(1,{shade: 0.3});
+            $http.post(ctx + "/useBase/getSysUserNum",dateData)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj2 =  data.data.obj;
+                        var xLineData = [];
+                        var yLineData = [];
+
+
+                        for(var i = 0;i<dataObj2.length; i++){
+                            xLineData.push(dataObj2[i].d_date);
+                            yLineData.push(dataObj2[i].d_num);
+
+                        }
+
+                        $scope.lineChart2(xLineData,yLineData);
+
+                        $scope.dataObj2 = dataObj2;
+
+                    }
+
+                    layer.closeAll();
+
+                },function(data){
+
+                    layer.closeAll();
+                })
+
+        }
+
+
+        $scope.lineChart1 = function(allAgentName,xLineData,y1LineData,y2LineData,y3LineData,y4LineData,y5LineData){
+            // debugger;
+
+            var myChart1 = echarts.init(document.getElementById('revenueChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                grid:{
+                    bottom:'20%',//距离下边距
+                },
+                legend: {
+                    data:allAgentName,
+                    bottom:0
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    },
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    },
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    },
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    },
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name:allAgentName[0],
+                        type:'bar',
+                        data:y1LineData
+                    },
+                    {
+                        name:allAgentName[1],
+                        type:'bar',
+                        data:y2LineData
+                    },
+                    {
+                        name:allAgentName[2],
+                        type:'bar',
+                        data:y3LineData
+                    },
+                    {
+                        name:allAgentName[3],
+                        type:'line',
+                        data:y4LineData
+                    },
+                    {
+                        name:allAgentName[4],
+                        type:'line',
+                        data:y5LineData
+                    }
+                ]
+            };
+
+
+            myChart1.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart1.resize();
+
+            };
+
+
+        }
+
+
+        $scope.lineChart2 = function(xLineData,yLineData){
+            // debugger;
+
+            var myChart2 = echarts.init(document.getElementById('singleChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                grid:{
+                    bottom:'20%',//距离下边距
+                },
+
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        type:'bar',
+                        data:yLineData
+                    }
+                ]
+            };
+
+
+            myChart2.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart2.resize();
+
+            };
+
+
+        }
+
+    }
+    // lineChart();
+
+
+
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+</script>
+
+

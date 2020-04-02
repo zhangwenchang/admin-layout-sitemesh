@@ -1,0 +1,1108 @@
+<style type="text/css">
+.giftReal-t td { padding: 6px; }
+.ylt1, .ylt2, .ylt3, .ylt4, .ylt5 { max-height: 100px; }
+.edit-img-box { position: relative; display: none; }
+.edit-img-box span { width: 15px; height: 15px; position: absolute; background: #f00; right: 0; text-align: center;  line-height: 16px;  color: #FFF; cursor: pointer;  }
+.edit-img-box.have { display: inline-block; }
+.zi{width: 10%;float: left;text-align: center;line-height: 34px;}
+.startTime{width: 45%;float: left;}
+.edit-member-ul li {
+	list-style-type: none;
+}
+
+.edit-member-ul li .labels {
+	display: inline-block;
+	width: 112px;
+}
+
+.edit-member-ul li input, .edit-member-ul li select {
+	width: 537px;
+	margin-right: 12px;
+}
+</style>
+<section class="content-header">
+	<h1>
+		短视频管理<small></small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>模块管理</li>
+		<li class="active">短视频管理</li>
+	</ol>
+</section>
+
+<section class="content-main">
+<input type="hidden" id="imageType" name="imageType">
+<input type="hidden" id="UType" name="UType">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<!-- 头部操作菜单 -->
+				<form class="form-horizontal" id="searchForm">
+					<div class="box-body">
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="ds_host">会员</label>
+							<div class="col-sm-4">
+								<input class="form-control" id="V_gaga" name="V_gaga" type="text" placeholder="会员嘎嘎号或教师手机号" />
+							</div>
+							<label class="col-sm-2 control-label" for="ds_name">标题</label>
+							<div class="col-sm-4">
+								<input class="form-control" id="V_title" name="V_title" type="text" placeholder="标题"
+									required="required" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="content" class="col-sm-2 control-label">视频类型：</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="vedioType" aria-controls="example1" id="vedioType" onchange="search()">
+									<option value="1">会员视频</option>
+									<option value="2">教师视频</option>
+								</select>
+							</div>
+							<label for="content" class="col-sm-2 control-label">状态：</label>
+							<div class="col-sm-4">
+								<span class="relative-top6"><input type="checkbox" id="offline" name ="isdel">下线视频</span>
+								<span class="relative-top6"><input type="checkbox" id="online" name ="isdel">上线视频</span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">创建时间：</label>
+							<div class="row">
+								<div class="col-sm-4">
+									<input type="text" class="form-control startTime" id="addStart" name="addStart">
+									<span class="zi" style="">至</span>
+									<input type="text" class="form-control startTime" id="addEnd" name="addEnd">
+								</div>
+							<label for="content" class="col-sm-2 control-label">翻译状态：</label>
+							<div class="col-sm-2">
+								<span class="relative-top6"><input type="checkbox" name ="transtate" value="0">未翻译</span>
+								<span class="relative-top6"><input type="checkbox" name ="transtate" value="1">翻译中</span>
+								<span class="relative-top6"><input type="checkbox" name ="transtate" value="2">翻译成功</span>
+								<span class="relative-top6"><input type="checkbox" name ="transtate" value="3">翻译失败</span>
+							</div>
+							</div>
+						</div>
+
+					</div>
+					<div class="box-footer">
+						 <button type="button" class="btn btn-primary" onclick="openAddNew()">新增</button>
+						 <button type="button" id="deleted" class="btn btn-primary" onclick="batchdel(false)">删除</button> 
+						 <button type="button" class="btn btn-primary" onclick="offlineClick(false,1)">下线</button> 
+						 <button type="button" class="btn btn-primary" onclick="offlineClick(false,2)">上线</button> 
+						<button type="button" class="btn btn-primary" onclick="reload()">刷新</button>
+
+						<button type="button" class="btn btn-primary" onclick="search()">搜索</button>
+					<!-- 	<button type="button" class="btn btn-primary" onclick="convertVideo()">多语言转化</button> -->
+					
+					</div>
+				</form>
+
+				<!-- 列头 -->
+				<div class="box-body mailbox-messages">
+					<table id="privatemodellist" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>
+									<button class="btn btn-default btn-sm checkbox-toggle">
+										<i class="fa fa-square-o"></i>
+									</button>序号
+								</th>
+								<th>昵称</th>
+								<th>gaga号(手机号)</th>
+								<th>视频封面</th>
+								<th>视频文件</th>
+								<th>视频专题</th>
+								<th>视频标题</th>
+								<th>视频介绍</th>
+								<th>视频字幕</th>
+								<th>视频来源</th>
+								<th>视频类型</th>
+								<th>视频价格</th>
+								<th>视频语言</th>
+								<th>页面展示数据</th>
+								<th>点击量</th>
+								<th>付费量</th>
+								<th>付费总额</th>
+								<th>创建时间</th>
+								<th>上线状态</th>
+								<th>翻译状态</th>
+								<th>顺序</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- 提示弹窗 -->
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel1"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent1">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton1"></div>
+		</div>
+	</div>
+</div>
+<!-- 编辑弹窗 -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 850px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent"></div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" id="modalbutton" class="btn btn-primary">提交更改</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="Modal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 850px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel2"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent2" style="height: 500px; overflow: auto;"></div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" id="modalbutton2" class="btn btn-primary">提交更改</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id ="formDiv" hidden="hidden">
+<form class="form-horizontal" role="form" id="formAdd">
+<input type="hidden" id ="uuid" name="uuid"/>
+       <fieldset>
+           <legend>添加大使</legend>
+          <div class="form-group">
+                <label class="col-sm-2 control-label" for="ds_password">视频类型</label>
+             <div class="col-sm-4">
+               	<select id="type" name="type" class="form-control" onchange="checkGagaId()">
+               		<option value="2">教师主页的视频 </option>
+               		<option value="3">教师课程的视频</option>
+               		<option value="1">用户的视频</option>
+               		<option value="4">用户动态页面视频</option>
+               	</select>
+            </div>
+             <label class="col-sm-2 control-label" for="ds_name">会员嘎嘎号或教师手机号</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="gaga_id" name="gaga_id" type="text" onchange="checkGagaId()" placeholder="会员嘎嘎号或教师手机号" required="required"/>
+            	 <input type="hidden" id="gagaId" name="gagaId" />
+             </div>
+          </div>
+           <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_username">视频标题</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="title" name="title" type="text" value="标题" placeholder="视频标题"/>
+             </div>
+             <label class="col-sm-2 control-label" for="ds_username">视频专题</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="specialSubject" name="specialSubject" type="text"  placeholder="视频专题"/>
+             </div>
+          </div>
+          <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_username">视频来源</label>
+             <div class="col-sm-4">
+               	<select id="videoSource" name="videoSource" class="form-control">
+               		<option value="1">GaGaHi平台录制</option>
+               		<option value="2">第三方录制（企业） </option>
+               		<option value="3">第三方录制（个人）</option>
+               	</select>
+             </div>
+             <label class="col-sm-2 control-label" for="ds_password">视频价格</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="price" name="price" type="text" value="0" placeholder="视频价格"/>
+             </div>
+          </div>
+           <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_username">视频介绍</label>
+             <div class="col-sm-4">
+                <textarea class="form-control" id="description" name="description" rows="6"></textarea>
+             </div>
+              <label class="col-sm-2 control-label" for="ds_password">视频字幕</label>
+             <div class="col-sm-4">
+                <textarea class="form-control" id="sourceContent" name="sourceContent" rows="6" placeholder="由翻译提供"></textarea>
+             </div> 
+          </div>
+           <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_username">页面展示数据</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="lookNumber2" name="lookNumber2" value="0" type="text" placeholder=""/>
+             </div>
+       		 <label class="col-sm-2 control-label" for="ds_password">页面顺序（数字越大排序越靠前）</label>
+             <div class="col-sm-4">
+                 <input class="form-control" id="sort" name="sort" value="0" type="text" placeholder=""/>
+             </div> 
+          </div>
+           <div class="form-group">
+           <label class="col-sm-2 control-label" for="ds_password">视频封面</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="img_url" name="img_url" onchange="upload(this,1)" type="file"/>
+                <input class="form-control" type="text" id="imgUrl" name="imgUrl"/>
+             </div>
+            <label class="col-sm-2 control-label" for="ds_password">视频地址</label>
+             <div class="col-sm-4">
+                <input  id="video_url" name="video_url" onchange="upload(this,2)" type="file" />
+                <input class="form-control" type="text" id="videoUrl" name="videoUrl"/>
+             </div>
+          </div>
+           <div class="form-group"> 
+           <div class="col-sm-4"> <img style="width:100px;" id="tupian" src=""></div> 
+           <div class="col-sm-4"> <video style="width:150px;height:150px;" id="shipin" src=""></video></div></div>
+       </fieldset>     
+</form>
+</div>
+<div id="videoTrans" class="box-body" hidden="hidden">
+<ul class="edit-member-ul">
+	<li><span class="labels">价格： </span></span><input style="width: 537px;" id="trans_price" name="trans_price" type="text" value="1" /></li><br/>
+	<li><span class="labels">视频url： </span></span><input style="width: 537px;" id="transvideo_url" name="transvideo_url" type="text" /></li><br/>
+	<li><span class="labels">字幕：</span></span><textarea style="width: 537px" id="sourceContent_tr" name="sourceContent_tr" rows="18"></textarea></li>
+</ul>
+	
+</div>
+<div class="modal fade" id="Modalpage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 60%">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabelpage"></h4>
+			</div>
+			<div class="modal-body" id="bodycontentpage">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbuttonpage"></div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+<script src="dist/js/pages/agent.js"></script>
+<script type="text/javascript">
+
+function ityzl_SHOW_LOAD_LAYER(){  
+    return layer.msg('<div id="loading">加载中……</div>', {icon: 16,shade: [0.5, '#f5f5f5'],scrollbar: false,offset: '0px', time:100000}) ;  
+}  
+function ityzl_CLOSE_LOAD_LAYER(index){  
+    layer.close(index);  
+}  
+function ityzl_SHOW_TIP_LAYER(){  
+    layer.msg('完成！',{time: 1000,offset: '10px'});  
+}  
+$(function(){
+	$('#addStart').datepicker({format: 'yyyy-mm-dd',language: 'zh-CN',defaultDate : new Date()});
+	 $('#addEnd').datepicker({format: 'yyyy-mm-dd',language: 'zh-CN',defaultDate : new Date()});
+});
+function openEditNew(id){
+	$('#bodycontent').html($('#formDiv').html());
+	$('legend').text('编辑视频');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	$.ajax({
+		type:"post",
+		async:"false",
+		url:ctx + "/vedio/getVedio",
+		dataType:"json",
+		data:{"vedioId":id},
+		success:function(data){
+			if(data.success){
+				if(!data.obj){layer.msg("获取信息失败！");return}
+				var vedio = data.obj.vedio;
+				var ty=vedio.type;
+				$('#uuid').val(vedio.uuid);
+				$('#type').val(ty);
+				$('#gaga_id').val(data.obj.username);
+				$('#gagaId').val(data.obj.gaga_id);
+				$('#title').val(vedio.title);
+				$('#description').val(vedio.description);
+				$('#specialSubject').val(vedio.specialSubject);
+				$('#sourceContent').val(vedio.sourceContent);
+				$('#price').val(vedio.price);
+				$('#lookNumber2').val(vedio.lookNumber2);
+				$('#sort').val(vedio.sort);
+				$('#imgUrl').val(vedio.imgUrl);
+				$('#tupian').attr('src',vedio.imgUrl);
+				$('#shipin').attr('src',vedio.videoUrl);
+				$('#videoUrl').val(vedio.videoUrl);
+				if(ty==2||ty==3){
+					$('#gagaId').val(data.obj.teacher_id);
+					$('#gaga_id').val(data.obj.teacher_phone);
+				}
+				//$('#videoUrl').attr('disabled',"true");
+				//$('#video_url').attr('disabled',"true");
+			}else{
+				layer.msg(data.msg);
+			}
+		}
+	});
+  $('#modalbutton').unbind();
+  $('#modalbutton').on('click', function(event) {
+    	event.preventDefault();
+  
+    	if(!checkForms())return;
+    	//$('#modalbutton').attr('disabled',"true");
+    	  $.ajax({
+				type:"post",
+				url:ctx + "/vedio/editVedio",
+				dataType:"json",
+				data:$('#formAdd').serialize(),
+				success:function(data){
+					$('#modalbutton').removeAttr("disabled"); 
+					$('#videoUrl').removeAttr("disabled"); 
+					$('#video_url').removeAttr("disabled"); 
+					layer.msg(data.msg);
+					if(data.success){
+						$('#Modal').modal('hide');
+						search();
+					}else{
+						layer.msg(data.msg);
+					}
+				}
+			});
+    });
+}
+function checkForms(){
+	var gaga_id=$('#gaga_id').val();
+	if(!gaga_id){
+		layer.msg("会员号不能为空");return false;
+	}
+	var price=$('#price').val();
+	var lookNumber2=$('#lookNumber2').val();
+	if(!checkRe('number',lookNumber2)){
+		layer.msg("页面展示数据，请输入正确的数字（大于0 正整数）！");return false;
+	}
+	if(!checkRe('decimal',price)){
+		layer.msg("请输入正确的价格");return false;
+	}
+	if(!checkGagaId()){
+		return false;}
+	return true;
+}
+function checkGagaId(){
+	var type = $('#type').val();
+	var gagaId = $('#gaga_id').val();
+	var flag = true;
+	if(gagaId){
+		$.ajax({
+			type:"post",
+			async: false,
+			url:ctx + "/vedio/checkGagaId",
+			data:{"type":type,"gagaId":gagaId},
+			dataType:"json",
+			success:function(result){
+				if(!result.obj){
+					layer.msg('会员号错误，请确保视频类型和会员号对应！');
+					flag = false;
+				}else{
+					layer.closeAll();
+					if(type=='2'||type=='3'){
+						$('#gagaId').val(result.obj.teacher_id);
+						
+					}else{
+						$('#gagaId').val(result.obj.gaga_id);
+					}
+					flag = true;
+				}
+				console.log(result)
+			}
+		});
+		return flag;
+	}
+}
+
+
+/**
+ * 上传预览图
+ * obj 当前对象
+ * index 对应控件id
+ */
+function upload(obj,type){
+	var imgobj = $("#img_url");
+	
+	var uType = 'V-I';
+	$('#UType').val(type);
+	if(type==2){
+		imgobj = $("#video_url");
+		uType = 'V-V';
+	}else{
+		var img=$('#img_url').val();
+		console.log(img)
+	   if(!/\.(gif|jpg|jpeg|png|GIF|JPG|PNG)$/.test(img)){
+	        alert("图片类型必须是.gif,jpeg,jpg,png中的一种")
+	        return false;
+	    }
+	}
+	var that=obj;
+	var key=$(that).val();
+	var imageType=key.split(".");
+	$("#imageType").val(imageType[1]);
+	var token = "";
+	$.post(ctx+"/Image/uploadVedioInit",{type:uType,imgNum:1},function(result){
+		 if(result.success){
+			token = result.obj.upToken;
+			key=result.obj.img;
+			if ($(that).length > 0 && token != "") {
+				Qiniu_upload($(that)[0].files[0], token,key,imgobj);
+			} else {
+				console && console.log("form input error");
+			}
+		 }
+	});
+}
+function openAddNew(){
+	$('#bodycontent').html($('#formDiv').html());
+	$('legend').text('添加视频');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+
+	//$('#sourceContent').attr('disabled',"true");
+	 $('#modalbutton').unbind();
+	  $('#modalbutton').on('click', function(event) {
+	    	event.preventDefault();
+
+	    	if(!checkForms())return;
+	    	//$('#modalbutton').attr('disabled',"true");
+	    	  $.ajax({
+					type:"post",
+					url:ctx + "/vedio/addVedio",
+					dataType:"json",
+					data:$('#formAdd').serialize(),
+					success:function(data){
+						$('#modalbutton').removeAttr("disabled"); 
+						$('#sourceContent').removeAttr("disabled"); 
+						layer.msg(data.msg);
+						if(data.success){
+							$('#Modal').modal('hide');
+							search();
+						}else{
+							layer.msg(data.msg);
+						}
+					}
+				});
+	    });
+}
+/**
+ * 查询
+ */
+function search(){
+	$("#privatemodellist").dataTable().fnDraw(true);
+}
+
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        var tabs=$("#privatemodellist").dataTable({
+        	"bStateSave": true,
+        	"paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "info": true,
+            "autoWidth": false,
+            "ordering": true,
+            "pageLength":10,//分页长度
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	var istuikuan = 0;
+	        	if($('#offline').prop('checked')&&!$('#online').prop('checked')){
+	        	　	istuikuan = 1;
+	        	    aoData.push({"name":"isdel","value":istuikuan});
+	        	}
+	        	if(!$('#offline').prop('checked')&&$('#online').prop('checked')){
+	        	　	istuikuan = 0;
+	        	    aoData.push({"name":"isdel","value":istuikuan});
+	        	} 
+	        	var id_array=new Array();  
+	        	$('input[name="transtate"]:checked').each(function(){  
+	        	    id_array.push($(this).val());//向数组中添加元素  
+	        	});  
+	        	var idstr=id_array.join(',');//将数组元素连接起来以构建一个字符串  
+	        	console.log(idstr);  
+	        	aoData.push(
+	        			{"name":"gagaId","value":$('#V_gaga').val()},
+		       			{"name":"vedioType","value": $("#vedioType").val()},
+		       			{"name":"addStart","value":$('#addStart').val()},
+		       			{"name":"addEnd","value":$('#addEnd').val()},
+		       			{"name":"title","value":$('#V_title').val()},
+		       			{"name":"callbackState","value":idstr}
+		       			
+       			)
+       			 var url=(tabs)?(ctx+"/vedio/getVedioList"):"#";
+	        	layer.load(1, {shade: 0.3});
+	        	oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": url,
+	              "data": aoData,
+	              "success": fnCallback
+	        	});
+	        },
+	        "columns": [//排序、赋值
+	        	{"data": "uuid","bSortable": false },
+	        	{"data": "memb_nickname","bSortable": false },
+				{"data": "memb_gagano","bSortable": false,"defaultContent":""},
+				{"data": "img_url","bSortable": false},
+				{"data": "video_url","bSortable": false},
+				{"data": "special_subject","bSortable": false },
+				{"data": "title","bSortable": false },
+				{"data": "description","bSortable": false,"defaultContent":""},
+				{"data": "source_content","bSortable": false },
+				{"data": "video_source","bSortable": false},
+				{"data": "type","bSortable": false},
+				{"data": "price","bSortable": false },
+				{"data": "lang_id","bSortable": false,"defaultContent":""},
+				{"data": "look_number2","bSortable": false,"defaultContent":0},
+				{"data": "look_number","bSortable": false,"defaultContent":0},
+				{"data": "buys","bSortable": false,"defaultContent":0,"bVisible":true},
+				{"data": "totalBuys","bSortable": false,"defaultContent":0,"bVisible":true},
+				{"data": "create_date","bSortable": false },
+				{"data": "isdel","bSortable": false },
+				{"data": "callback_state","bSortable": false ,"bVisible":false},
+				{"data": "sort","bSortable": false,"defaultContent":0},
+				{"data": "uuid","bSortable": false }
+	        ],
+	        "columnDefs": [{//特殊数据
+	        		"targets": 0,//复选框
+					"render": function ( data, type, full, meta ) {
+						 return '<input type="checkbox" value="' + data + '" title="' + data + '" name="checkbox" class="checkbox" />'; 
+					}   
+				},{
+	                 "targets": 3,
+	                 "render": function(data, type, full, meta) {	                	
+	                 	if(data){data='<img style="width:100px;" class="min" src="'+data+'" />' }
+	                 	return data	
+	                 }
+	             },{
+	                 "targets": 4,
+	                 "render": function(data, type, full, meta) {	                	
+	                 	if(data){data='<video style="width:150px;height:150px;" src="'+data+'" controls="controls">您的浏览器不支持 video 标签。</video>' }
+	                 	return data	
+	                 }
+	             },{
+	                 "targets": 9,
+	                 "render": function(data, type, full, meta) {	                	
+	                 	if(data==1){data='GaGaHi平台录制'}else if(data==2){data='第三方录制（企业）'}else if(data==3){data='第三方录制（个人）'}
+	                 	return data	
+	                 }
+	             },{
+	                 "targets": 10,
+	                 "render": function(data, type, full, meta) {	                	
+	                 	if(data==1){data='用户的视频'}else if(data==2){data='教师主页的视频'}else if(data==3){data='教师课程的视频'}else if(data==4){data='动态页面视频'}
+	                 	return data	
+	                 }
+	             },{//特殊数据
+	        		"targets": 17,
+					"render": function ( data, type, full, meta ) {
+	                	if(data!=null){
+	                		var longtime=new Date(data).getTime();
+	                		date=new Date(longtime);
+	                   	 return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();;
+	                	}
+					}   
+				},{
+	        		"targets": 18,//操作
+					"render": function ( data, type, full, meta ) {
+						if(data==0){data = '已上线'}else {data='已下线'}
+						return data
+					}
+				},{
+	        		"targets": 19,//操作
+					"render": function ( data, type, full, meta ) {
+						if(data==0){data = '未翻译'}else if(data==1){data = '翻译中'}else if(data==2){data = '翻译成功'}
+						else if(data==3){data = '翻译失败'}
+						return data
+					}
+				},{
+	        		"targets": 21,//操作
+					"render": function ( data, type, full, meta ) {
+						var htm='<a class="openEditNew" href="javascript:void(0)" onclick="openTrans(\''+ data +'\',1)">查看多语言</a> <br/>'+
+						 '<a class="openEditNew" href="javascript:void(0)" onclick="openEditNew(\''+ data +'\')">编辑</a> <br/>';
+						 if(full.isdel==1){
+							// htm +='<a class="openEditNew" href="javascript:void(0)" onclick="online(\''+ data +'\',1,'+full.callback_state+','+full.type+')">上线</a> <br/>' 
+						 }else{
+							// htm +='<a class="openEditNew" href="javascript:void(0)" onclick="online(\''+ data +'\',0,'+full.callback_state+')">下线</a> <br/>' 
+						 }
+						 return htm;
+					}
+				}
+			],"fnRowCallback": function (nRow, aData, iDisplayIndex) {
+	            if (aData.description&&aData.description.length > 10) {
+	                $('td:eq(7)', nRow).html( aData.description.substr(0, 5)+'……');
+	            }
+	            if (aData.source_content&&aData.source_content.length > 10) {
+	                $('td:eq(8)', nRow).html( aData.source_content.substr(0, 5)+'……');
+	            }
+	        },
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+            	$(".mailbox-messages input[type='checkbox']").iCheck({
+	            	checkboxClass: 'icheckbox_flat-blue',
+	                radioClass: 'iradio_flat-blue'
+	            });
+            	layer.closeAll();
+            	var json=jQuery.parseJSON(oSettings.jqXHR.responseText);
+            	 	
+            }
+	    });
+		$(".checkbox-toggle").click(function() {//复选框全选/反选
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+			    $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+			    $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+        //序号相关
+        var table = $('#privatemodellist').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML += page.page*page.length+ i+1;
+            });
+        }).draw();
+   });
+});
+
+
+function reload(){
+	window.location.reload();//刷新当前页面.
+}
+/**
+ *	批量删除
+ *	sign	标志true 不再提示是否删除
+ */
+ function batchdel(sign) {
+
+		var objs = $("#privatemodellist div");
+		var id = "";
+		 for (var i = 0; i < objs.length; i++) {
+		        var obj = objs[i];
+		        var flag = $(obj).attr("aria-checked");
+		        if (flag == "true") {
+		            if (id.trim() != "") {
+		                id += ","
+		            }
+		            id += $(obj).children("input").attr("value");
+		        }
+		    }
+
+	    console.log(id);
+	 	if(id.trim() == ""){
+			$("#ModalLabel1").text("提示");
+			$("#bodycontent1").html('<span>请选中一条进行删除！</span>');
+			$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			$('#Modal1').modal({
+			    keyboard: true
+			});
+			return;
+	 	}  
+	    if(!sign){
+			$("#ModalLabel1").text("删除模板");
+			$("#bodycontent1").html('<span>确定要删除所选项吗？</span>');
+			$("#modalbutton1").html('<button type="button" onclick="batchdel(true)" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			$('#Modal1').modal({
+			    keyboard: true
+			});
+			return;
+	    }
+	    $.ajax({
+	        type: "post",
+	        url: ctx + "/vedio/deleteVideo",
+	        dataType: "json",
+	        data: {"vedioId": id},
+	        success: function(data) {
+	            if (data.success) {
+	            	$("#privatemodellist").dataTable().fnDraw(true);
+	            	$('#Modal1').modal('hide');
+	            	search();
+	            }else{
+	            	$("#privatemodellist").dataTable().fnDraw(true);
+	            	$('#Modal1').modal('hide');
+	            	layer.msg("服务器异常！请重试")
+	            }
+	        },
+	        error: function (XMLHttpRequest, textStatus, errorThrown) {
+	        	$("#privatemodellist").dataTable().fnDraw(true);
+            	$('#Modal1').modal('hide');
+	        }
+	    });
+};
+ function offlineClick(sign,state) {
+		var objs = $("#privatemodellist div");
+		var id = "";
+		 for (var i = 0; i < objs.length; i++) {
+		        var obj = objs[i];
+		        var flag = $(obj).attr("aria-checked");
+		        if (flag == "true") {
+		            if (id.trim() != "") {
+		                id += ","
+		            }
+		            id += $(obj).children("input").attr("value");
+		        }
+		    }
+
+	    console.log(id);
+	 	if(id.trim() == ""){
+			$("#ModalLabel1").text("提示");
+			$("#bodycontent1").html('<span>请选中一条进行操作！</span>');
+			$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			$('#Modal1').modal({
+			    keyboard: true
+			});
+			return;
+	 	}  
+	    if(!sign){
+			$("#ModalLabel1").text("");
+			var texx='上线';
+			if(state==1){texx='下线'}
+			$("#bodycontent1").html('<span>确定要'+texx+'所选项吗？</span>');
+			$("#modalbutton1").html('<button type="button" onclick="offlineClick(true,'+state+')" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			$('#Modal1').modal({
+			    keyboard: true
+			});
+			return;
+	    }
+	    $.ajax({
+	        type: "post",
+	        url : ctx + "/vedio/videoState",
+	        dataType: "json",
+	        data: {"vedioId": id,"type":state},
+	        success: function(data) {
+	            if (data.success) {
+	            	$("#privatemodellist").dataTable().fnDraw(true);
+	            	$('#Modal1').modal('hide');
+	            	search();
+	            }else{
+	            	$("#privatemodellist").dataTable().fnDraw(true);
+	            	$('#Modal1').modal('hide');
+	            	layer.msg("服务器异常！请重试")
+	            }
+	        },
+	        error: function (XMLHttpRequest, textStatus, errorThrown) {
+	        	$("#privatemodellist").dataTable().fnDraw(true);
+         	$('#Modal1').modal('hide');
+	        }
+	    });
+};
+
+ function convertVideo(sign) {
+		var diphid = new Array();		
+		var objs = $("#privatemodellist div");
+
+	    for (var i = 0; i < objs.length; i++) {
+	        var obj = objs[i];
+	        var flag = $(obj).attr("aria-checked");
+	        if (flag == "true") {
+	            var val=$(obj).children("input").attr("value");
+	            diphid.push(val);  
+	        }
+	    }
+	    console.log(diphid);
+	 	if(null == diphid || diphid.length <= 0||diphid.length > 1){
+			$("#ModalLabel1").text("提示");
+			$("#bodycontent1").html('<span>请选中一条进行处理！</span>');
+			$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			$('#Modal1').modal({
+			    keyboard: true
+			});
+			return;
+	 	}  
+	    if(!sign){
+			$("#ModalLabel1").text("");
+			$("#bodycontent1").html('<span>确定要转化所选项吗？</span>');
+			$("#modalbutton1").html('<button type="button" onclick="convertVideo(true)" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			$('#Modal1').modal({
+			    keyboard: true
+			});
+			return;
+	    }
+		var i;
+		i = ityzl_SHOW_LOAD_LAYER();  
+	    $.ajax({
+	        type: "post",
+	        url: ctx + "/vedio/convertVideo",
+	        dataType: "json",
+	        data: {"vedioId": diphid.join()},
+	        success: function(data) {
+	        	ityzl_CLOSE_LOAD_LAYER(i);  
+	            if (data.success) {
+	            	layer.msg(data.msg)
+	            	$("#privatemodellist").dataTable().fnDraw(true);
+	            	$('#Modal1').modal('hide');
+	            }else{
+	            	layer.msg(data.msg)
+	            	$('#Modal1').modal('hide');
+	            }
+	        },
+	        error: function (XMLHttpRequest, textStatus, errorThrown) {
+	        	ityzl_CLOSE_LOAD_LAYER(i);  
+	        	$("#privatemodellist").dataTable().fnDraw(true);
+         		$('#Modal1').modal('hide');
+         		layer.msg(data.msg)
+	        }
+	    });
+}
+
+ /**
+  * 七牛上传图片
+  */
+ var Qiniu_UploadUrl = "https://upload.qiniup.com";
+ var Qiniu_upload = function(f, token, key,obj) {
+	var i;
+	i = ityzl_SHOW_LOAD_LAYER();  
+ 	var xhr = new XMLHttpRequest();
+ 	xhr.open("POST", Qiniu_UploadUrl, true);
+ 	var formData, startDate;
+ 	formData = new FormData();
+ 	if (key !== null && key !== undefined) formData.append("key", key);
+ 	formData.append("token", token);
+ 	formData.append("file", f);
+ 	var taking;
+ 	xhr.upload.addEventListener("progress", function(evt) {
+ 		if (evt.lengthComputable) {
+ 			var nowDate = new Date().getTime();
+ 			taking = nowDate - startDate;
+ 			var x = (evt.loaded) / 1024;
+ 			var y = taking / 1000;
+ 			var uploadSpeed = (x / y);
+ 			var formatSpeed;
+ 			if (uploadSpeed > 1024) {
+ 				formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+ 			} else {
+ 				formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+ 			}
+ 			$('#loading').text('大小：'+x+'kb  速度：'+formatSpeed+' 时间：'+y+' 秒');
+ 		}else{
+ 			  ityzl_CLOSE_LOAD_LAYER(i);  
+ 		 	   ityzl_SHOW_TIP_LAYER();  
+ 		}
+ 	}, false);
+ 	 //upload events
+    xhr.upload.onloadstart = function(event) {
+        console.log("upload.onloadstart()");
+    }
+    xhr.upload.onprogress = function(event) {
+        console.log("upload.onprogress()"+event);
+    }
+    xhr.upload.onabort = function(event) {
+        console.log("upload.onabort()");
+    }
+    xhr.upload.onerror = function(event) {
+        console.log("upload.onerror()");
+    }
+    xhr.upload.onload = function(event) {
+        console.log("upload.onload()");
+    }
+    xhr.upload.ontimeout = function(event) {
+        console.log("upload.ontimeout()");
+    }
+    xhr.upload.onloadend = function(event) {
+    	console.log("upload.onloadend()");
+  	   ityzl_CLOSE_LOAD_LAYER(i);  
+ 	   ityzl_SHOW_TIP_LAYER(); 
+  	  
+    }
+ 	xhr.onreadystatechange = function(response) {
+ 		
+ 		if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+ 			var blkRet = JSON.parse(xhr.responseText);
+ 			$(obj).closest('.edit-img-box').addClass('have');
+ 			$(obj).attr('src',qiniuVedio+blkRet.key);//图片赋值 
+ 			if($('#UType').val()==2){
+ 				$('#videoUrl').val(qiniuVedio+blkRet.key);
+ 				$('#shipin').attr('src',qiniuVedio+blkRet.key);
+ 			}else{
+ 				$('#imgUrl').val(qiniuVedio+blkRet.key);
+ 	 			$('#tupian').attr('src',qiniuVedio+blkRet.key);
+ 			}
+ 			
+ 		} else if (xhr.status != 200 && xhr.responseText) {
+ 			
+ 		}
+ 	};
+ 	startDate = new Date().getTime();
+ 	xhr.send(formData);
+ };
+ function checkRe(type,value){ 
+		console.log(value)
+		if(!value)return true;
+		var patt = /e/;
+		switch(type)
+		{
+		case 'number':
+			patt=/^[0-9]+$/;
+		  break;
+		case 'phone':
+			patt=/^1[34578]\d{9}$/;
+		  break;
+		case 'decimal':
+			patt=/^\d+(\.\d+)?$/
+		  break;
+		default:
+			 break;
+		}
+		return patt.test(value);  
+	}
+
+ //充值
+ function openTrans(id,type){
+	   if(type==1){
+		   $("#ModalLabelpage").text("多语言列表");
+		   var tablehtml ='<div class="box">';
+			   tablehtml+='<div class="box-body mailbox-messages">';
+			   tablehtml+='<table id="recharges" class="table table-bordered table-hover">';
+			   tablehtml+='<thead>';
+			  
+			   tablehtml+='<tr><th>序号</th><th>语言id</th><th>价格</th><th>字幕</th><th>视频</th><th>操作</th></tr></thead></table></div></div>';
+			   $("#bodycontentpage").html(tablehtml);
+			
+			   rechargelist(id);
+				$('#Modalpage').modal({
+					keyboard : true
+				});
+	   }
+	   if (type == 2) {
+			$('#Modalpage').modal('hide');
+		}
+ }
+ 
+ function rechargelist(id){
+  var layinx;
+	   var reTable=$("#recharges").dataTable({
+	    	"bStateSave": true, 
+	    	//"paging": true,
+	        //"processing": true,
+	        "serverSide": true,
+	        "lengthChange": false,
+	        "searching": false,
+	       // "ordering": true,
+	       // "info": true,
+	        "autoWidth": false,
+	        "pageLength":10,
+	       // "bScrollInfinite": true,
+	        //"bScrollCollapse": true,
+	       // "sScrollY": "500px",
+	        //"ajax" : ctx+"/adminmember/notauditedimgList",
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	aoData.push({"name":"vedioId","value":id})
+	        	//aoData=gagaidorname; 
+            layinx = layer.load(1, {shade: 0.3}); 
+            var url=(reTable)?(ctx+"/vedio/transList"):"#";
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": url,
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "uuid","bSortable": false },
+				{"data": "lang_id","bSortable": false },
+				{"data": "price","bSortable": false},
+				{"data": "translate_content","bSortable": false, sWidth:"30%",  },
+				{"data": "video_url","bSortable": false},
+				{"data": "uuid","bSortable": false}
+			
+	        ], 
+	         "columnDefs": [
+	        	 {"targets": 4,
+						"render": function ( data, type, full, meta ) {
+							if(data){data='<video style="width:150px;height:150px;" src="'+data+'" controls="controls">您的浏览器不支持 video 标签。</video>' }
+		                 	return data	
+						}
+					},
+				{"targets": 5,
+					"render": function ( data, type, full, meta ) {
+						return '<a href="javascript:void(0)" onclick="tuikuan(\''+ data +'\','+full.price+')">编辑</a>';
+					}
+				}
+			],"fnRowCallback": function (nRow, aData, iDisplayIndex) {
+		            if (aData.translate_content.length > 10) {
+		                $('td:eq(3)', nRow).html( aData.translate_content.substr(0, 50)+'……');
+		            }
+			         
+			},
+	      "fnDrawCallback": function (oSettings) {
+	            layer.close(layinx);                    
+	      }  
+	    });
+	   var table = $('#recharges').DataTable();
+     	table.on( 'order.dt search.dt', function () {
+     	//获取页信息
+     	//debugger
+     	var page=table.page.info();
+      	table.column(0, {}).nodes().each( function (cell, i) {
+              cell.innerHTML =page.page*page.length+ i+1;
+          } );
+      } ).draw();
+ }
+ function tuikuan(id,price,translateContent){
+	 $('#bodycontent2').html($('#videoTrans').html());
+	 $('#Modal2').css("z-index","10000");
+		$('#Modal2').modal({
+		    keyboard: true
+		});
+		  $.ajax({
+				type:"post",
+				url:ctx + "/vedio/getTrans",
+				async: false,
+				dataType:"json",
+				data:{"uuid":id},
+				success:function(data){
+					if(data.success){
+						translateContent=data.obj.translateContent;
+						 $('#transvideo_url').val(data.obj.videoUrl);
+					}
+				}
+			});
+	 $('#trans_price').val(price);
+	 $('#sourceContent_tr').val(translateContent);
+	 $('#modalbutton2').unbind();
+	  $('#modalbutton2').on('click', function(event) {
+	    	event.preventDefault();
+	    	//if(!checkForms())return;
+	    	//$('#modalbutton2').attr('disabled',"true");
+	    	price = $('#trans_price').val();
+	    	translateContent = $('#sourceContent_tr').val();
+	    	  $.ajax({
+					type:"post",
+					url:ctx + "/vedio/editTrans",
+					dataType:"json",
+					data:{"uuid":id,"price":price,"translateContent":translateContent,"videoUrl":$('#transvideo_url').val()},
+					success:function(data){
+						$('#modalbutton2').removeAttr("disabled"); 
+						layer.msg(data.msg);
+						if(data.success){
+							$('#Modal2').modal('hide');
+							$("#recharges").dataTable().fnDraw(true);
+						}else{
+							layer.msg(data.msg);
+							$('#Modal2').modal('hide');
+							$("#recharges").dataTable().fnDraw(true);
+						}
+					}
+				});
+	    });
+ }
+
+</script>
+

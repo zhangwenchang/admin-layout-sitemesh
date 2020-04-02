@@ -1,0 +1,71 @@
+<section>
+
+</section>
+
+<script type="text/javascript">
+
+
+
+$(function(){
+	
+	$.ajax({
+	    type: "post",
+	    url: ctx + "/useBase/getdistribution",
+	    dataType: "json",
+	    data: {"type": 1,"startTime":"2018-01-01","endTime":"2018-03-01"},
+	    success: function(data) {
+	    	console.log("大洲===") ;
+	       console.log(data) ;
+	    }
+	});
+	
+	$.ajax({
+	    type: "post",
+	    url: ctx + "/useBase/getCountryDetail",
+	    dataType: "json",
+	    data: {"startTime":"2018-01-01","endTime":"2018-03-01"},
+	    success: function(data) {
+	    	console.log("国家明细===") ;
+	       console.log(data) ;
+	    }
+	});
+	
+	$.ajax({
+	    type: "post",
+	    url: ctx + "/useBase/getCountrySex",
+	    dataType: "json",
+	    data: {"countryName": "中国"},
+	    success: function(data) {
+	    	console.log("性别表格===") ;
+	       console.log(data) ;
+	    }
+	});
+
+	$.ajax({
+	    type: "post",
+	    url: ctx + "/useBase/getSexChart",
+	    dataType: "json",
+	    data: {"countryName": "中国"},
+	    success: function(data) {
+	    	console.log("性别图表===") ;
+	       console.log(data) ;
+	    }
+	});
+	
+	$.ajax({
+	    type: "post",
+	    url: ctx + "/useBase/getChannlDetail",
+	    dataType: "json",
+	    data: {"countryName": "中国"},
+	    success: function(data) {
+	    	console.log("渠道统计===") ;
+	       console.log(data) ;
+	    }
+	});
+	
+})
+
+
+
+</script>
+

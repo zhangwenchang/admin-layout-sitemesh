@@ -1,0 +1,361 @@
+<style>
+.log {height: 300px;  overflow: auto;  border: solid 1px #ccc;   padding: 4px;}
+#chatcontent { padding-left: 0; }
+#memberemailcontent { padding-left: 0; }
+.log li { margin-bottom:20px;    list-style-type: none;  }
+.service {  text-align: right; }
+</style>
+<script type="text/javascript">
+	//刷新表格
+	function search() {
+	    $("#tableData").dataTable().fnDraw(false);
+	}
+	//删除
+	function deleteContent(id){
+		if(!id){
+			return;
+		}
+		$('#delModal').find("#delId").val(id);
+		$('#delModal').modal({
+		      keyboard: true
+	 	})
+	}
+	function ignored(id){
+		if(!id){
+			return;
+		}
+		$.ajax({
+			type: "post",
+	        url: ctx + "/report/ignored",
+	        dataType: "json",
+	        data: {
+	            "id": id
+	        },
+	        success: function(rs) {
+	        	if(rs.success){
+	        		alert("操作成功");
+		        	search();
+	        	}else{
+	        		alert(rs.msg);
+	        	}
+	        }
+		})
+	}
+	function delConfirm(){
+		var id = $('#delModal').find("#delId").val();
+		if(!id){
+			return;
+		}
+		$.ajax({
+			type: "post",
+	        url: ctx + "/report/deleteById",
+	        dataType: "json",
+	        data: {
+	            "id": id
+	        },
+	        success: function(rs) {
+	        	if(rs.success){
+	        		alert("操作成功");
+	        		$('#delModal').modal('hide');
+		        	search();
+	        	}else{
+	        		alert(rs.msg);
+	        	}
+	        }
+		})
+	}
+	//禁用
+	function forbidden(id){
+		if(!id){
+			return;
+		}
+		$.ajax({
+			type: "post",
+	        url: ctx + "/report/forbid",
+	        dataType: "json",
+	        data: {
+	            "id": id
+	        },
+	        success: function(rs) {
+	        	if(rs.success){
+	        		alert("操作成功");
+		        	search();
+	        	}else{
+	        		alert(rs.msg);
+	        	}
+	        }
+		})
+	}
+</script>
+<section class="content-header">
+    <h1>举报管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>举报管理</li>
+        <li class="active">举报管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          
+           <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">举报ID：</label>
+                  <div class="col-sm-2">
+                    <input type="text" class="form-control" id="gagaNo" placeholder="举报GAGA号" maxlength="50">
+                  </div>
+                  <label for="membNo" class="col-sm-2 control-label">被举报ID：</label>
+                  <div class="col-sm-2">
+                    <input type="text" class="form-control" id="targetGagaNo" placeholder="被举报GAGA号" maxlength="50">
+                  </div>
+                  <label for="content" class="col-sm-2 control-label">状态：</label>
+                  <div class="col-sm-2">
+                     <select name="example1_length" aria-controls="example1" id="status" class="form-control input-sm">
+		          		<option value="" selected="selected">不限</option>
+		          		<option value="1">未处理</option>
+		          		<option value="2">已忽略</option>
+		          		<option value="3">已处理</option>
+		          	</select>
+                  </div>
+                </div>
+                
+                <div class="form-group">   
+                  <label for="content" class="col-sm-2 control-label">内容分类：</label>
+                  <div class="col-sm-2">
+                     <select name="example1_length" aria-controls="example1" id="contentType" class="form-control input-sm">
+		          		<option value="">不限</option>
+		          		<option value="1">个人</option>
+		          		<option value="2">内容</option>
+		          	</select>
+                  </div>
+                  <label for="content" class="col-sm-2 control-label">来源：</label>
+                  <div class="col-sm-2">
+                     <select name="example1_length" aria-controls="example1" id="platform" class="form-control input-sm">
+		          		<option value="">不限</option>
+		          		<option value="1">PC</option>
+		          		<option value="2">APP</option>
+		          	</select>
+                  </div>
+                  <label for="content" class="col-sm-2 control-label">原因：</label>
+                  <div class="col-sm-2">
+                     <select name="example1_length" aria-controls="example1" id="reasonType" class="form-control input-sm">
+		          		<option value="">不限</option>
+		          		<option value="1">垃圾广告</option>
+		          		<option value="2">淫秽色情</option>
+		          		<option value="3">虚假中奖</option>
+		          		<option value="4">敏感信息</option>
+		          		<option value="5">人身攻击</option>
+		          		<option value="6">骚扰他人</option>
+		          		<option value="7">骗子</option>
+		          		<option value="8">广告</option>
+		          		<option value="9">色情低俗</option>
+		          		<option value="10">违法</option>
+		          		<option value="11">政治敏感</option>
+		          		<option value="12">谣言</option>
+		          		<option value="13">骚扰信息</option>
+		          	</select>
+                  </div>     
+                </div>
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">举报时间:</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="startDate" maxlength="10">至<input type="text" id="endDate" maxlength="10">
+                  </div>
+                </div>
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  	<th>ID</th>
+                    <th>GAGAID</th>
+                    <th>IP</th>
+                    <th>备注</th>
+                    <th>举报时间</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+<!-- 删除对话框 -->
+<div class="modal fade" id="delModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+            <input type="hidden" id="delId">
+         </div>
+         <div class="modal-body">
+            	确定删除此内容
+         </div>
+         <div class="modal-footer">
+         	<button type="button" class="btn btn-default" onclick="delConfirm();">确定</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+$(function() {
+	$('#startDate').datepicker({format: 'yyyy-mm-dd'});
+	$('#endDate').datepicker({format: 'yyyy-mm-dd'});
+	
+	
+	
+	$.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 ], function() {
+
+        var userListt=$("#tableData").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 20,
+
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+	        	var _gagaNo = $("#gagaNo").val();
+	        	if(_gagaNo){
+    	         	aoData.push({"name":"gagaNo","value":_gagaNo})
+    	       	}
+               	var url=(userListt)?(ctx + "/blackUser/list"):"#";     
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": url,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "id",
+                "bSortable": false
+            },{
+                "data": "gagaNo",
+                "bSortable": false
+            },{
+                "data": "ip",
+                "bSortable": false
+            }, {
+                "data": "imei",
+                "bSortable": false
+            }, {
+                "data": "remark",
+                "bSortable": false
+            }, {
+                "data": "createTimeUtc",
+                "bSortable": false,
+                "render": function ( data, type, full, meta ) {
+					var dstr='';
+    				if(data!=null){
+    				dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+    				}
+       			 return dstr;
+       			 }
+            },{
+                "data": "status",
+                "bSortable": false,
+                "render": function ( data, type, full, meta ) {
+                	var _html = '<a href="javascript:void(0)" onclick=deleteContent('+full.id+')>刪除</a>';
+                	return _html;
+       			 }
+            }],
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.draw();
+        /* table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw(); */
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+    });
+	
+});
+</script>
+

@@ -1,0 +1,335 @@
+<style type="text/css">
+.page-search-box .form-group { width: 35%; float: left;}
+.page-search-box .form-group .form-control { height: 30px; }
+.page-search-box .form-group .form-control.half-self { width: 46%; display: inline-block; }
+.jingque { position: absolute;top: 29px;  left: 15px; font-size: 11px;  line-height: 11px; }
+.jingque input { position: relative; top: -2px; }
+.higher-group { height: 30px; }
+.relative-top6 { position: relative; top: 6px; }
+.edit-member-ul li { list-style-type: none; }
+.edit-member-ul li .labels { display: inline-block; width: 112px; }
+.edit-member-ul li input, .edit-member-ul li select { width: 137px; margin-right: 12px; }
+.red { color: #F00; }
+</style>
+<section class="content-header">
+	<h1>敏感词过滤审核管理<small></small></h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>其他管理</li>
+		<li class="active">敏感词过滤审核管理</li>
+	</ol>
+</section>
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<form class="form-horizontal page-search-box">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">发件人:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="sendP" placeholder="" aria-controls="example1">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">发送时间:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control half-self"  id="startTime"> 至 <input type="text" class="form-control half-self"  id="endTime">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">状态:</label>
+							<div class="col-sm-9">
+								<select id="status" class="form-control">
+									<option value="">未审核</option>
+									<option value="1">已审核</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">收件人:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="getP" placeholder="" aria-controls="example1">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">内容:</label>
+							<div class="col-sm-9">
+								<input type="text" class="form-control" id="content" placeholder="" aria-controls="example1">
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="col-sm-2"></div>
+							<button type="button" class="btn btn-primary search-btn">查询</button>
+						</div>
+					</div>
+					<div class="box-footer">
+						<button type="button" class="btn btn-primary pass-btn">放行</button>&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-primary refresh-btn">刷新</button>&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-primary nopass-btn">不放行</button>
+					</div>
+				</form>
+				<div class="box-body mailbox-messages">
+					<table id="datalist" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+								<th>发件人</th>
+								<th>发件人ID</th>
+								<th>收件人</th>
+								<th>收件人ID</th>
+								<th>内容</th>
+								<th>敏感词</th>
+								<th>字符总数</th>
+								<th>发送时间</th>
+								<th>状态</th>
+							</tr>
+						</thead>
+						
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+$(function() {
+	console.log(1);
+	$.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js', '/plugins/daterangepicker/daterangepicker.js'], function() {
+		//设置默认时间，起始范围：前一天18点到当天18点
+		var dateObj = new Date();
+		var defaultEndDate = dateObj.getFullYear() + '-' + (dateObj.getMonth() + 1) + '-' + dateObj.getDate() + ' 10:00:00';
+		var prevDate = new Date(dateObj.getTime() - 86400000);
+		var defaultStartDate = prevDate.getFullYear() + '-' + (prevDate.getMonth() + 1) + '-' + prevDate.getDate() + ' 10:00:00';
+		$('#startTime').daterangepicker({
+			timePicker: true,
+			timePicker12Hour: false,
+			timePickerSeconds: true,
+			timePickerIncrement: 1,
+			opens: "right",
+			format: 'YYYY-MM-DD HH:mm:ss',
+			singleDatePicker: true,
+			startDate: defaultStartDate
+		});
+		$('#endTime').daterangepicker({
+			timePicker: true,
+			timePicker12Hour: false,
+			timePickerSeconds: true,
+			timePickerIncrement: 1,
+			opens: "right",
+			format: 'YYYY-MM-DD HH:mm:ss',
+			singleDatePicker: true
+		});
+		$('#startTime').data('daterangepicker').setStartDate(defaultStartDate);
+		$('#endTime').data('daterangepicker').setEndDate(defaultEndDate);
+		var t = $("#datalist").dataTable({
+			"bStateSave": true,
+			"paging": true,
+			//"processing": true,
+			"serverSide": true,
+			"lengthChange": false,
+			"searching": false,
+			"ordering": true,
+			"info": true,
+			"autoWidth": false,
+			"pageLength": 10,
+			"fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+				var sendP = $("#sendP").val();
+				var beginDate = $("#startTime").val();
+				var endDate = $("#endTime").val();
+				var status = $('#status').val();
+				var getP = $('#getP').val();
+				var content = $('#content').val();
+
+				if (sendP) {
+					aoData.push({"name": "sname", "value": sendP});
+				}
+				if (beginDate) {
+					aoData.push({"name": "stime", "value": beginDate});
+				}
+				if (endDate) {
+					aoData.push({"name": "etime", "value": endDate});
+				}
+				if (status) {
+					aoData.push({"name": "type", "value": status});
+				}
+				if (getP) {
+					aoData.push({"name": "gname", "value": getP});
+				}
+				if (content) {
+					aoData.push({"name": "key", "value": content});
+				}
+				layer.load(1, {shade: 0.3});
+				oSettings.jqXHR = $.ajax({
+					"dataType": 'json',
+					"type": "POST",
+					"url": ctx + "/Sensitive/list",
+					"data": aoData,
+					"success": fnCallback
+				});
+			},
+			"columns": [{
+				"data": "sswlId",
+				"bSortable": false
+				}, {
+				"data": "sswlId",
+				"bSortable": false
+				}, {
+				"data": "sswlNicknames",
+				"bSortable": false
+				}, {
+				"data": "sswlGaganos",
+				"bSortable": false
+				}, {
+				"data": "sswlNicknamer",
+				"bSortable": false
+				}, {
+				"data": "sswlGaganor",
+				"bSortable": false
+				}, {
+				"data": "sswlContent",
+				"bSortable": false
+				}, {
+				"data": "sswlWords",
+				"bSortable": false
+				}, {
+				"data": "sswlLength",
+				"bSortable": false
+				}, {
+				"data": "sswlDatetime",
+				"bSortable": false
+				}, {
+				"data": "sswlState",
+				"bSortable": false
+			}],
+			"columnDefs": [
+				{
+					"targets": 1,
+					"render": function(data, type, full, meta) {
+						return '<input type="checkbox" value="' + data + '" title="' + data + '" name="withId" />';
+					}
+				},
+				{
+					"targets": 6,
+					"render": function(data, type, full, meta) {
+						if (data) {
+							return data.replace(full.sswlWords, '<span class="red">' + full.sswlWords + "</span>");
+						}						
+					}
+				},
+				{
+					"targets": 9,
+					"render": function(data, type, full, meta) {
+						var dstr='';
+						if(data!=null){
+							dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss', true);
+						}
+						return dstr;
+					}
+				},
+				{
+					"targets": 10,
+					"render": function(data, type, full, meta) {
+						var str = '';
+						if (data == 1) {
+							str = '已放行';
+						} else if (data == 2) {
+							str = '未放行';
+						} else {
+							str = '未审核';
+						}
+						return str;
+					}
+				}
+			],
+			"fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+				$(".mailbox-messages input[type='checkbox']").iCheck({
+					checkboxClass: 'icheckbox_flat-blue',
+					radioClass: 'iradio_flat-blue'
+				});
+				layer.closeAll();
+				$("#tableData .fa").removeClass('fa-check-square-o').addClass('fa-square-o');
+				}
+			});
+
+		//序号相关 .draw()
+		var table = $('#datalist').DataTable();
+		table.on( 'order.dt search.dt', function () {
+			//获取页信息
+			//debugger
+			var page = table.page.info();
+			table.column(0, {}).nodes().each( function (cell, i) {
+				cell.innerHTML = page.page * page.length + i + 1;
+			});
+		});
+
+		$(".checkbox-toggle").click(function() {
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+				$(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+				$(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+				$(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+				$(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+
+		$('.search-btn').click(function() {
+			$("#datalist").dataTable().fnDraw(true);
+		});
+
+		$('.pass-btn').click(function() {
+			//console.log('放行');
+			var chk_value =[]; 
+			$('input[name="withId"]:checked').each(function(){ 
+				chk_value.push($(this).val()); 
+			}); 
+			if(chk_value.length==0){
+				$.msg("请选择要删除的用户");
+			}else{    
+			    doPost("Sensitive/release", {"ids[]":chk_value, "release": 1},userDelHd,errorHd);	
+			}
+		});
+
+		$('.refresh-btn').click(function() {
+			$('#sendP').val('');
+			$('#getP').val('');
+			$('#content').val('');
+			$('#status').val('');
+			$('#startTime').val(defaultStartDate);
+			$('#endTime').val(defaultEndDate);
+			//$('#startTime').data('daterangepicker').setStartDate(defaultStartDate);
+			//$('#endTime').data('daterangepicker').setEndDate(defaultEndDate);
+			$("#datalist").dataTable().fnDraw(true);
+		});
+
+		$('.nopass-btn').click(function() {
+			//console.log('拦截');
+			var chk_value =[]; 
+			$('input[name="withId"]:checked').each(function(){ 
+				chk_value.push($(this).val()); 
+			}); 
+			if(chk_value.length==0){
+				$.msg("请选择要删除的用户");
+			}else{    
+			    doPost("Sensitive/release", {"ids[]":chk_value, "release": 2},userDelHd,errorHd);	
+			}
+		});
+
+	});
+});
+
+function userDelHd(data){
+	if(data.success){
+		$("#datalist").dataTable().fnDraw(false);
+	}else{
+		$.msg(data.msg);
+	}	
+}
+function errorHd(xreq){	 
+	  $.msg(xreq.statusText+"["+xreq.status+"]");
+}
+
+</script>

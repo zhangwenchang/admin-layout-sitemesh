@@ -1,0 +1,32 @@
+<script type="x-templete" id="nav-tmpl">
+	<%if(data.datalist){var loginInfo=data.datalist.attributes, navList=data.datalist.obj;%>
+		<div class="user-panel">
+	        <div class="pull-left image">
+	          <img src="dist/img/male.png" class="img-circle" alt="User Image">
+	        </div>
+	        <div class="pull-left info">
+	          <p class="myInfo" data-time="<%=$.convertDate(loginInfo.syusLogintime)%>" data-ip="<%=loginInfo.syusLoginip%>" data-depart="<%=loginInfo.syusDepart%>"><%=loginInfo.syusUsername%></p>
+	          <a href="/"><i class="fa fa-circle text-success"></i> Online</a>
+	        </div>
+	    </div>
+	   	<ul class="sidebar-menu">
+	   		<li class="header">导航菜单</li>
+			<%for(var i=0;i<navList.length;i++){var item=navList[i];%>
+				<li class="treeview <%=(i==0?'active':'')%>">
+					<a href="<%=item.symoUrl || '#'%>">
+            			<i class="fa <%=nav_class[item.symoId]%>"></i> <span><%=item.symoName%></span> <i class="fa fa-angle-left pull-right"></i>
+          			</a>
+          			<%if(item.subnav){%>
+          				<ul class="treeview-menu <%=(i==0?'menu-open':'')%>">
+	          				<%for(var j=0;j<item.subnav.length;j++){var subitem=item.subnav[j];%>
+	          					<li><a href="?po=<%=subitem.symoId%>" class="mode-lis" data-type="<%=subitem.symoId%>" target="_blank"><i class="fa fa-circle-o"></i><%=subitem.symoName%></a></li>
+	          				<%}%>
+          				</ul>
+          			<%}%>
+				</li>
+			<%}%>
+		</ul>
+	<%}else{%>
+		<li class="treeview active">无数据</li>
+	<%}%>
+</script>

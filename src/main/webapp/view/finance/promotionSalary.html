@@ -1,0 +1,875 @@
+<style type="text/css">
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.modal .dataTables_wrapper .dataTables_length { position: relative; left: 0; top: 0; }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+</style>
+<section class="content-header">
+    <h1>推广员工资<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>财务统计</li>
+        <li class="active">推广员工资</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+             <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">   
+                  <label for="createDate" class="col-sm-2 control-label">开始日期(UTC)：</label>
+                  <div class="col-sm-10">
+                    <input type="text"  class="form-control pull-right" id="beginDate">
+                  </div>             
+                </div>
+                
+                 <div class="form-group">   
+                  <label for="createDate" class="col-sm-2 control-label">结束日期(UTC)：</label>
+                  <div class="col-sm-10">
+                    <input type="text"  class="form-control pull-right" id="endDate">
+                  </div>             
+                </div>
+                
+                <div class="form-group">
+                  <label for="content" class="col-sm-2 control-label">推广员账号：</label>
+                  <div class="col-sm-10">
+                     <input type="text" class="form-control" id="userName" placeholder="推广员账号模糊查询" >
+                  </div>             
+                </div>
+                
+                
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+                <button type="button" class="btn btn-primary" onclick="search()">查询</button>
+				<button type="button" onclick="refreshdata()" class="btn btn-primary">刷新</button>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>                  
+                  <th>推广员名称</th>                 
+                  <th>注册时间</th>
+                  <th>最后登录时间</th>
+                  <th>APP总提成($)</th>
+                  <th>PC总提成($)</th>
+                  <th>总提成($)</th>
+                  <th>时间段内提成($)</th>
+                  <th>绑定前总提成($)</th>
+                  <th>绑定前时间段内提成($)</th>
+                  <th>操作</th>
+                  </tr>
+                  </thead>                  
+                </table>
+                <font color="#aaaaaa">备注：查询条件中的日期使用说明，开始日期为包含即'>='，结束日期为不包含即'<'。</font>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>  
+    <input type="hidden" id="band"/> 
+</section>
+<script type="text/javascript">
+var departIdTmp='',userIdTmp='',userNameTmp='';
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js'            
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 
+                 , '/plugins/daterangepicker/daterangepicker.js'
+                 ,'/plugins/datepicker/bootstrap-datepicker.js'
+                 ], function() {
+       // console.log(1);
+        //debugger
+        //$('#createDate').daterangepicker({timePicker: false, timePickerIncrement: 30, format: 'YYYY-MM-DD'});
+		//$('#beginDate').datepicker({format: 'yyyy-mm-dd',autoclose: true});
+    
+    //设置默认时间，起始范围：当月1号0点到当月最后一天24点 timePickerIncrement: 30,
+    var defaultDateObj = new Date();
+    var currentYear = defaultDateObj.getFullYear();
+    var currentMonth = defaultDateObj.getMonth() + 1;
+    var defaultStartDate = currentYear + '-' + currentMonth + '-01 01:00:00';
+    var isOverYear = (currentMonth + 1) > 12;
+    var defaultEndDate = (isOverYear ? (currentYear + 1) : currentYear) + '-' + (isOverYear ? '01' : currentMonth + 1) + '-01 01:00:00';
+     $('#beginDate').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true,
+        startDate: defaultStartDate
+      });
+      $('#endDate').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true
+      });
+      $('#beginDate').data('daterangepicker').setStartDate(defaultStartDate);
+      $('#endDate').data('daterangepicker').setEndDate(defaultEndDate);
+
+
+        var tui=$("#tableData").dataTable({
+           "dom": 'T<"clear">lfrtip',
+             "tableTools": {
+                 "sSwfPath": "/gaga_sns_admin/plugins/datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
+             },
+            "bLengthChange": true,
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 30,
+
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+             var userName = $("#userName").val();
+             var beginDate=$("#beginDate").val();
+             var endDate=$("#endDate").val();
+                
+             aoData.push({"name": "userName", "value": userName});
+             aoData.push({"name": "beginDate",  "value": beginDate});
+             aoData.push({"name": "endDate",  "value": endDate});
+            layer.load(1, {shade: 0.3});
+            var url=(tui)?(ctx + "/FinancePromotion/newSalaryList"):"#";
+              oSettings.jqXHR = $.ajax({
+                  "dataType": 'json',
+                  "type": "POST",
+                  "url": url,
+                  "data": aoData,
+                  "success": fnCallback
+              });
+            },
+            "columns": [{
+                "data": "syus_id",
+                "bSortable": false
+            }, {
+                "data": "syus_username",
+                "bSortable": false
+            }, {
+                "data": "syus_createtime",
+                "bSortable": false
+            }, {
+                "data": "syus_logintime",
+                "bSortable": false
+            }, {
+                "data": "appAmountTotal",
+                "bSortable": false
+            }, {
+                "data": "pcAmountTotal",
+                "bSortable": false
+            }, {
+                "data": "salaryAmountTotal",
+                "bSortable": false
+            }, {
+                "data": "salaryAmount",
+                "bSortable": false
+            },{
+                "data": "salaryAmountBefore",
+                "bSortable": false,"defaultContent":0
+            },{
+                "data": "salaryAmountB",
+                "bSortable": false,"defaultContent":0
+            },  {
+                "data": "syus_id",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 2,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 3,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 10,
+                "data": "syusId",
+                "render": function(data, type, full, meta) {
+                	var lnks='<a href="javascript:auto('+data+');">自动提成</a>';
+                	lnks+='&nbsp;&nbsp;<a href="javascript:hand('+full.syus_id+');">手动提成</a>';
+                	lnks+='&nbsp;&nbsp;<a href="javascript:add('+full.syus_id+');">添加提成</a>';
+                	lnks+='&nbsp;&nbsp;<a href="javascript:bandB('+full.syus_id+');">绑定前提成</a>';
+                    return lnks;
+                }
+            } ],
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+    });
+});
+
+function errorHd(xreq){	 
+	  $.msg(xreq.statusText+"["+xreq.status+"]");
+}
+
+
+/**自动提成**/
+
+function auto(id,type){
+	console.log(id)
+	console.log(type)
+	$("#autoData tbody").html("");
+	//自动提成列表初始化
+	var aut=$("#autoData").dataTable({
+            "bStateSave": true,
+            "bRetrieve":true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            "bLengthChange": true,
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+            // var userName = $("#userName").val();
+             aoData.push({"name": "curUserId", "value": id});
+             if(type==1){
+            	 console.log(type+"---")
+            	 aoData.push({"name": "type", "value": 1 }); 
+             }
+             var url=(aut)?(ctx + "/Salary/salaryListDetail"):"#";
+              oSettings.jqXHR = $.ajax({
+                  "dataType": 'json',
+                  "type": "POST",
+                  "async": "false",
+                  "url": url,
+                  "data": aoData,
+                  "success": fnCallback
+              });
+            },
+            "columns": [{
+                "data": "cost_id",
+                "bSortable": false
+            }, {
+                "data": "bmemb_nickname",
+                "bSortable": false
+            }, {
+                "data": "bmemb_gagano",
+                "bSortable": false
+            }, {
+                "data": "bmemb_sex",
+                "bSortable": false
+            }, {
+                "data": "cost_goldreal",
+                "bSortable": false
+            }, {
+                "data": "cost_goldcommis",
+                "bSortable": false
+            }, {
+                "data": "memb_gagano",
+                "bSortable": false
+            }, {
+                "data": "cost_description",
+                "bSortable": false
+            }, {
+                "data": "flag",
+                "bSortable": false
+            }, {
+                "data": "cost_addtime",
+                "bSortable": false
+            }, {
+                "data": "cost_rechconsuid",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 0,                
+                "render": function(data, type, full, meta) {
+                    return '';
+                }
+            },{
+                "targets": 1,                
+                "render": function(data, type, full, meta) {
+                   if(!data){data= full.memb_nickname}return data
+                }
+            },{
+                "targets": 2,                
+                "render": function(data, type, full, meta) {
+                	 if(!data){data= full.memb_gagano}return data
+                }
+            },{
+                "targets": 3,                
+                "render": function(data, type, full, meta) {
+                	if(data==1){
+                    	return "男";
+                    }else if(data==2){
+                    	return "女";
+                    }
+                    return "无";
+                }
+            },{
+                "targets": 6,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 9,
+                "data": "cost_typeid",
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            }]
+        });
+        
+        //序号相关
+        var table = $('#autoData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+	//end自动提成列表初始化
+	 $('#modal2').modal({keyboard: true});
+}
+/*手动提成*/
+function hand(id){
+	tmpId=id;
+	//手动提成初始化列表
+	var t=$("#handData").dataTable({
+            "bStateSave": true,
+            "bRetrieve":true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            "bLengthChange": true,
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+            // var userName = $("#userName").val();
+             aoData.push({"name": "curUserId", "value": tmpId});
+
+              oSettings.jqXHR = $.ajax({
+                  "dataType": 'json',
+                  "type": "POST",
+                  "url": ctx + "/Salary/changeListDetail",
+                  "data": aoData,
+                  "success": fnCallback
+              });
+            },
+            "columns": [{
+                "data": "cost_id",
+                "bSortable": false
+            }, {
+                "data": "cost_goldcommis",
+                "bSortable": false
+            }, {
+                "data": "nc_czr",
+                "bSortable": false
+            }, {
+                "data": "cost_description",
+                "bSortable": false
+            }, {
+                "data": "flag",
+                "bSortable": false
+            }, {
+                "data": "cost_addtime",
+                "bSortable": false
+            }, {
+                "data": "cost_rechconsuid",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 0,                
+                "render": function(data, type, full, meta) {                	
+                    return '';
+                }
+            },{
+                "targets": 2,
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null||data!=undefined){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 3,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 5,
+                "data": "cost_typeid",
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            }]
+        });
+        
+        //序号相关
+        var table = $('#handData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+	//end手动提成初始化列表
+	 $('#modal3').modal({keyboard: true});
+}
+/*添加提成*/
+function add(id){
+	tmpId=id;
+	//$('#datepicker').datepicker({format: 'yyyy-mm-dd',autoclose: true});
+  $('#datepicker').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true
+      });
+	$('#modal').modal({keyboard: true});
+}
+
+<!-- 添加提成提交  -->
+$('#modal').find('[field="modalTj"]').click(function(){
+	var dollar=$.trim($("#dollar").val());
+	var remark=$.trim($("#remark").val());
+	var datepicker=$.trim($("#datepicker").val());
+	var flag=$("#flag").val();
+	if(dollar==''||isNaN(dollar)){		
+		$.msg("请正确填写金额($).");
+		return;
+	}
+	if(remark==''){
+		$.msg("请正确填写备注信息.");
+		return;
+	}
+	
+	if(datepicker==''){
+		$.msg("请正确填写日期.");
+		return;
+	}
+	//var str =datepicker.replace(/-/g,"/");
+	var tmpDate;
+	tmpDate=datepicker;
+	//alert(tmpDate.toString());
+	//手动提成保存	
+	if(confirm("确定要为此推广员添加手动提成项吗？")){
+		doPost("FinancePromotion/salaryAdd", {"promId": tmpId, "dollar":dollar, "remark":remark ,"addDate":tmpDate,"flag":flag},modalHd,errorHd);
+	}	
+});
+
+function modalHd(data){
+	if(data.success){
+		$.msg(data.msg);
+		$('#modal').find('[field="closeModal"]').click();
+		$("#dollar").val('');
+		$("#remark").val('');
+		$("#datepicker").val('');
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+<!-- end 添加提成提交  -->
+
+//刷新表格
+function refreshdata() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+
+function search() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+function bandB(id){
+	tmpId=id;
+	//$("#autoDataBand tbody").html("");
+//	var bandB=$("#autoDataBand").dataTable();
+	/* aut.fnClearTable(); //清空一下table
+	aut.fnDestroy(); //还原初始化了的datatable */
+	//自动提成列表初始化
+	var bandB=$("#autoDataBand").dataTable({
+            "bStateSave": true,
+            "bRetrieve":true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            "bLengthChange": true,
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+            // var userName = $("#userName").val();
+             aoData.push({"name": "curUserId", "value": tmpId},{"name": "type", "value": 1 });
+            
+              oSettings.jqXHR = $.ajax({
+                  "dataType": 'json',
+                  "type": "POST",
+                  "async": "false",
+                  "url": ctx + "/Salary/salaryListDetail",
+                  "data": aoData,
+                  "success": fnCallback
+              });
+            },
+            "columns": [{
+                "data": "cost_id",
+                "bSortable": false
+            }, {
+                "data": "bmemb_nickname",
+                "bSortable": false
+            }, {
+                "data": "bmemb_gagano",
+                "bSortable": false
+            }, {
+                "data": "bmemb_sex",
+                "bSortable": false
+            }, {
+                "data": "cost_goldreal",
+                "bSortable": false
+            }, {
+                "data": "cost_goldcommis",
+                "bSortable": false
+            }, {
+                "data": "memb_gagano",
+                "bSortable": false
+            }, {
+                "data": "cost_description",
+                "bSortable": false
+            }, {
+                "data": "flag",
+                "bSortable": false
+            }, {
+                "data": "cost_addtime",
+                "bSortable": false
+            }, {
+                "data": "cost_rechconsuid",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 0,                
+                "render": function(data, type, full, meta) {
+                    return '';
+                }
+            },{
+                "targets": 1,                
+                "render": function(data, type, full, meta) {
+                   if(!data){data= full.memb_nickname}return data
+                }
+            },{
+                "targets": 2,                
+                "render": function(data, type, full, meta) {
+                	 if(!data){data= full.memb_gagano}return data
+                }
+            },{
+                "targets": 3,                
+                "render": function(data, type, full, meta) {
+                	if(data==1){
+                    	return "男";
+                    }else if(data==2){
+                    	return "女";
+                    }
+                    return "无";
+                }
+            },{
+                "targets": 6,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 9,
+                "data": "cost_typeid",
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            }]
+        });
+        
+        //序号相关
+         var table = $('#autoDataBand').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw(); 
+	//end自动提成列表初始化
+	 $('#modal4').modal({keyboard: true});
+}
+</script>
+
+<style>
+.modal-dialog{width:90%}
+</style>
+
+<!-- 添加提成 -->
+<div class="modal fade" id="modal" tabindex="-1" 
+   aria-labelledby="userAddModalLabel" aria-hidden="true">
+   <div class="modal-dialog" style="width:40%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" >
+               添加提成
+            </h4>
+         </div>
+         <div class="modal-body" id="modalBody">
+           <!-- 模态内容 -->
+           <form user="form">
+	<div class="box-body">
+		<div class="form-group">
+			<label for="userName">金额($)：</label> <input type="text"
+				class="form-control" id="dollar" placeholder="">
+		</div>
+		<div class="form-group">
+			<label for="userName">来源：</label> 
+			<select id="flag" class="form-control"><option value="pc">pc</option><option value="app">app</option></select>
+		</div>
+		
+		<div class="form-group">
+			<label for="userName">备注：</label> <input type="text"
+				class="form-control" id="remark" placeholder="">
+		</div>
+		
+		<div class="form-group">   
+                  <label for="datepicker" >日期：</label>
+                   <span style="position: relative; z-index: 9999;"><input type="text"  class="form-control pull-right" id="datepicker">
+         </span>
+                </div>
+
+	</div>
+	<!-- /.box-body -->
+
+	<div class="box-footer">		
+	</div>
+</form>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" field="closeModal">关闭
+            </button>
+            <!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+            <button type="button" class="btn btn-primary" field="modalTj">提交</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->
+
+<!-- 自动提成 -->
+<div class="modal fade" id="modal2" tabindex="-1" 
+   aria-labelledby="modal2" aria-hidden="true">
+   <div class="modal-dialog" style="width:90%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" >
+               
+            </h4>
+         </div>
+         <div class="modal-body" id="modal2Body">
+           <!-- 模态内容 -->
+           <div class="box-body mailbox-messages">
+                <table id="autoData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>                  
+                  <th>会员昵称</th>
+                  <th>GAGA号</th>
+                  <th>性别</th>
+                  <th>消费金币($)</th>
+                  <th>提成金额($)</th>   
+                  <th>消费会员GAGA号</th>   
+                  <th>消费类型</th>
+                  <th>来源</th>        
+                  <th>消费时间</th>
+                  <th>充值/消费订单号</th>
+                  </tr>
+                  </thead>                  
+                </table>              
+              </div>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" >关闭
+            </button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->
+<!-- /自动提成 -->
+
+<!-- 手动提成 -->
+<div class="modal fade" id="modal3" tabindex="-1" 
+   aria-labelledby="modal2" aria-hidden="true">
+   <div class="modal-dialog" style="width:90%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" >
+               手动提成
+            </h4>
+         </div>
+         <div class="modal-body" id="modal3Body">
+           <!-- 模态内容 -->
+           <div class="box-body mailbox-messages">
+                <table id="handData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th>提成金额($)</th>
+                  <th>操作员</th>
+                  <th>描述</th>
+                   <th>来源</th>        
+                  <th>时间</th>
+                  </tr>
+                  </thead>                  
+                </table>                
+              </div>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" >关闭
+            </button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->
+<!-- /手动提成 -->
+<!-- 绑定前提成 -->
+<div class="modal fade" id="modal4" tabindex="-1" aria-labelledby="modal4" aria-hidden="true">
+   <div class="modal-dialog" style="width:90%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" >
+               	绑定前提成
+            </h4>
+         </div>
+         <div class="modal-body" id="modal4Body">
+           <!-- 模态内容 -->
+           <div class="box-body mailbox-messages">
+                <table id="autoDataBand" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>                  
+                  <th>会员昵称</th>
+                  <th>GAGA号</th>
+                  <th>性别</th>
+                  <th>消费金币($)</th>
+                  <th>提成金额($)</th>   
+                  <th>消费会员GAGA号</th>   
+                  <th>消费类型</th>
+                  <th>来源</th>        
+                  <th>消费时间</th>
+                  <th>充值/消费ID</th>
+                  </tr>
+                  </thead>                  
+                </table>              
+              </div>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default"  data-dismiss="modal" >关闭 </button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->
+<!-- /自动提成 -->

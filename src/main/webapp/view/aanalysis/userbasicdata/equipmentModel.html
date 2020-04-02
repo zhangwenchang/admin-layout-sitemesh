@@ -1,0 +1,331 @@
+<div id="equimentModel" class="right-model">
+    <div ng-controller="equimentCtrl" class="right-model-content">
+        <div class="equimentBar">
+            <header>
+                <span class="equiment-title">用户机型</span>
+                <span id="equimentDate"><input type="text" id="channelTime" value="" readonly></span>
+            </header>
+            <div id="equimentBar"></div>
+            <div id="pagination"></div>
+        </div>
+        <div class="main_hot">
+            <ul>
+                <li>
+                    <h4>机型摘要</h4>
+                    <hr>
+                    <p>
+                        <span>30日上升最快机型</span>
+                        <span>{{equimentData.equimentThrty}}</span>
+                    </p>
+                </li>
+                <li>
+                    <h4>最热机型</h4>
+                    <hr>
+                    <p>
+                        <span>最热机型</span>
+                        <span>{{equimentData.equimentHot}}</span>
+                    </p>
+                </li>
+            </ul>
+        </div>
+        <div class="equimentTable">
+            <table id="countryData" class="table table-bordered table-hover">
+                <tr>
+                    <th>机型</th>
+                    <th>新注册用户</th>
+                    <th>活跃用户</th>
+                    <th>启动次数</th>
+                </tr>
+                <tr ng-repeat="item in equimentData.equimentTable">
+                    <td>{{item.phone_type==null? '其它（未知）':item.phone_type}}</td>
+                    <td>{{item.num}}</td>
+                    <td>{{item.act_num}}</td>
+                    <td>{{item.start_num}}</td>
+                </tr>
+            </table>
+            <div id="tablePage"></div>
+        </div>
+    </div>
+</div>
+<script>
+    app.controller('equimentCtrl', function ($scope, $http) {
+        var daterangepickerBox = $("#channelTime");
+        var myChart = echarts.init(document.getElementById("equimentBar"));
+        var defaultDateObj = new Date();
+        var currentYear = defaultDateObj.getFullYear();
+        var currentMonth = defaultDateObj.getMonth() + 1;
+        var defaultStartDate = currentYear + '-' + currentMonth + '-01';
+        var isOverYear = (currentMonth + 1) > 12;
+        var defaultEndDate = (isOverYear ? (currentYear + 1) : currentYear) + '-' + (isOverYear ? '01' : currentMonth + 1) + '-01';
+        //机型柱状图接口传参
+        var equimentDatas = {
+            startTime: defaultStartDate,
+            endTime: defaultEndDate,
+            start: 1,
+            length: 10
+        };
+        //机型表格传参
+        var equimentTdatas = {
+            startTime: defaultStartDate,
+            endTime: defaultEndDate,
+            start: 1
+        }
+        //最热机型传参
+        var equimentHot = {
+            startTime: defaultStartDate,
+            endTime: defaultEndDate,
+        }
+
+        //展示绑定数据
+        $scope.equimentData = {
+            equimentTable: [],
+            equimentThrty:'',
+            equimentHot:''
+        }
+
+        //机型柱状图
+        function equimentBar(data) {
+            var optionBar = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    boundaryGap: [0, 0],
+                    axisTick: {       //y轴刻度线
+                        show: false
+                    },
+                    axisLine: {show: false},
+                    axisLabel: {
+                        formatter: '{value}k'
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: function () {
+                        var yAxisdatas = [];
+                        yAxisdatas.splice(0, yAxisdatas.length)
+                        for (var ins in data) {
+                            yAxisdatas.push(data[ins].phone_type)
+                        }
+                        ;
+                        // console.log(yAxisdatas);
+                        return yAxisdatas;
+                    }()
+                },
+                series: [
+                    {
+                        name: '设备机型',
+                        type: 'bar',
+                        data: function () {
+                            var xAxisdatas = [];
+                            xAxisdatas.splice(0, xAxisdatas.length)
+                            for (var ins in data) {
+                                xAxisdatas.push(data[ins].num)
+                            }
+                            ;
+                            // console.log(xAxisdatas)
+                            return xAxisdatas;
+                        }(),
+                        itemStyle: {normal: {color: '#6699ff'}},
+
+                    },
+
+                ]
+            };
+            myChart.setOption(optionBar);
+            window.onresize = function () {
+                myChart.resize();
+            };
+        };
+
+        function equimentBarAjax() {
+        	layer.load(1, {shade: 0.3});  
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + "/useBase/getPhoneTypeTu",
+                data: equimentDatas,
+                cache: false,
+            }).then(function (resData) {
+            	layer.closeAll();
+                for (var ins in resData.data.obj) {
+                    if (resData.data.obj[ins].phone_type == null) {
+                        resData.data.obj[ins].phone_type = '其它'
+                    }
+                }
+                // console.log(resData.data.obj)
+                equimentBar(resData.data.obj)
+                //    分页插件
+                var totalPages = Math.ceil(Number(resData.data.msg) / Number(resData.data.obj.length))
+                $('#pagination').pagination({
+                    pageCount: totalPages,
+                    totalData: resData.data.msg,
+                    showData: resData.data.obj.length,
+                    isHide: true,
+                    jump: true,
+                    coping: true,
+                    keepShowPN: true,
+                    current: 1,
+                    count: 5,
+                    prevContent: '<上一页',
+                    nextContent: '下一页>',
+                    jumpIptCls: 'jump-ipt',
+                    jumpBtn: '确定',
+                    callback: function (api) {
+                        // console.log(api)
+                        equimentDatas.start = Number(api.getCurrent());
+                        // equimentBarAjax()
+                        $http({
+                            method: 'post',
+                            dataType: "json",
+                            // headers: {'Content-Type': 'application/json'},
+                            url: ctx + "/useBase/getPhoneTypeTu",
+                            data: equimentDatas,
+                            cache: false,
+                        }).then(function (resData) {
+                            for (var ins in resData.data.obj) {
+                                if (resData.data.obj[ins].phone_type == null) {
+                                    resData.data.obj[ins].phone_type = '其它'
+                                }
+                            }
+                            // console.log(resData.data.obj)
+                            equimentBar(resData.data.obj)
+                        }, function (err) {
+                            console.log('分页请求错误');
+                            alert("请求错误");
+                        })
+                    }
+                })
+            	layer.closeAll();
+            }, function (err) {
+                console.log("00000000000000");
+            	layer.closeAll();
+            })
+        };
+
+        function equimentTableAjax() {
+        	 layer.load(1, {shade: 0.3});
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + "/useBase/getPhoneTypeDetail",
+                data: equimentTdatas,
+                cache: false,
+            }).then(function (resData) {
+            	layer.closeAll();
+                // console.log(resData.data.data)
+                $scope.equimentData.equimentTable = resData.data.data;
+                var tabletotalPages = Math.ceil(Number(resData.data.recordsTotal) / Number(resData.data.length))
+                $('#tablePage').pagination({
+                    pageCount: tabletotalPages,
+                    totalData: resData.data.recordsTotal,
+                    showData: resData.data.length,
+                    isHide: true,
+                    jump: true,
+                    coping: true,
+                    keepShowPN: true,
+                    current: 1,
+                    count: 5,
+                    prevContent: '<上一页',
+                    nextContent: '下一页>',
+                    jumpIptCls: 'jump-ipt',
+                    jumpBtn: '确定',
+                    callback: function (api) {
+                        console.log(api)
+                        equimentTdatas.start = Number(api.getCurrent());
+                        // equimentBarAjax()
+                         layer.load(1, {shade: 0.3});  
+                        $http({
+                            method: 'post',
+                            dataType: "json",
+                            // headers: {'Content-Type': 'application/json'},
+                            url: ctx + "/useBase/getPhoneTypeDetail",
+                            data: equimentTdatas,
+                            cache: false,
+                        }).then(function (resData) {
+                        	layer.closeAll();
+                            $scope.equimentData.equimentTable = resData.data.data;
+                        }, function (err) {
+                            console.log('分页请求错误');
+                            alert("分页请求错误");
+                        	layer.closeAll();
+                        })
+                    }
+                })
+                layer.closeAll();
+            }, function (err) {
+            	layer.closeAll();
+            })
+        };
+
+        //最热机型
+        function maxHot() {
+        	 layer.load(1, {shade: 0.3}); 
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + "/useBase/getPhoneType",
+                data: equimentHot,
+                cache: false,
+            }).then(function (resData) {
+            	layer.closeAll();
+                // console.log(resData)
+                $scope.equimentData.equimentThrty=resData.data.obj.date30;
+                $scope.equimentData.equimentHot=resData.data.obj.hotPhoneType;
+            }, function (errData) {
+                console.log(errData);
+            	layer.closeAll();
+            })
+        }
+
+        equimentBarAjax();
+        equimentTableAjax();
+        maxHot();
+        daterangepickerBox.daterangepicker({
+            timePicker: false,
+            timePickerIncrement: 10,
+            format: 'YYYY-MM-DD',
+            opens: 'right',
+            timePicker12Hour: false,
+            timePicker: false,
+            showDropdowns: true,
+            startDate: defaultStartDate,
+            endDate: defaultEndDate
+        }, function (start, end, label) {
+            // console.log(daterangepickerBox.val())
+            // console.log(this.startDate.format(this.locale.format));
+            // console.log(this.endDate.format(this.locale.format));
+            var starInit = this.startDate.format(this.locale.format);
+            var endInit = this.endDate.format(this.locale.format);
+            var timeIndex = starInit.indexOf('T');
+            var startTimes = starInit.substr(0, timeIndex);
+            var endTimes = endInit.substr(0, timeIndex);
+            equimentDatas.startTime = startTimes;
+            equimentDatas.endTime = endTimes;
+            equimentTdatas.startTime = startTimes;
+            equimentTdatas.endTime = endTimes;
+            equimentHot.startTime=startTimes;
+            equimentHot.endTime=endTimes;
+            equimentBarAjax();
+            equimentTableAjax();
+            maxHot();
+        });
+        daterangepickerBox.data('daterangepicker').setStartDate(daterangepickerBox.daterangepicker);
+
+
+    })
+    angular.bootstrap(document.getElementById('equimentModel'), ['App']);
+</script>

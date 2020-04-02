@@ -1,0 +1,767 @@
+<style type="text/css">
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+
+</style>
+<section class="content-header">
+    <h1>订单查询<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>财务统计</li>
+        <li class="active">订单查询</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          
+           <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">统计时间:</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="starttime">至<input type="text" id="endtime">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">会员：</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="membnoornickname" placeholder="昵称/GAGA号" >
+                  </div>
+                </div>
+                
+                <div class="form-group">   
+                  <label for="sendDate" class="col-sm-2 control-label">订单号：</label>
+                  <div class="col-sm-10">
+                 <!--    <input type="text" class="form-control" id="orderno"> -->
+                    <textarea rows="1" class="form-control" id="orderno"></textarea>
+                  </div>             
+                </div>
+                
+                <div class="form-group">   
+                  <label for="sendDate" class="col-sm-2 control-label">交易号：</label>
+                  <div class="col-sm-10">
+                    <!-- <input type="text" class="form-control" id="transactionno"> -->
+                    <textarea rows="1" class="form-control" id="transactionno"></textarea>
+                  </div>             
+                </div>
+                <div class="form-group">   
+                 <label for="content" class="col-sm-2 control-label">状态：</label>
+					<div class="col-sm-4">
+						<span class="relative-top6"><input type="checkbox" id="isdel" name ="isdel">退款订单</span>
+					</div>        
+                </div>
+                <div class="form-group">   
+                 <label for="content" class="col-sm-2 control-label">支付方式：</label>
+					<div class="col-sm-4">
+						<select name="example1_length" id="rechType"
+							aria-controls="example1" class="form-control input-sm">
+							<option value="">不限</option>
+							<option value="1">支付宝</option>
+							<option value="2">微信</option>
+							<option value="3">paypal</option>
+						</select>
+					</div>        
+                </div>
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>&nbsp;&nbsp;<b style="color:blue">批量查询订单号、交易号请以逗号分隔</b>&nbsp;&nbsp;
+              <!--<button type="button" onclick="batchdel()" class="btn btn-primary">导出</button>-->
+              <span>订单总金额：<span id="sumgold"></span></span></div>
+              <!-- /.box-footer -->
+            </form>
+          
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="orderrecharges" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>订单号</th>
+                    <th>时间</th>
+                    <th>昵称</th>
+                    <th>GAGA号</th>
+                    <th>类型</th>
+                    <th>商品名称</th>
+                    <th>折扣后的美元 ( $ )</th>
+                    <th>支付方式</th>
+                    <th>状态</th>
+                    <th>失败/退款原因</th>
+                    <th>交易单号</th>
+                    <th>退款时间</th>
+                    <th>退款类型</th>
+                    <th>退款金币</th>
+                    <th>退款状态</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+<!-- 修改状态框 -->
+<div class="modal fade" id="Modalupdate" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabelupdate">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontentupdate">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbuttonupdate">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="Modalpage" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog" style="width:60%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabelpage">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontentpage">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbuttonpage">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+<div class="modal fade" id="Modal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width: 820px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel2"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent2" style="height: 180px; overflow: auto;">
+				<div id="videoTrans" >
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_username">退款类型</label>
+						<div class="col-sm-4">
+							<select id="refund_type_re" name="refund_type_re" class="form-control">
+								<option value="1">客户拒付</option>
+								<option value="2">测试退款</option>
+								<option value="3">其他</option>
+								<option value="">无</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_username">退款状态</label>
+						<div class="col-sm-4">
+							<select id="refund_state_re" name="refund_state_re" class="form-control">
+								<option value="1">退款</option>
+								<option value="0">未退款</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_username">退款金币</label>
+						<div class="col-sm-4">
+							<input class="form-control" id="refund_gold_re" name="refund_gold_re" type="text" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_username">退款原因</label>
+						<div class="col-sm-4">
+							<input class="form-control" id="rech_reason_re" name="rech_reason_re" type="text" />
+						</div>
+					</div>
+				<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_username">退款时间</label>
+						<div class="col-sm-4">
+							<input class="form-control startTime" id="refund_time_re" name="refund_time_re" type="text" />
+						</div>
+					</div>
+				<div class="form-group">
+						<label class="col-sm-2 control-label" for="refundMoney">退款人民币</label>
+						<div class="col-sm-4">
+							<input class="form-control" id="refundMoney" name="refundMoney" type="text" />
+						</div>
+				</div>
+
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				<button type="button" id="modalbutton2" class="btn btn-primary">提交更改</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(function() {
+	 $('#starttime').datepicker({format: 'yyyy-mm-dd'});
+	  $('#endtime').datepicker({format: 'yyyy-mm-dd'});
+	  $('#refund_time_re').datepicker({format: 'yyyy-mm-dd'});
+	
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+       var tabs= $("#orderrecharges").dataTable({
+        	 "dom": 'T<"clear">lfrtip',
+             "tableTools": {
+                 "sSwfPath": "/gaga_sns_admin/plugins/datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
+             },
+            "bLengthChange": true,
+        	"bStateSave": true, 
+        	"paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength":10,
+	        //"ajax" : ctx+"/adminmember/notauditedimgList",
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	var starttime = $("#starttime").val();
+	        	var endtime = $("#endtime").val();
+	        	var nameorno = $("#membnoornickname").val();
+	        	var orderno = $("#orderno").val();
+	        	var transactionno = $("#transactionno").val();
+	        	var istuikuan = 0;
+	        	if($('#isdel').prop('checked'))
+	        	{
+	        	　　istuikuan =1;
+	        	}
+	        	aoData.push(
+	        			{"name":"starttime","value":starttime},
+	        			{"name":"endtime","value":endtime},
+	        			{"name":"nameorno","value":nameorno},
+	        			{"name":"orderno","value":orderno},
+	        			{"name":"transactionno","value":transactionno},
+	        			{"name":"isdel","value":istuikuan},
+	        			{"name":"rechType","value":$("#rechType").val()}
+	        			)
+	        	//aoData=gagaidorname;
+	        	layer.load(1, {shade: 0.3}); 
+	        	 var url=(tabs)?(ctx+"/order/rechargelist"):"#";
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": url,
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "xh","bSortable": false },
+				{"data": "rechId","bSortable": false },
+				{"data": "rechOrdertime","bSortable": false},
+				{"data": "member.membNickname","bSortable": false },
+				{"data": "member.membGagano","bSortable": false},
+				{"data": "rechId","bSortable": false },
+				{"data": "rechId","bSortable": false },
+				{"data": "rechGoldreal","bSortable": false},
+				{"data": "rechType","bSortable": false},
+				{"data": "rechState","bSortable": false},
+				{"data": "rechReason","bSortable": false},
+				{"data": "rechPlatorerid","bSortable": false},
+				{"data": "refundTime","bSortable": false,"defaultContent":""},
+				{"data": "refundType","bSortable": false,"defaultContent":""},
+				{"data": "refundGold","bSortable": false,"defaultContent":""},
+				{"data": "refundState","bSortable": false},
+				{"data": "rechId","bSortable": false}
+	        ], 
+	         "columnDefs": [
+	         	{"targets": 1,
+					"data": "rechId",
+					"render": function ( data, type, full, meta ) {						
+				    	return '&nbsp;'+data;
+				}},
+				{"targets": 2,
+					"data": "rechOrdertime",
+					"render": function ( data, type, full, meta ) {						
+				    	return data ? (new Date(data*1000)).format('yyyy-MM-dd hh:mm:ss', true) : '';
+				}},
+				{"targets":3,
+					"data": "member.membNickname",
+					"render": function ( data, type, full, meta ) {
+						if(data==null||data==''){
+							return "";
+						}
+				    	return data;
+				}},
+				{"targets":4,
+					"data": "member.membGagano",
+					"render": function ( data, type, full, meta ) {
+						if(data==null||data==''){
+							return "";
+						}
+				    	return data;
+				}},
+				{"targets": 5,
+					"data": "rechId",
+					"render": function ( data, type, full, meta ) {
+					return "充值";
+				}},
+				{"targets": 6,
+					"data": "rechId",
+					"render": function ( data, type, full, meta ) {
+						return "金币";
+				}},
+				{"targets": 9,
+					"data": "rechState",
+					"render": function ( data, type, full, meta ) {
+					if(data==0){
+						return "已下单，未支付";
+					}else if(data==1){
+						return "支付成功";
+					}else if(data==2){
+						return "支付失败";
+					}else if(data==3){
+						return "删除";
+					}else if(data==4){
+						return "交易处理中";
+					}else if(data==5){
+						return "退款";
+					}else{
+						return data;
+					}
+				}},{"targets": 10,
+					"data": "rechReason",
+					"render": function ( data, type, full, meta ) {
+						if(data==''||data==null){
+							return "";
+						}else{
+							if(full.rechType=='paypal'&&full.rechState == 2){
+								data='paypal提示该用户存在风险交易，未能成功支付。';
+							}
+							return data;
+						}
+				}},{"targets": 11,
+					"data": "rechPlatorerid",
+					"render": function ( data, type, full, meta ) {
+						if(data==''||data==null){
+							return "";
+						}else{
+							return data;
+						}
+				}},{"targets": 15,
+					"data": "refundState",
+					"render": function ( data, type, full, meta ) {
+						if(data==0){data='未退款'}else if(data==1){data='退款'}
+						return data;
+				}},{"targets": 12,
+					"render": function ( data, type, full, meta ) {
+						if(data!=null){
+	                		//var longtime=new Date(data).getTime();
+	                		var date=new Date(data);
+	                   	 return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();;
+	                	}
+				}},{"targets": 13,
+					"render": function ( data, type, full, meta ) {
+						if(data){
+							if(data==1){data='客户拒付'}else if(data==2){data='测试退款'}else if(data==3){data='其他'}
+						}
+						return data;
+				}},{"targets": 16,
+					"data": "rechId",
+					"render": function ( data, type, full, meta ) {
+						var html = "<a href='javascript:void(0)' onclick='addjufu(\""+data+"\",1,\""+full.rechType+"\")'>添加拒付</a>   <a href='javascript:void(0)' onclick='updateState(\""+data+"\",1,\""+full.rechType+"\")'>修改状态</a>   <a href='javascript:void(0)' onclick='operationlog(\""+data+"\",1)'>操作记录</a>";
+							html += '&nbsp;<a href="javascript:void(0)" onclick="tuikuan(\''+ data+ '\',5)">退款</a>'
+						return html;
+						
+				}}],
+	            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+	            	layer.closeAll();
+	            	var starttime = $("#starttime").val();
+		        	var endtime = $("#endtime").val();
+	            	$.post(ctx+"/order/sumgold",{starttime:starttime,endtime:endtime}, function (data){
+	            		$("#sumgold").text(data.obj);
+	            		})
+	            }
+	    });
+      //序号相关
+        var table = $('#orderrecharges').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+    });
+});
+function tuikuan(id, type) {
+	// $('#bodycontent2').html($('#videoTrans').html());
+	$('#Modal2').css("z-index", "10000");
+	$('#Modal2').modal({
+		keyboard : true
+	});
+
+	$.ajax({
+		type : "post",
+		url : ctx + "/adminmember/getRecharge",
+		dataType : "json",
+		data : {
+			"rechId" : id
+		},
+		success : function(data) {
+			console.log(data)
+			$('#rech_reason_re').val(data.obj.rechReason);
+			$('#refund_gold_re').val(data.obj.refundGold);
+			$('#refund_type_re').val(data.obj.refundType);
+			$('#refundMoney').val(data.obj.refundMoney);
+			var ti=data.obj.refundTime;
+			if(ti!=null){
+        		var longtime=new Date(ti).getTime();
+        		ti=new Date(longtime);
+        		ti=ti.getFullYear()+"-"+(ti.getMonth()+1)+"-"+ti.getDate();
+        	}
+			$('#refund_time_re').val(ti);
+		}
+	});
+	
+	$('#modalbutton2').unbind();
+	$('#modalbutton2').on('click', function(event) {
+		event.preventDefault();
+		if (!checkForms())
+			return;
+	
+		$.ajax({
+			type : "post",
+			url : ctx + "/adminmember/tuikuan",
+			dataType : "json",
+			data : {
+				"rechId" : id,
+				"type" : type,
+				"rech_reason":$('#rech_reason_re').val(),
+				"refund_gold":$('#refund_gold_re').val(),
+				"refund_type":$('#refund_type_re').val(),
+				"refundTime":$('#refund_time_re').val(),
+				"refundMoney":$('#refundMoney').val(),
+				"refundState":$('#refund_state_re').val()
+			},
+			success : function(data) {
+				
+				if (data.success) {
+					layer.msg("状态更改成功")
+					$('#Modal2').modal('hide');
+					$("#orderrecharges").dataTable().fnDraw(true);
+				} else {
+					layer.msg("操作失败")
+					layer.msg(data.msg);
+					$('#Modal2').modal('hide');
+					$("#orderrecharges").dataTable().fnDraw(true);
+				}
+				$("#orderrecharges").dataTable().fnDraw(true);
+			}
+		});
+	});
+}
+function checkForms(){
+	var price=$('#refund_gold_re').val();
+	
+	if(!checkRe('decimal',price)){
+		layer.msg("金币输入有误！");return false;
+	}
+	return true;
+}
+ function checkRe(type,value){ 
+		console.log(value)
+		if(!value)return true;
+		var patt = /e/;
+		switch(type)
+		{
+		case 'number':
+			patt=/^[0-9]+$/;
+		  break;
+		case 'phone':
+			patt=/^1[34578]\d{9}$/;
+		  break;
+		case 'decimal':
+			patt=/^\d+(\.\d+)?$/
+		  break;
+		default:
+			 break;
+		}
+		return patt.test(value);  
+	}
+//添加拒付
+function addjufu(id,type,rechtype){
+	if(type==1){
+		var flag = true;
+		$.post(ctx+"/order/getjufubyorderid",{orderid:id}, function (data){
+    			if(!data.success){
+    				$("#errorbodycontent").html(data.msg);
+    		  		   $('#errorModal').modal({
+    		  				keyboard : true
+    		  			});
+    			}else{
+					var state = '';
+					if(rechtype=='paypal'){
+						state='<select id="jfstate"><option value="3">退单与争议</option><option value="4">争议拒付</option></select>';
+					}else if(rechtype=='alipay'){
+						state='<select id="jfstate"><option value="10">退款</option></select>';
+					}else{
+						state='<select id="jfstate"><option value="5">已清算退款申请</option><option value="6">已清算退款失败</option>'+
+						'<option value="7">拒付冻结资金</option><option value="8">拒付解冻资金</option>'+
+						'<option value="9">拒付扣款</option></select>';
+					}
+					
+					$("#ModalLabel").text("添加拒付");
+					var content = '<span>状态：</span>'+state+'<br><br><span>备注：</span><textarea rows="3" cols="" id="remark"></textarea>';
+					   $("#bodycontent").html(content);
+					   $("#modalbutton").html("<button type='button' onclick='addjufu(\"" +id+"\",2,\"" +rechtype+"\")' class='btn btn-primary'>确定  </button>");
+					   $('#Modal').modal({
+						      keyboard: true
+					   });
+    			}
+    		});
+	}
+	if(type==2){
+		var jfstate = $("#jfstate").val();
+		var remark = $("#remark").val();
+		if(remark==''){
+			$("#errorbodycontent").html("请填写拒付原因备注");
+  		   $('#errorModal').modal({
+  				keyboard : true
+  			});
+  		   return;
+		}else{
+			$.ajax({
+		        type: "post",
+		        url: ctx + "/order/addunrecharge",
+		        dataType: "json",
+		        data: {
+		            "orderid": id,
+		            "state": jfstate,
+		            "remark": remark
+		        },
+		        success: function(data) {
+		        	$("#orderrecharges").dataTable().fnDraw(true);
+		        	$('#Modal').modal('hide');
+		        }
+			});
+		}
+	}
+}
+
+//修改状态		type  1代表打开编辑窗口   2 代表保存编辑窗口
+function updateState(id,type,rechtype){
+	if(type==1){
+		var flag = true;
+		$.post(ctx+"/order/getChangeStateByOrderId",{rechId:id}, function (data){
+    			if(!data.success){
+    				$("#errorbodycontent").html(data.msg);
+    		  		   $('#errorModal').modal({
+    		  				keyboard : true
+    		  			});
+    			}else{
+					var state = '';
+					
+					state='<select id="updatestate"><option value="1">成功</option></select>';
+				
+					$("#ModalLabelupdate").text("修改状态");
+					var content = '<span>状态：</span>'+state+'<br><br><span>备注：</span><textarea rows="3" cols="" id="remark1"></textarea>';
+					   $("#bodycontentupdate").html(content);
+					   $("#modalbuttonupdate").html("<button type='button' onclick='updateState(\"" +id+"\",2,\"" +rechtype+"\")' class='btn btn-primary'>确定  </button>");
+					   $('#Modalupdate').modal({
+						      keyboard: true
+					   });
+    			}
+    		});
+	}
+	if(type==2){
+		var updatestate = $("#updatestate").val();
+		var remark1 = $("#remark1").val();
+		if(remark1==''){
+			$("#errorbodycontent").html("请填写修改状态原因备注");
+  		   $('#errorModal').modal({
+  				keyboard : true
+  			});
+  		   return;
+		}else{
+			$.ajax({
+		        type: "post",
+		        url: ctx + "/order/changeRechargeState",
+		        dataType: "json",
+		        data: {
+		            "rechId": id,
+		            "state": updatestate,
+		            "remark": remark1
+		        },
+		        success: function(data) {
+		        	$("#orderrecharges").dataTable().fnDraw(true);
+		        	$('#Modalupdate').modal('hide');
+		        }
+			});
+		}
+	}
+}
+
+
+//查询
+function search(){
+	$("#orderrecharges").dataTable().fnDraw(true);
+}
+
+/**
+ * 操作记录
+ */
+function operationlog(id,type){
+	   if(type==1){
+		   $("#ModalLabelpage").text("操作记录");
+		   var tablehtml ='<div class="box">';
+			   tablehtml+='<div class="box-body mailbox-messages">';
+			   tablehtml+='<table id="operationlog" class="table table-bordered table-hover">';
+			   tablehtml+='<thead>';
+			   tablehtml+='<tr><th>时间</th><th>状态</th><th>操作人</th><th>备注</th></tr></thead></table></div></div>';
+			   $("#bodycontentpage").html(tablehtml);
+			   $("#modalbuttonpage").html(
+						'<button type="button" onclick="operationlog(' + id
+								+ ',2)" class="btn btn-primary">确定  </button>');
+			   
+			   logshow(id);
+				$('#Modalpage').modal({
+					keyboard : true
+				});
+	   }
+	   if (type == 2) {
+		   $("#orderrecharges").dataTable().fnDraw(true);
+			$('#Modalpage').modal('hide');
+		}
+}
+function logshow(id){
+	   $("#operationlog").dataTable({
+	    	"bStateSave": true, 
+	    	"paging": true,
+	        //"processing": true,
+	        "serverSide": true,
+	        "lengthChange": false,
+	        "searching": false,
+	        "ordering": true,
+	        "info": true,
+	        "autoWidth": false,
+	        "pageLength":10,
+	        //"ajax" : ctx+"/adminmember/notauditedimgList",
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	aoData.push({"name":"orderid","value":id})
+	        	//aoData=gagaidorname; 
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/order/unrechargelist",
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "syreAddtime","bSortable": false },
+				{"data": "syreState","bSortable": false },
+				{"data": "sysUser.syusUsername","bSortable": false},
+				{"data": "syreDescription","bSortable": false}
+	        ], 
+	         "columnDefs": [
+				{"targets": 0,
+					"data": "syreAddtime",
+					"render": function ( data, type, full, meta ) {
+						var date = new Date(data);
+				    	return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+				}},
+				{"targets": 1,
+					"data": "syreState",
+					"render": function ( data, type, full, meta ) {
+						if(data==3){
+							return "退单与争议";
+						}else if(data==4){
+							return "争议拒付";
+						}else if(data==5){
+							return "已清算退款申请";
+						}else if(data==6){
+							return "已清算退款失败";
+						}else if(data==7){
+							return "拒付冻结资金";
+						}else if(data==8){
+							return "拒付冻结资金";
+						}else if(data==9){
+							return "拒付扣款";
+						}else if(data==10){
+							return "退款";
+						}else if(data==1){
+							return "未支付->成功";
+						}else{
+							return data;
+						}
+				}}]  
+	    });
+}
+</script>
+

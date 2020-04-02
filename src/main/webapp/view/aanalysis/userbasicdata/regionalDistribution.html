@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+</head>
+<body>
+<div class="right-model" id="regionalApp">
+    <div ng-controller="AppController" class="right-model-content">
+        <div class="regionalTile">
+            <span>地区分布</span>
+            <input type="text" id="regionalTime" readonly>
+        </div>
+        <div class="regionalChart">
+            <ul class="userType">
+                <li ng-repeat="item in regional.userTypes" ng-class="item.isClick? 'clickStyle':''" ng-click="userTypeClick($index)">{{item.name}}</li>
+            </ul>
+            <ul class="userContinent">
+                    <li  ng-repeat="item in regional.userDatas">
+                        <p>{{item.continet}}</p>
+                        <p>{{item.num}}</p>
+                    </li>
+            </ul>
+        </div>
+        <!--国家明细表-->
+        <div class="countryTable">
+            <div class="tableTitle">
+                <span>国家明细表</span>
+                <button class="exportData" onclick="exportTable('countryData','国家明细表')">导出</button>
+            </div>
+            <table id="countryData" class="table table-bordered table-hover">
+                <tr>
+                    <th>国家</th>
+                    <th>用户量</th>
+                    <th>时间段内用户量</th>
+                    <th>活跃用户</th>
+                    <th>活跃用户占比</th>
+                </tr>
+                <tr ng-repeat="item in regional.countryTable">
+                    <td>{{item.multilang_name==null? '其它（未知）':item.multilang_name}}</td>
+                    <td>{{item.total}}</td>
+                    <td>{{item.timeRegUserNum}}</td>
+                    <td>{{item.timeActUserNum}}</td>
+                    <td>{{regional.actUserpercent[$index]=='NaN%'? '':regional.actUserpercent[$index]}}</td>
+                </tr>
+            </table>
+            <div id="pagination"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+    // var app=angular.module('App',[]);
+    // channelData();
+
+    app.controller('AppController', function ($scope, $http) {
+        //    时间选择插件
+        var daterangepickerBox = $("#regionalTime");
+        var defaultDateObj = new Date();
+        var currentYear = defaultDateObj.getFullYear();
+        var currentMonth = defaultDateObj.getMonth() + 1;
+        var defaultStartDate = currentYear + '-' + currentMonth + '-01';
+        var isOverYear = (currentMonth + 1) > 12;
+        var defaultEndDate = (isOverYear ? (currentYear + 1) : currentYear) + '-' + (isOverYear ? '01' : currentMonth + 1) + '-01';
+        var reqData = {
+            types: 1,
+            startTime: defaultStartDate,
+            endTime: defaultEndDate
+        }
+        $scope.regional={
+            userTypes:[
+                {
+                    name:"用户量",
+                    isClick:true
+                },
+                {
+                    name:"活跃用户",
+                    isClick:false
+                }
+            ],
+            userDatas:[],
+            countryTable:[],
+            actUserpercent:[],
+            nowTitle:''
+        }
+        //国家地区分布请求
+        $scope.shiShiAajx = function () {
+        	 layer.load(1, {shade: 0.3}); 
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url:ctx + "/useBase/getdistribution",
+                data: JSON.stringify(reqData),
+                cache: false,
+            }).then(function (resData) {
+            	layer.closeAll();
+                console.log(resData)
+                if (resData.data.success==true){
+                    $scope.regional.userDatas=resData.data.obj.slice(1)
+                }else {
+                    alert(resData.data.msg)
+                }
+            }, function (errData) {
+                console.log('00000000000');
+            	layer.closeAll();
+            })
+        };
+
+        //    国家明细表请求
+        var conReqData = {
+            startTime: defaultStartDate,
+            endTime: defaultEndDate,
+            start:1,
+            length: 10
+        }
+        function countryaAajax(){
+        	 layer.load(1, {shade: 0.3});  	
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url:ctx + "/useBase/getCountryDetail",
+                data: conReqData,
+                cache: false,
+            }).then(function (resData) {
+            	layer.closeAll();
+                console.log(resData)
+                $scope.regional.actUserpercent.splice(0,   $scope.regional.actUserpercent.length)
+                $scope.regional.countryTable=resData.data.data;
+                for (var ins in $scope.regional.countryTable){
+                    var userPercent = Math.round(Number($scope.regional.countryTable[ins].timeActUserNum) / Number($scope.regional.countryTable[ins].total) * 10000) / 100.00 + "%";
+                    $scope.regional.actUserpercent.push(userPercent)
+                }
+                console.log($scope.regional.countryTable)
+                //    分页插件调用
+                var totalPages = Math.ceil(Number(resData.data.recordsTotal) / Number(resData.data.length))
+                $('#pagination').pagination({
+                    pageCount: totalPages,
+                    totalData: resData.data.recordsTotal,
+                    showData: resData.data.length,
+                    isHide: true,
+                    jump: true,
+                    coping: true,
+                    keepShowPN: true,
+                    current: 1,
+                    count: 5,
+                    prevContent: '<上一页',
+                    nextContent: '下一页>',
+                    jumpIptCls: 'jump-ipt',
+                    jumpBtn: '确定',
+                    callback: function (api) {
+                        console.log(api)
+                        conReqData.start=Number(api.getCurrent());
+                        $http({
+                            method: 'post',
+                            dataType: "json",
+                            // headers: {'Content-Type': 'application/json'},
+                            url: ctx + "/useBase/getCountryDetail",
+                            data: conReqData,
+                            cache: false,
+                        }).then(function (data) {
+                            $scope.regional.countryTable = data.data.data;
+                            $scope.regional.actUserpercent.splice(0,   $scope.regional.actUserpercent.length)
+                            for (var ins in $scope.regional.countryTable){
+                                var userPercent = Math.round(Number($scope.regional.countryTable[ins].timeActUserNum) / Number($scope.regional.countryTable[ins].total) * 10000) / 100.00 + "%";
+                                $scope.regional.actUserpercent.push(userPercent)
+                            }
+                        }, function () {
+                            console.log("分页请求错误");
+
+                        })
+                    }
+                })
+                layer.closeAll();
+            },function () {
+            	layer.closeAll();
+            })
+        };
+        $scope.shiShiAajx();
+        countryaAajax()
+        daterangepickerBox.daterangepicker({
+            timePicker: false,
+            timePickerIncrement: 10,
+            format: 'YYYY-MM-DD',
+            opens: 'right',
+            timePicker12Hour: false,
+            timePicker: false,
+            showDropdowns: true,
+            startDate: defaultStartDate,
+            endDate: defaultEndDate
+        }, function (start, end, label) {
+            // console.log(this.startDate.format(this.locale.format));
+            // console.log(this.endDate.format(this.locale.format));
+            var starInit =this.startDate.format(this.locale.format);
+            var endInit =this.endDate.format(this.locale.format);
+            var timeIndex = starInit.indexOf('T');
+            var startTimes = starInit.substr(0,timeIndex);
+            var endTimes = endInit.substr(0,timeIndex);
+            reqData.startTime = startTimes;
+            reqData.endTime = endTimes;
+            conReqData.startTime = startTimes;
+            conReqData.endTime=endTimes;
+            $scope.shiShiAajx();
+            countryaAajax();
+            // console.log(startTimes);
+            // console.log(timeIndex)
+
+        });
+        daterangepickerBox.data('daterangepicker').setStartDate(daterangepickerBox.daterangepicker);
+    //用户类型选择
+        $scope.userTypeClick = function ($index) {
+            for (var ins in $scope.regional.userTypes){
+                if (ins==$index){
+                    $scope.regional.userTypes[ins].isClick=true
+                    reqData.types = Number(ins)+1;
+                    $scope.shiShiAajx()
+                }else{
+                    $scope.regional.userTypes[ins].isClick = false
+                }
+            }
+        };
+        //    表格导出
+        // $scope.regional.nowTitle = document.title;
+        // $scope.exportTable = function exportTable(tableid, nowData) {
+        //
+        //     if (!!window.ActiveXObject || "ActiveXObject" in window) {
+        //         window.document.write(document.getElementById(tableid).outerHTML);
+        //         window.document.execCommand("SaveAs", false, nowData + ".xls");
+        //         history.go(-1);
+        //     }
+        //     else {
+        //         var tb = document.getElementById(tableid);    //获取table对像
+        //         var rows = tb.rows;
+        //         var str = "";
+        //         for (var i = 0; i < rows.length; i++) {          //---循环--行---
+        //             var cells = rows[i].cells;
+        //             for (var j = 0; j < cells.length; j++) {   //---循环--列---
+        //                 str = str + cells[j].innerText + ",";
+        //             }
+        //             str = str + "\n";
+        //         }
+        //         // console.log(str);
+        //         str = encodeURIComponent(str);
+        //         var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+        //         var downloadLink = document.createElement("a");
+        //         downloadLink.href = uri;
+        //         downloadLink.download = nowData + ".csv";
+        //         document.body.appendChild(downloadLink);
+        //         downloadLink.click();
+        //         document.body.removeChild(downloadLink);
+        //     }
+        // }
+
+
+    });
+
+    angular.bootstrap(document.getElementById('regionalApp'), ['App']);
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+
+
+
+
+</script>

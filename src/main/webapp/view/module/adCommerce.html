@@ -1,0 +1,434 @@
+<style>
+    .layui-form-label {
+        width: 100px;
+    }
+
+</style>
+<section class="content-header">
+    <h1>
+        自主投放广告管理
+        <small></small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>模块管理</li>
+        <li class="active">自主投放广告管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">广告名称</label>
+                        <div class="layui-input-block">
+                            <input id="ad_title" type="text" name="ad_title" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">广告位置</label>
+                        <div class="layui-input-block">
+                            <select name="ad_position" id="ad_position">
+                                <option value="">全部</option>
+                                <option value="0">app发现</option>
+                                <option value="1">app我的</option>
+                                <option value="2">app国际圈系统广告</option>
+                                <option value="3">app偶遇</option>
+                                <option value="4">app国际圈投放广告</option>
+                                <option value="100">pc偶遇</option>
+                                <option value="101">pc动态</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <select name="ad_state" id="ad_state">
+                                <option value=""></option>
+                                <option value="3">待审核</option>
+                                <option value="6">已拒绝</option>
+                                <option value="9">已通过</option>
+                                <option value="10">投放中</option>
+                                <option value="12">到期已结束</option>
+                                <option value="15">余额不足已结束</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">app/pc</label>
+                        <div class="layui-input-block">
+                            <select name="ad_flag" id="ad_flag">
+                                <option value="">全部</option>
+                                <option value="app">app</option>
+                                <option value="pc">pc</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">投放金额</label>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            <input type="text" name="ad_gold_start" id="ad_gold_start" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid">-</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            <input type="text" name="ad_gold_end" id="ad_gold_end" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">嘎嘎号</label>
+                        <div class="layui-input-block">
+                            <input id="memb_gagano" type="text" name="memb_gagano" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <button class="layui-btn layui-btn-normal" id="searchEx">搜索</button>
+            <button class="layui-btn layui-btn-normal" id="openAdd">绑定邮箱</button>
+        </div>
+        <div class="layui-fluid">
+            <table class="layui-hide" id="adCommerceTable" lay-filter="adCommerceTable"></table>
+        </div>
+    </div>
+</section>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div id="chat_box">
+                    <div class="layui-row">
+                        <form class="layui-form" action="" lay-filter="formTest">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 100px;">理由</label>
+                                <div class="layui-input-block">
+                                    <textarea name="adReason" required lay-verify="required" placeholder="请输入"
+                                              class="layui-textarea"></textarea>
+                                    <input type="hidden" name="adState" id="adState" value="6"/>
+                                    <input type="hidden" name="pcId" id="pcId"/>
+                                    <input type="hidden" name="adFlag" id="adFlag"/>
+                                    <input type="hidden" name="adId" id="adId"/>
+                                    <input type="hidden" name="adGold" id="adGold"/>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="agree">同意</a>
+    <a class="layui-btn layui-btn-xs" lay-event="refuse">拒绝</a>
+</script>
+<script>
+    layui.use(['form', 'upload', 'table', 'element', 'laydate'], function () {
+        //获取form模块
+        var form = layui.form, table = layui.table, element = layui.element;
+        table.render({
+            id: 'adCommerceTable',
+            elem: '#adCommerceTable',
+            url: ctx + '/adCommerce/list',
+            where: {
+                ad_position: $("#ad_position").val()
+                , ad_title: $("#ad_title").val()
+                , ad_gold_start: $("#ad_gold_start").val()
+                , ad_gold_end: $("#ad_gold_end").val()
+                , ad_state: $("#ad_state").val()
+                , ad_flag: $("#ad_flag").val()
+                , memb_gagano: $("#memb_gagano").val()
+            },
+            //	method: 'post' //	默认 get
+            //	contentType: 'application/json'
+            toolbar: true,
+            defaultToolbar: ['filter'],
+            even: true, //	开启隔行背景
+            title: '自主投放广告管理',
+            limits: [10, 30, 50, 100, 500, 1000],
+            limit: 10
+            , cellMinWidth: 80
+            , cols: [[{
+                field: 'i',
+                title: '序号',
+                type: 'numbers'
+            }, {
+                field: 'memb_nickname',
+                title: '申请人'
+                , width: '100'
+            }, {
+                field: 'memb_gagano',
+                title: 'GaGaID'
+                , width: '100'
+            }, {
+                field: 'create_time',
+                title: '申请时间'
+                , templet: function (res) {
+                    if (res != null) {
+                        const date = new Date(res.create_time);
+                        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    }
+                }
+                , width: '160'
+            }, {
+                field: 'ad_title',
+                title: '广告标题'
+                , width: '100'
+            }, {
+                field: 'ad_position',
+                title: '广告位置'
+                , templet: function (res) {
+                    if (res != null) {
+                        //0：app发现1：app我的2：app国际圈100:pc动态101:pc偶遇
+                        switch (res.ad_position) {
+                            case 0:
+                                return 'app发现';
+                            case 1:
+                                return 'app我的';
+                            case 2:
+                                return 'app国际圈系统广告';
+                            case 3:
+                                return 'app偶遇';
+                            case 4:
+                                return 'app国际圈投放广告';
+                            case 100:
+                                return 'pc偶遇';
+                            case 101:
+                                return 'pc动态';
+                            case 102:
+                                return 'pc左栏';
+                        }
+                    }
+                }
+                , width: '100'
+            }, {
+                field: 'start_date',
+                title: '预计投放排期'
+                , width: '190'
+                , templet: function (res) {
+                    return res.start_date + '至' + res.end_date;
+                }
+            }, {
+                field: 'createdate',
+                title: '投放时段'
+                , templet: function (res) {
+                    return res.start_time + '至' + res.end_time;
+                }
+                , width: '160'
+            }, {
+                field: 'click_url',
+                title: '落地页链接'
+                , width: '100'
+            }, {
+                field: 'image_url',
+                title: '投放图片'
+                , templet: function (res) {
+                    return '<img class="min" onclick="imageclick(this)" src="' + res.image_url + '" />'
+                }
+            }, {
+                field: 'ad_gold',
+                title: '预估费用（金币）'
+                , width: '120'
+            }, {
+                field: 'createdate',
+                title: '已展示天数'
+                , templet: function (res) {
+                    if (res.ad_state < 9) {
+                        return 0;
+                    }
+                    if (res.ad_state >= 9) {
+                        let agree_time = res.agree_time;
+                        let start_date = res.start_date;
+                        let end_date = res.end_date;
+                        let now_date = getYMD();
+                        if (res.ad_state == 9) {
+                            end_date = now_date;
+                        }
+                        if (new Date(start_date).getTime() < new Date(agree_time).getTime()) {
+                            start_date = new Date(agree_time);
+                        }
+                        return datedifference(start_date, end_date);
+                    }
+                }
+                , width: '100'
+            }, {
+                field: 'createdate',
+                title: '点击量'
+                , templet: function (res) {
+                    return res.ad_gold_cost / 0.5
+                }
+                , width: '100'
+            }, {
+                field: 'ad_gold_cost',
+                title: '已扣除费用（金币）'
+                , width: '120'
+            }, {
+                field: 'ad_state',
+                title: '状态'
+                , templet: function (res) {
+                    switch (res.ad_state) {
+                        case 0:
+                            return "未支付";
+                        case 3:
+                            return "待审核";
+                        case 6:
+                            return "已拒绝";
+                        case 9:
+                            return "已通过";
+                        case 10:
+                            return "投放中";
+                        case 12:
+                            return "到期已结束";
+                        case 15:
+                            return "余额不足已结束";
+                    }
+                }
+                , width: '100'
+            }, {
+                field: 'ad_reason',
+                title: '拒绝理由'
+                , width: '100'
+            }, {
+                title: '操作',
+                fixed: 'right',
+                toolbar: '#barDemo'
+                , width: '120'
+            }
+            ]],
+            page: true
+        })
+        ;
+        //	监听行工具事件
+        table.on('tool(adCommerceTable)', function (obj) {
+            const data = obj.data;
+            console.log(data.ad_flag)
+            console.log(data.ad_id)
+            console.log(data.pc_id)
+            if (obj.event === 'refuse') {
+                if (data.ad_state != 3) {
+                    layer.msg("已审核，不能操作！");
+                    return;
+                }
+                $('#myModal').modal('show');
+                form.val("formTest", {
+                    "adFlag": data.ad_flag
+                    , "adId": data.ad_id
+                    , "pcId": data.pc_id
+                    , "adReason": data.ad_reason
+                    , "adGold": data.ad_gold
+                });
+            } else if (obj.event === 'agree') {
+                if (data.ad_state != 3) {
+                    layer.msg("当前状态，不能操作！");
+                    return;
+                }
+                // $('#myModal').modal('show');
+                $.post(ctx + "/adCommerce/update", {
+                    adState: 9,
+                    adReason: "",
+                    adId: data.ad_id,
+                    pcId: data.pc_id,
+                    adFlag: data.ad_flag
+
+                }, function (result) {
+                    if (result.success) {
+                        layer.msg("操作成功！");
+                        $('#myModal').modal('hide');
+                        table.reload('adCommerceTable');
+                    } else {
+                        layer.msg("操作失败！");
+                    }
+                });
+            }
+        });
+        //		搜索 按钮
+        $('#searchEx').click(function () {
+            table.reload('adCommerceTable', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                , where: {
+                    ad_position: $("#ad_position").val()
+                    , ad_title: $("#ad_title").val()
+                    , ad_gold_start: $("#ad_gold_start").val()
+                    , ad_gold_end: $("#ad_gold_end").val()
+                    , ad_state: $("#ad_state").val()
+                    , ad_flag: $("#ad_flag").val()
+                    , memb_gagano: $("#memb_gagano").val()
+                }
+            });
+        });
+        form.on('submit(formDemo)', function (data) {
+            $.post(ctx + "/adCommerce/update", data.field, function (result) {
+                if (result.success) {
+                    layer.msg("操作成功！");
+                    $('#myModal').modal('hide');
+                    table.reload('adCommerceTable');
+                } else {
+                    layer.msg("操作失败！")
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        $('#openAdd').click(function () {
+            $.get(ctx + "/adPublishAppClass/getEmail", function (res) {
+                if (res.success) {
+                    //prompt层
+                    layer.prompt({title: '绑定邮箱', formType: 0, value: res.obj}, function (text, index) {
+                        layer.close(index);
+                        $.post(ctx + "/adPublishAppClass/updateEmail", {email: text}, function (result) {
+                            if (result.success) {
+                                layer.msg("操作成功！");
+                            } else {
+                                layer.msg("操作失败！")
+                            }
+                        });
+                    });
+                }
+            });
+
+
+        });
+
+
+    });
+
+    function imageclick(obj) {
+        layer.photos({
+            photos: {"data": [{"src": obj.src}]}
+        });
+    }
+
+    //两个时间相差天数 兼容firefox chrome
+    function datedifference(sDate1, sDate2) {    //sDate1和sDate2是2006-12-18格式
+        if (sDate1 == sDate2) {
+            return 1;
+        }
+        let dateSpan,
+            tempDate,
+            iDays;
+        sDate1 = Date.parse(sDate1);
+        sDate2 = Date.parse(sDate2);
+        dateSpan = sDate2 - sDate1;
+        dateSpan = Math.abs(dateSpan);
+        iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
+        return iDays;
+    };
+
+    function getYMD() {
+        let date = new Date();
+        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    }
+
+</script>

@@ -1,0 +1,467 @@
+
+<div ng-controller="AppController" class="user-participation">
+
+    <div class="right-model">
+        <div class="right-model-content right-model-content1" style="display: block">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        消费总额
+                    </div>
+                    <div class="title-content-right">
+
+                        <span>
+							<input type="text" id="revenueStarttime1" class="startTime" readonly ng-model="revenueStarttime1" ng-change="revenueChangeVal1()">至
+                            <input type="text" id="revenueEndtime1" class="startTime" readonly ng-model="revenueEndtime1" ng-change="revenueChangeVal1()">
+						</span>
+                        <ul class="ul-li" id="deviceUl1">
+                            <li ng-class="bluebgflag1 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange1(1)" class="exportBtn">全部</li>
+                            <li class="border-none exportBtn" ng-click="bluebgflagChange1(2)" ng-class="bluebgflag1 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange1(3)" ng-class="bluebgflag1 == 3 ? 'blue-bg' : '' " class="exportBtn">APP</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="revenueChartPC" style="height:450px;margin-top: 30px;"></div>
+            </div>
+            <div class="addUserMain-content" style="margin-top: 30px;">
+                <div id="revenueChartAPP" style="height:450px;margin-top: 30px;"></div>
+            </div>
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        消费明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('revenueTable','消费明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="revenueTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>总额</th>
+                        <th>VIP会员升级</th>
+                        <th>高级会员升级</th>
+                        <th>翻译</th>
+                        <th>翻译字符包</th>
+                        <th>模糊图</th>
+                        <th>红包</th>
+                        <th>一键异性50封</th>
+                        <th>小视频</th>
+                        <th>gagatalk</th>
+                        <th>真实礼物</th>
+                        <th>虚拟礼物</th>
+                        <th>打赏</th>
+
+                    </tr>
+                    <tr ng-repeat="x in dataObj3">
+
+                        <td>{{x['日期']}}</td>
+                        <td>{{x['总额']}}</td>
+                        <td>{{x['vip升级']}}</td>
+                        <td>{{x['高级升级']}}</td>
+                        <td>{{x['翻译']}}</td>
+                        <td>{{x['翻译翻译包']}}</td>
+                        <td>{{x['模糊图']}}</td>
+                        <td>{{x['红包']}}</td>
+                        <td>{{x['一键异性50封']}}</td>
+                        <td>{{x['小视频']}}</td>
+                        <td>{{x['gagatalk']}}</td>
+                        <td>{{x['真实礼物']}}</td>
+                        <td>{{x['虚拟礼物']}}</td>
+                        <td>{{x['打赏']}}</td>
+
+                    </tr>
+                    </thead>
+
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+    app.controller('AppController',function($scope,$http){
+        $scope.bluebgStatus = 1;
+
+        $scope.bluebgflag1 = 1;
+        $scope.revenuebgflag1 = '';
+
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.revenueStarttime1 = firstDay;
+        $scope.revenueEndtime1 = nowdate;
+
+        $('#revenueStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#revenueEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        initPage($scope,$http);
+        $scope.revenue();
+        $scope.revenueBottom();
+
+
+
+
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http) {
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+
+        $scope.bluebgflagChange1 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag1 = 1;
+                    $scope.revenuebgflag1 = '';
+                    $("#revenueChartPC").show();
+                    $("#revenueChartAPP").show();
+                    $scope.revenueBottom();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag1 = 2;
+                    $scope.revenuebgflag1 = 'pc';
+                    $("#revenueChartPC").show();
+                    $("#revenueChartAPP").hide();
+
+                    $scope.revenueBottom();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag1 = 3;
+                    $scope.revenuebgflag1 = 'app';
+                    $("#revenueChartPC").hide();
+                    $("#revenueChartAPP").show();
+                    $scope.revenueBottom();
+
+                    break;
+
+            }
+
+        };
+
+
+        $scope.revenueChangeVal1 =function(){
+            if($scope.revenueStarttime1 == ''){
+                $scope.revenueStarttime1 = firstDay;
+            }
+            if($scope.revenueEndtime1 == ''){
+                $scope.revenueEndtime1 = nowdate;
+            }
+            if($scope.revenueStarttime1 > $scope.revenueEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.revenueStarttime1 = firstDay;
+                $scope.revenueEndtime1 = nowdate;
+
+            }
+            $scope.revenue();
+            $scope.revenueBottom();
+
+
+        }
+
+
+        $scope.revenue = function(){
+
+            var dateData1 = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:'pc'
+            };
+            layer.load(1, {shade: 0.3});  	
+            $http.post(ctx + "/useranalysis/consByGold",dateData1)
+                .then(function(data){
+                	layer.closeAll();
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj1 =  data.data.obj;
+                        var xLineData = [];
+                        var yLineData = [];
+
+                        for(var i = 0;i<dataObj1.length; i++){
+                            xLineData.push(dataObj1[i]['vip升级']);
+                            yLineData.push(dataObj1[i].gold);
+                        }
+                        console.log(xLineData);
+                        console.log(yLineData);
+
+                        $scope.lineChartPC(xLineData,yLineData);
+
+                    }
+
+                },function(data){
+
+                })
+
+            var dateData2 = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:'app'
+            };
+            layer.load(1, {shade: 0.3});  	
+            $http.post(ctx + "/useranalysis/consByGold",dateData2)
+                .then(function(data){
+                    //debugger;
+                    	layer.closeAll();
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj2 =  data.data.obj;
+                        var x1LineData = [];
+                        var y1LineData = [];
+
+                        for(var i = 0;i<dataObj2.length; i++){
+                            x1LineData.push(dataObj2[i]['vip升级']);
+                            y1LineData.push(dataObj2[i].gold);
+                        }
+
+                        $scope.lineChartAPP(x1LineData,y1LineData);
+
+                    }
+
+                },function(data){
+                	layer.closeAll();
+                })
+
+        }
+
+
+        $scope.revenueBottom = function(){
+
+            var dateData3 = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:''
+            };
+            layer.load(1, {shade: 0.3});  
+            $http.post(ctx + "/useranalysis/consumGoldDetail",dateData3)
+                .then(function(data){
+                    //debugger;
+
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj3 =  data.data.obj;
+                        $scope.dataObj3 =  dataObj3;
+
+                    }
+
+                },function(data){
+
+                })
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+        $scope.lineChartPC = function(xLineData,yLineData){
+            // debugger;
+
+            var myChartPC = echarts.init(document.getElementById('revenueChartPC'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                color: colors,
+
+                tooltip: {
+                    trigger: 'none',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                title:{
+                    left:'center',
+                    text:'PC端消费总额',
+                    textStyle:{
+
+                    }
+                },
+                grid: {
+                    top: 70,
+                    bottom: 70
+                },
+
+                xAxis: {
+                    type: 'category',
+                    show: true,
+                    // boundaryGap: false,
+                    data: xLineData
+
+                },
+
+
+                yAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: false
+
+                    },
+                    axisTick: {
+                        show: false
+                    }
+                }],
+                series: [
+                    {
+                        type: 'bar',
+
+                        data: yLineData
+                    }
+                ]
+            };
+
+            myChartPC.setOption(option);
+
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChartPC.resize();
+            };
+
+
+
+        }
+
+
+
+        $scope.lineChartAPP = function(x1LineData,y1LineData){
+            // debugger;
+
+            var myChartAPP = echarts.init(document.getElementById('revenueChartAPP'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                color: colors,
+
+                tooltip: {
+                    trigger: 'none',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                title:{
+                    left:'center',
+                    text:'APP端消费总额',
+                    textStyle:{
+
+                    }
+                },
+                grid: {
+                    top: 70,
+                    bottom: 70
+                },
+
+                xAxis: {
+                    type: 'category',
+                    show: true,
+                    // boundaryGap: false,
+                    data: x1LineData
+
+                },
+
+
+                yAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: false
+
+                    },
+                    axisTick: {
+                        show: false
+                    }
+                }],
+                series: [
+                    {
+                        type: 'bar',
+
+                        data: y1LineData
+                    }
+                ]
+            };
+
+            myChartAPP.setOption(option);
+
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChartAPP.resize();
+            };
+
+
+
+        }
+
+
+
+
+
+
+    }
+    // lineChart();
+
+
+
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+</script>
+
+

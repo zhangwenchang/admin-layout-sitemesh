@@ -1,0 +1,1044 @@
+<style type="text/css">
+.giftReal-t td { padding: 6px; }
+.ylt1, .ylt2, .ylt3, .ylt4, .ylt5 { max-height: 100px; }
+.edit-img-box { position: relative; display: none; }
+.edit-img-box span { width: 15px; height: 15px; position: absolute; background: #f00; right: 0; text-align: center;  line-height: 16px;  color: #FFF; cursor: pointer;  }
+.edit-img-box.have { display: inline-block; }
+</style>
+<section class="content-header">
+	<h1>
+		真实礼物<small></small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>全局配置</li>
+		<li class="active">真实礼物</li>
+	</ol>
+</section>
+
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<!-- 头部操作菜单 -->
+				<form class="form-horizontal">
+					<div class="box-footer">
+						<button type="button" class="btn btn-primary" onclick="openAdd()">新增</button>
+						<button type="button" class="btn btn-primary" onclick="batchdel(false)">删除</button>
+						<button type="button" class="btn btn-primary" onclick="gotogclist()">分类管理</button>
+						<button type="button" class="btn btn-primary" onclick="reload()">刷新</button>
+						
+						分类:<select id="gcselect"></select>
+						<input type="text" id="key" placeholder="礼物名称">
+						<input type="text" id="gireGiftid_search" placeholder="礼物Id">
+						<button type="button" class="btn btn-primary" onclick="search()">搜索</button>
+					</div>
+				</form>
+
+				<!-- 列头 -->
+				<div class="box-body mailbox-messages">
+					<table id="privatemodellist" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>
+									<button class="btn btn-default btn-sm checkbox-toggle">
+										<i class="fa fa-square-o"></i>
+									</button>序号
+								</th>
+								<th>名称</th>
+								<th width="15%">礼物Id</th>
+								<th>语言</th>
+								<th>金币</th>
+								<th>分类</th>
+								<th>材质</th>
+								<th>是否推荐</th>
+								<th>排序</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- 编辑弹窗 -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width:820px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton"></div>
+		</div>
+	</div>
+</div>
+
+<!-- 提示弹窗 -->
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel1"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent1">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton1"></div>
+		</div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+/**
+ * 查询
+ */
+function search(){
+	$("#privatemodellist").dataTable().fnDraw(true);
+}
+
+
+function gotogclist(){
+	 window.location.href = ctx + "/welcome.html?po=48"; 
+}
+
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        var giftreal=$("#privatemodellist").dataTable({
+        	"bStateSave": true,
+        	"paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "info": true,
+            "autoWidth": false,
+            "ordering": true,
+            "pageLength":30,//分页长度
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	            var key = $("#key").val();
+	            var gicaId = $("#gcselect").val();
+	            var gicaLanguage = $("#gcselect").find("option:selected").attr("language");
+	            
+	        	aoData.push(
+	       			{"name":"key","value":key},
+	       			{"name":"gicaLanguage","value":gicaLanguage},
+	       			{"name":"gireGiftid","value":$('#gireGiftid_search').val()},
+	       			{"name":"gicaId","value":gicaId}
+       			)
+       			var url=(giftreal)?(ctx+"/Giftreal/list"):"#";
+	        	layer.load(1, {shade: 0.3});
+	        	oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": url,
+	              "data": aoData,
+	              "success": fnCallback
+	        	});
+	        },
+	        "columns": [//排序、赋值
+				{"data": "gireId","bSortable": false },
+				
+				{"data": "gireName","bSortable": false},
+				{"data": "gireGiftid","bSortable": false},
+				{"data": "gireLanage","bSortable": false },
+				{"data": "gireGold","bSortable": false},
+				{"data": "giftcategory.gicaName","bSortable": false },
+				{"data": "gireMaterial","bSortable": false},
+				{"data": "gireIsrecommend","bSortable": false},
+				{"data": "gireSort","bSortable": false},
+				{"data": "gireId","bSortable": false}
+	        ],
+	        "columnDefs": [{//特殊数据
+	        		"targets": 0,//复选框
+					"data": "diphId",
+					"render": function ( data, type, full, meta ) {
+						 return '<input type="checkbox" value="' + data + '" title="' + data + '" name="checkbox" class="checkbox" />'; 
+					}   
+				},{
+	        		"targets": 5,
+					"data": "diphId",
+					"render": function ( data, type, full, meta ) {
+						if(data){
+							data+="——"
+							data+=full.giftcategory.gicaLanguage;
+						}
+						 return data; 
+					}   
+				},{//特殊数据
+	        		"targets": 7,//复选框
+					"data": "diphId",
+					"render": function ( data, type, full, meta ) {
+						 return data==1?'推荐':'未推荐'; 
+					}   
+				},{
+	        		"targets": 9,//操作
+					"data": "diphId",
+					"render": function ( data, type, full, meta ) {
+						 return '<a href="javascript:void(0)" cname=\"'+full.giftcategory.gicaName+'\" onclick="openAdd2(\''+ data +'\',\''+ full.gireGiftid +'\',this)">批次添加</a> '
+						 +' <a href="javascript:void(0)" onclick="openEdit(\''+ data +'\',\''+ full.gireGiftid +'\')">编辑</a><br/><a href="javascript:void(0)"  onclick="openImg(\''+ full.gireGiftid +'\')">图片预览</a>';
+					}
+				}
+			],
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+            	$(".mailbox-messages input[type='checkbox']").iCheck({
+	            	checkboxClass: 'icheckbox_flat-blue',
+	                radioClass: 'iradio_flat-blue'
+	            });
+	            layer.closeAll();
+            	var json=jQuery.parseJSON(oSettings.jqXHR.responseText);
+            	// console.log(json);
+            	var str ="";
+            		str += "<option value =\"\" language=\"\">全部</option>";
+            	for(var i = 0;i < json.obj.length; i++){
+            		str += "<option value =\""+ json.obj[i].gicaId +"\" language=\""+ json.obj[i].gicaLanguage +"\">" + json.obj[i].gicaName+"-"+json.obj[i].gicaLanguage + "</option>";
+            	}
+            	$("#gcselect").append(str);
+            	$("#privatemodellist .fa").removeClass('fa-check-square-o').addClass('fa-square-o');
+            }
+	    });
+		$(".checkbox-toggle").click(function() {//复选框全选/反选
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+			    $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+			    $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+        //序号相关
+        var table = $('#privatemodellist').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML += page.page*page.length+ i+1;
+            });
+        }).draw();
+   });
+});
+
+/**
+ *	批量删除
+ *	sign	标志true 不再提示是否删除
+ */
+function batchdel(sign) {
+	var diphid = "";
+	
+	var objs = $("#privatemodellist div");
+    for (var i = 0; i < objs.length; i++) {
+        var obj = objs[i];
+        var flag = $(obj).attr("aria-checked");
+        if (flag == "true") {
+            if (diphid.trim() != "" && $.trim(diphid).length > 0) {
+            	diphid += ","
+            }
+            diphid += $(obj).children("input").attr("value");
+        }
+    }
+ 	if(null == diphid || diphid.length <= 0){
+		$("#ModalLabel").text("提示");
+		$("#bodycontent").html('<span>请先选中要删除的数据！</span>');
+		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal').modal({
+		    keyboard: true
+		});
+		return;
+ 	}
+    
+    if(!sign){
+		$("#ModalLabel").text("删除模板");
+		$("#bodycontent").html('<span>确定要删除所选项吗？</span>');
+		$("#modalbutton").html('<button type="button" onclick="batchdel(true)" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal').modal({
+		    keyboard: true
+		});
+		return;
+    }
+    
+    $.ajax({
+        type: "post",
+        url: ctx + "/Giftreal/del",
+        dataType: "json",
+        data: {"gids": diphid},
+        success: function(data) {
+            if (data.success) {
+            	$("#privatemodellist").dataTable().fnDraw(true);
+            	$('#Modal').modal('hide');
+            }else{
+            	$("#privatemodellist").dataTable().fnDraw(true);
+            	$('#Modal').modal('hide');
+            	
+            	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>数据异常！请重试！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});
+            }
+        }
+    });
+}
+
+/**
+ * 点击“+”展开图片
+ */
+function openImg(grimRealgift){
+	var str = "";
+	$.ajax({
+        type: "post",
+        url: ctx + "/Giftreal/getImgs",
+        dataType: "json",
+        data: {"grimRealgift": grimRealgift},
+        success: function(data) {
+        	$("#privatemodellist").find(".ylt").remove();
+            if (data.success) {
+            	if( null != data.obj && data.obj.length > 0){
+            		/*
+            		str = "<tr class='ylt'><td colspan='9'>预览图：";
+                	for(var i = 0 ;i < data.obj.length; i++ ){
+                		str += "<img src='" + qiniu +data.obj[i].grimPreview + "' width='100' >";
+                	}
+                	str += "</td></tr>";
+                	$("#privatemodellist").append(str);
+                	*/
+                	var imgData = {
+                		"title": "图片预览", 
+						"id": 123, 
+						"start": 0,
+						"data": []
+                	};
+                	imgData.data = $.map(data.obj, function(n){
+                		return {
+                			"alt": '第' + n.grimSort + '张图片',
+                			"pid": n.grimId,
+                			"src": qiniu + n.grimDisplay,
+                			"thumb": qiniu + n.grimDisplay + '?imageView2/1/w/400/h/400'
+                		};
+                	});
+                	layer.photos({
+                		shade: 0.3,
+                		closeBtn: 1,
+						photos: imgData
+					});
+            	}else{
+            		//$("#privatemodellist").append("<tr class='ylt'><td colspan='9'>暂无预览图</td></tr>");
+            		layer.msg('暂无预览图');
+            	}
+            }else{
+            	layer.msg('数据异常！请重试！');
+            	/*
+            	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>数据异常！请重试！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});*/
+            }
+        }
+    });
+}
+
+/**
+ * 刷新
+ */
+function reload(){
+	window.location.reload();//刷新当前页面.
+}
+
+/**
+ * 打开新增窗口
+ */
+function openAdd(){
+	var count = "";
+	var gid = "";
+	var gclist = "";
+	count += "<table><tr><td><img class='ylt1' />"
+	+"<img class='ylt2'/><img class='ylt3'/>"
+	+"<img class='ylt4'/><img class='ylt5'/></td></tr></table>";
+	$.ajax({
+        type: "post",
+        url: ctx + "/Giftreal/openAdd",
+        dataType: "json",
+        async: false,
+        //data: {"grimRealgift": grimRealgift},
+        success: function(data) {
+        	 if (data.success) {
+        		 gid = data.obj.gireGiftid;
+        		 gclist = data.obj.gclist;
+        	 }
+        }
+    });
+	
+	count += "<table class='giftReal-t'>";
+	count +="<tr><td width='75'>ID:</td><td>"+ gid +"<input id='gireGiftid' type='hidden' value='"+ gid +"'></td>";
+	count +="<td>语言:</td><td><select id='gireLanage'><option value=\"zh-cn\">zh-cn</option>"
+	+"<option value=\"zh-tw\">zh-tw</option>"
+	+"<option value=\"en-us\">en-us</option>"
+	+"<option value=\"de-de\">de-de</option>"
+	+"<option value=\"es-es\">es-es</option>"
+	+"<option value=\"ru-ru\">ru-ru</option>"
+	+"<option value=\"ja-jp\">ja-jp</option>"
+	+"<option value=\"ko-kr\">ko-kr</option>"
+	+"</select></td></tr>";
+	
+	count +="<tr><td>类别:</td><td><select id='gireCategoryid'>";
+	if(null != gclist && gclist.length > 0){
+		for(var i = 0;i < gclist.length;i++ ){
+			count += "<option value=\""+ gclist[i].gicaId +"\">"+ gclist[i].gicaName +"-"+ gclist[i].gicaLanguage +"</option>";
+		}
+	}
+	count += "</select></td>";
+	count +="<td>名称:</td><td><input type='text' id='gireName'/></td></tr>";
+	count +="<tr><td>默认赠言:</td><td><textarea id='gireGreeting'></textarea></td>";
+	count +="<td>材料:</td><td><input type='text' id='gireMaterial'/></td></tr>";
+	count +="<tr><td>金币:</td><td><input type='text' id='gireGold'/></td>";
+	count +="<td>排序:</td><td><input type='text' id='gireSort'/></td></tr>";
+	count +="<tr><td>购买链接:</td><td colspan='3'><input type='text' id='girePlatsource'/>（第三方网站，便于后期采购）</td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' style='width:200px' id='img1' onchange='upload(this,1)'/></td>";
+	count +="<td width='80'>礼物图片:</td><td><input type='file' style='width:200px' id='img2' onchange='upload(this,2)'/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img3' style='width:200px' onchange='upload(this,3)'/></td>";
+	count +="<td width='80'>礼物图片:</td><td><input type='file' id='img4' style='width:200px' onchange='upload(this,4)'/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td colspan='3'><input type='file' style='width:200px' id='img5' onchange='upload(this,5)'/></td></tr>";
+	//编辑框
+	count +="<tr><td>商品详情:</td><td colspan='3'><textarea id='compose-textarea' class='form-control'></textarea></td></tr>";
+	count +="<tr><td>活动推荐:</td><td colspan='3'><input type='checkbox' id='gireIsrecommend'/></td></tr>";
+	
+	count += "</table><input type='file' id='inputs2' multiple='multiple' /><ul></ul>";
+	$("#ModalLabel").text("添加真实礼物");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(true)" class="btn btn-primary">添加 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	
+	// $("#compose-textarea").wysihtml5();//为编辑框初始化   onchange='uploadM(this)'
+	var editors = CKEDITOR.replace('compose-textarea');
+	$('#Modal').on('shown.bs.modal', function() {
+	    $('#modalbutton .btn-primary').on('click', function(event) {
+	    	event.preventDefault();
+	    	add(true, editors);
+	    });
+	    $('#Modal input[type="file"]').on('change', function(event) {	    	
+	    	uploadM(this, editors);
+	    	// console.log(1);
+	    });
+	});	
+	$('#Modal').on('hidden.bs.modal', function() {
+		$('#Modal').off();
+	});
+}
+
+/**
+ * 七牛上传图片
+ */
+var Qiniu_UploadUrl = "https://upload.qiniup.com";
+var Qiniu_upload = function(f, token, key,obj) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", Qiniu_UploadUrl, true);
+	var formData, startDate;
+	formData = new FormData();
+	if (key !== null && key !== undefined) formData.append("key", key);
+	formData.append("token", token);
+	formData.append("file", f);
+	var taking;
+	xhr.upload.addEventListener("progress", function(evt) {
+		if (evt.lengthComputable) {
+			var nowDate = new Date().getTime();
+			taking = nowDate - startDate;
+			var x = (evt.loaded) / 1024;
+			var y = taking / 1000;
+			var uploadSpeed = (x / y);
+			var formatSpeed;
+			if (uploadSpeed > 1024) {
+				formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+			} else {
+				formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+			}
+		}
+	}, false);
+	xhr.onreadystatechange = function(response) {
+		if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+			var blkRet = JSON.parse(xhr.responseText);
+			$(obj).closest('.edit-img-box').addClass('have');
+			$(obj).attr('src',qiniu+blkRet.key);//图片赋值 
+		} else if (xhr.status != 200 && xhr.responseText) {
+			$("#errorbodycontent").html(xhr.responseText);
+			$('#errorModal').modal({
+				keyboard : true
+			});
+		}
+	};
+	startDate = new Date().getTime();
+	xhr.send(formData);
+};
+
+/**
+ * 上传预览图
+ * obj 当前对象
+ * index 对应控件id
+ */
+function upload(obj,index){
+	var imgobj = $(".ylt"+index);
+	var that=obj;
+	var key=$(that).val();
+	var token = "";
+	$.post(ctx+"/Image/uploadInit",{type:"R",imgNum:1},function(result){
+		 if(result.success){
+			token = result.obj.upToken;
+			key=result.obj.img;
+			if ($(that).length > 0 && token != "") {
+				Qiniu_upload($(that)[0].files[0], token,key,imgobj);
+			} else {
+				console && console.log("form input error");
+			}
+		 }
+	});
+}
+
+/**
+ * 新增
+ * sign 标志（是否校验数据完整性）
+ */
+function add(sign, editor){
+	var img1 = $(".ylt1").attr("src");
+	var img2 = $(".ylt2").attr("src");
+	var img3 = $(".ylt3").attr("src");
+	var img4 = $(".ylt4").attr("src");
+	var img5 = $(".ylt5").attr("src");
+	var str = ((null != img1 && $.trim(img1).length > 0)?img1.replace(qiniu,""):"") + "," 
+	+ ((null != img2 && $.trim(img2).length > 0)?img2.replace(qiniu,""):"") + ","	
+	+ ((null != img3 && $.trim(img3).length > 0)?img3.replace(qiniu,""):"") + "," 
+	+ ((null != img4 && $.trim(img4).length > 0)?img4.replace(qiniu,""):"") + ","	
+	+ ((null != img5 && $.trim(img5).length > 0)?img5.replace(qiniu,""):"") + "," ;
+	var gireGiftid = $("#gireGiftid").val();
+	var gireLanage = $("#gireLanage").val();
+	var gireCategoryid = $("#gireCategoryid").val();
+	var gireName = $("#gireName").val();
+	var gireGreeting = $("#gireGreeting").val();
+	var gireMaterial = $("#gireMaterial").val();
+	var gireGold = $("#gireGold").val();
+	var gireSort = $("#gireSort").val();
+	var gireDescription = editor? editor.getData() : $("#compose-textarea").val();
+	var girePlatsource = $("#girePlatsource").val();
+	var gireIsrecommend = $('#gireIsrecommend').is(':checked')?'1':'2';
+	
+	if((null == img1 || $.trim(img1).length <= 0)&&sign){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>第一张礼物图片必须选择！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+	}
+	
+	if((null == gireName || $.trim(gireName).length <= 0)&&sign){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请输入礼物名！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+	}
+	
+	if((null == gireMaterial || $.trim(gireMaterial).length <= 0)&&sign){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请输入材料！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+	}
+	
+	if((null == gireGold || $.trim(gireGold).length <= 0)&&sign){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请输入金币！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+	}
+	
+	if((null == gireSort || $.trim(gireSort).length <= 0)&&sign){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请输入排序！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+	}else{
+		if(sign){
+			var reg = /^[0-9]*$/;
+			if (!reg.test(gireSort)){
+				$("#ModalLabel1").text("提示");
+				$("#bodycontent1").html('<span>排序必须是正整数！</span>');
+				$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+				$('#Modal1').modal({
+				    keyboard: true
+				});
+				return;
+			}
+		}
+	}
+	
+	if((null == gireLanage || $.trim(gireLanage).length <= 0)){
+		var selectobj = $("#gireLanage").find("option");
+		if(null == selectobj || selectobj.length <= 0){
+			$("#ModalLabel1").text("提示");
+			$("#bodycontent1").html('<span>该礼物已经添加了8个！</span>');
+			$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+			$('#Modal1').modal({
+			    keyboard: true
+			});
+			return;
+		}
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请选择语言！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+	}
+	
+	if((null == girePlatsource || $.trim(girePlatsource).length <= 0)){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请输入购买链接！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+	}
+	
+	var url = "";
+	var data = "";
+	if(sign){
+		url = ctx + "/Giftreal/add";
+		data = {"imgs": str,"gireGiftid":gireGiftid,"gireLanage":gireLanage,"gireCategoryid":gireCategoryid,"gireName":gireName,
+		"gireGreeting":gireGreeting,"gireMaterial":gireMaterial,"gireGold":gireGold,
+		"gireSort":gireSort,"gireDescription":gireDescription,"girePlatsource":girePlatsource,"gireIsrecommend":gireIsrecommend}
+	}else{
+		var gid = $("#gid").val();
+		url = ctx + "/Giftreal/add2";
+		data = {"imgs": str,"gireGiftid":gireGiftid,"gireLanage":gireLanage,"gireCategoryid":gireCategoryid,"gireName":gireName,
+				"gireGreeting":gireGreeting,"gireMaterial":gireMaterial,"gireGold":gireGold,
+				"gireSort":gireSort,"gireDescription":gireDescription,"gid":gid,"girePlatsource":girePlatsource,"gireIsrecommend":gireIsrecommend}
+	}
+	
+	$.ajax({
+		type: "post",
+		url: url,
+		dataType: "json",
+		data: data,
+		success: function(data) {
+		    if (data.success) {
+		    	$("#privatemodellist").dataTable().fnDraw(true);
+		    	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>成功！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});
+		    }
+		}
+	});
+}
+
+/**
+ * 添加(根据批次号添加)
+ */
+function openAdd2(gid,ggid,obj){
+	var gicaName = $(obj).attr("cname");
+	var count = "";
+	var list = "";
+	var giftReal = "";//被复制的对象
+	var listimg = "";
+	$.ajax({
+        type: "post",
+        url: ctx + "/Giftreal/openAddByGireGiftid",
+        dataType: "json",
+        async: false,
+        data: {"gid": gid,"ggid":ggid},
+        success: function(data) {
+        	if (data.success) {
+        		list = data.obj.list;
+        		giftReal = data.obj.giftReal;
+        		listimg = data.obj.listimg;
+        	}
+        }
+    });
+	
+	var image1,image2,image3,image4,image5;//上传空间是否可用
+	var imagesrc1,imagesrc2,imagesrc3,imagesrc4,imagesrc5;//上传空间是否可用
+	
+	for(var i = 0;i < listimg.length;i++){
+		if(listimg[i].grimSort == "1"){
+			image1 = "disabled";
+			imagesrc1 = "src='" + qiniu + listimg[i].grimPreview + "'";
+		}else if(listimg[i].grimSort == "2"){
+			image2 = "disabled";
+			imagesrc2 = "src='" + qiniu+listimg[i].grimPreview + "'";
+		}else if(listimg[i].grimSort == "3"){
+			image3 = "disabled";
+			imagesrc3 = "src='" + qiniu+listimg[i].grimPreview + "'";
+		}else if(listimg[i].grimSort == "4"){
+			image4 = "disabled";
+			imagesrc4 = "src='" + qiniu+listimg[i].grimPreview + "'";
+		}else if(listimg[i].grimSort == "5"){
+			image5 = "disabled";
+			imagesrc5 = "src='" + qiniu+listimg[i].grimPreview + "'";
+		}
+	}
+	
+	count += "<table><tr><td><img class='ylt1' width='120' "+ imagesrc1 +" />"
+		+"<img class='ylt2' width='120' "+ imagesrc2 +"/><img class='ylt3' width='120' "+ imagesrc3 +"/>"
+		+"<img class='ylt4' width='120' "+ imagesrc4 +"/><img class='ylt5' width='120' "+ imagesrc5 +"/></td></tr></table>";
+	
+	count += "<table>";
+	count +="<tr><td>ID:</td><td>"+ ggid +"<input id='gireGiftid' type='hidden' value='"+ ggid +"'><input id='gid' type='hidden' value='"+ gid +"'></td></tr>";
+	count +="<tr><td>语言:</td><td><select id='gireLanage'>"
+	if(null != list && list.length > 0){
+		for(var i = 0;i < list.length; i++){
+			count +="<option value=\""+ list[i] +"\">"+ list[i] +"</option>"
+		}
+	}
+	count +="</select></td></tr>";
+	
+	count +="<tr><td>类别:</td><td><select id='gireCategoryid' disabled='disabled'>";
+	count += "<option value=\""+ giftReal.gireCategoryid +"\">"+ gicaName +"</option>";
+	count += "</select></td></tr>";
+	
+	count +="<tr><td>名称:</td><td><input type='text' id='gireName' value='"+ giftReal.gireName +"'/></td></tr>";
+	count +="<tr><td>默认赠言:</td><td><textarea id='gireGreeting'>"+giftReal.gireGreeting+"</textarea></td></tr>";
+	count +="<tr><td>材料:</td><td><input type='text' id='gireMaterial' value='"+ giftReal.gireMaterial +"'/></td></tr>";
+	count +="<tr><td>金币:</td><td><input type='text' id='gireGold' value='"+ giftReal.gireGold +"'/></td></tr>";
+	count +="<tr><td>排序:</td><td><input type='text' id='gireSort' value='"+ giftReal.gireSort +"'/></td></tr>";
+	
+
+	var read ="";
+	if(null != giftReal.girePlatsource && $.trim(giftReal.girePlatsource).length > 0){
+		read = "readonly='readonly'";
+	}
+	count +="<tr><td>购买链接:</td><td><input type='text' id='girePlatsource' value='"+ giftReal.girePlatsource +"' "+ read +" />（第三方网站，便于后期采购）</td></tr>";
+	
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img1' onchange='upload(this,1)' "+ image1 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img2' onchange='upload(this,2)' "+ image2 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img3' onchange='upload(this,3)' "+ image3 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img4' onchange='upload(this,4)' "+ image4 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img5' onchange='upload(this,5)' "+ image5 +"/></td></tr>";
+	//编辑框
+	count +="<tr><td>商品详情:</td><td><textarea id='compose-textarea' class='form-control'>"+ giftReal.gireDescription +"</textarea></td></tr>";
+
+	count +="<tr><td>活动推荐:</td><td colspan='3'><input type='checkbox' id='gireIsrecommend' " + (giftReal.gireIsrecommend==1?'checked="checked"':'') + "/></td></tr>";
+	
+	count += "</table>";
+	count += "<input type='file' id='inputs2' multiple='multiple' /><ul></ul>";
+	$("#ModalLabel").text("添加同批次真实礼物(点击添加按钮即可，默认与同批次内容一致，语言,分类自动变化)");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(false)" class="btn btn-primary">添加 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	// $("#compose-textarea").wysihtml5();//为编辑框初始化   onchange='uploadM(this)'
+	var editors = CKEDITOR.replace('compose-textarea');
+	$('#Modal').on('shown.bs.modal', function() {
+	    $('#modalbutton .btn-primary').on('click', function(event) {
+	    	event.preventDefault();
+	    	add(false, editors);
+	    });
+	    $('#Modal input[type="file"]').on('change', function(event) {	    	
+	    	uploadM(this, editors);
+	    	// console.log(1);
+	    });
+	});	
+	$('#Modal').on('hidden.bs.modal', function() {
+		$('#Modal').off();
+	});
+}
+
+
+/**
+ * 编辑
+ */
+function openEdit(gid,ggid){
+	var count = "";
+	var giftReal = "";//被复制的对象
+	var listimg = "";
+	var gclist = "";
+	$.ajax({
+        type: "post",
+        url: ctx + "/Giftreal/openAddByGireGiftid",
+        dataType: "json",
+        async: false,
+        data: {"gid": gid,"ggid":ggid},
+        success: function(data) {
+        	if (data.success) {
+        		giftReal = data.obj.giftReal;
+        		listimg = data.obj.listimg;
+        		gclist = data.obj.gclist2;
+        	}
+        }
+    });
+	
+	var image1,image2,image3,image4,image5;//上传空间是否可用
+	var imagesrc1="<div class='edit-img-box'><span>X</span><img class='ylt1' width='120'/></div>",
+	imagesrc2="<div class='edit-img-box'><span>X</span><img class='ylt2' width='120'/></div>",
+	imagesrc3="<div class='edit-img-box'><span>X</span><img class='ylt3' width='120'/></div>",
+	imagesrc4="<div class='edit-img-box'><span>X</span><img class='ylt4' width='120'/></div>",
+	imagesrc5="<div class='edit-img-box'><span>X</span><img class='ylt5' width='120'/></div>";//上传空间是否可用
+	var lanage1,lanage2,lanage3,lanage4,lanage5,lanage6,lanage7,lanage8;//语言下拉框
+	
+	var imgHtml = '';
+	for(var i = 0;i < listimg.length;i++){
+		if(listimg[i].grimSort == "1"){
+			image1 = "disabled";
+			imagesrc1 = "<div class='edit-img-box have'><span>X</span><img class='ylt1' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";			
+		}else if(listimg[i].grimSort == "2"){
+			image2 = "disabled";
+			imagesrc2 = "<div class='edit-img-box have'><span>X</span><img class='ylt2' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "3"){
+			image3 = "disabled";
+			imagesrc3 = "<div class='edit-img-box have'><span>X</span><img class='ylt3' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "4"){
+			image4 = "disabled";
+			imagesrc4 = "<div class='edit-img-box have'><span>X</span><img class='ylt4' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "5"){
+			image5 = "disabled";
+			imagesrc5 = "<div class='edit-img-box have'><span>X</span><img class='ylt5' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}
+	}
+	imgHtml = imagesrc1 + imagesrc2 + imagesrc3 + imagesrc4 + imagesrc5;
+	switch(giftReal.gireLanage){
+		case "zh-cn":
+			lanage1 = "selected='selected'";
+		break;
+		case "zh-tw":
+			lanage2 = "selected='selected'";
+		break;
+		case "en-us":
+			lanage3 = "selected='selected'";
+		break;
+		case "de-de":
+			lanage4 = "selected='selected'";
+		break;
+		case "es-es":
+			lanage5 = "selected='selected'";
+		break;
+		case "ru-ru":
+			lanage6 = "selected='selected'";
+		break;
+		case "ja-jp":
+			lanage7 = "selected='selected'";
+		break;
+		case "ko-kr":
+			lanage8 = "selected='selected'";
+		break;
+		default:
+	}
+	
+	count += "<table><tr><td>" + imgHtml + "</td></tr></table>";
+	
+	count += "<table>";
+	count +="<tr><td>ID:</td><td>"+ ggid +"<input id='gireGiftid' type='hidden' value='"+ ggid +"'>"
+		+"<input id='gid' type='hidden' value='"+ gid +"'></td></tr>";
+	
+	count +="<tr><td>语言:</td><td><select id='gireLanage'>"
+		+"<option value='zh-cn' "+ lanage1 +">zh-cn</option>"
+		+"<option value='zh-tw' "+ lanage2 +">zh-tw</option>"
+		+"<option value='en-us' "+ lanage3 +">en-us</option>"
+		+"<option value='de-de' "+ lanage4 +">de-de</option>"
+		+"<option value='es-es' "+ lanage5 +">es-es</option>"
+		+"<option value='ru-ru' "+ lanage6 +">ru-ru</option>"
+		+"<option value='ja-jp' "+ lanage7 +">ja-jp</option>"
+		+"<option value='ko-kr' "+ lanage8 +">ko-kr</option>"
+		+"</select></td></tr>";
+
+	count +="<tr><td>类别:</td><td><select id='gireCategoryid'>";
+	if(null != gclist && gclist.length > 0){
+		for(var i = 0;i < gclist.length;i++ ){
+			var selected = "";
+			if(null != gclist && gclist[i].gicaId == giftReal.gireCategoryid 
+					&& gclist[i].gicaLanguage == giftReal.gireLanage){
+				selected = "selected='selected'";
+			}
+			count += "<option value=\""+ gclist[i].gicaId +"\" "+ selected +">"+ gclist[i].gicaName+"-"+gclist[i].gicaLanguage+"</option>";
+		}
+	}
+	count += "</select></td></tr>";
+	
+	count +="<tr><td>名称:</td><td><input type='text' id='gireName' value='"+ giftReal.gireName +"'/></td></tr>";
+	count +="<tr><td>默认赠言:</td><td><textarea id='gireGreeting'>"+giftReal.gireGreeting+"</textarea></td></tr>";
+	count +="<tr><td>材料:</td><td><input type='text' id='gireMaterial' value='"+ giftReal.gireMaterial +"'/></td></tr>";
+	count +="<tr><td>金币:</td><td><input type='text' id='gireGold' value='"+ giftReal.gireGold +"'/></td></tr>";
+	count +="<tr><td>排序:</td><td><input type='text' id='gireSort' value='"+ giftReal.gireSort +"'/></td></tr>";
+	var read ="";
+	if(null != giftReal.girePlatsource && $.trim(giftReal.girePlatsource).length > 0){
+		read = "readonly='readonly'";
+	}
+	count +="<tr><td>购买链接:</td><td><input type='text' id='girePlatsource' value='"+ giftReal.girePlatsource +"' "+ read +" />（第三方网站，便于后期采购）</td></tr>";
+	
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img1' onchange='upload(this,1)' "+ image1 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img2' onchange='upload(this,2)' "+ image2 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img3' onchange='upload(this,3)' "+ image3 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img4' onchange='upload(this,4)' "+ image4 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img5' onchange='upload(this,5)' "+ image5 +"/></td></tr>";
+	//编辑框
+	count +="<tr><td>商品详情:</td><td><textarea id='compose-textarea' class='form-control'>"+ giftReal.gireDescription +"</textarea></td></tr>";
+
+	count +="<tr><td>活动推荐:</td><td colspan='3'><input type='checkbox' id='gireIsrecommend' " + (giftReal.gireIsrecommend==1?'checked="checked"':'') + "/></td></tr>";
+	
+	count += "</table><input type='file' id='inputs2' multiple='multiple' /><ul></ul>";
+	$("#ModalLabel").text("添加真实礼物");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(false)" class="btn btn-primary">添加 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	// var editors = $("#compose-textarea").wysihtml5();//为编辑框初始化   onchange='uploadM(this)'
+	// var commands = new wysihtml5.Commands(editors);
+	var editors = CKEDITOR.replace('compose-textarea');
+
+	$('#Modal').on('shown.bs.modal', function() {		
+	    $('#modalbutton .btn-primary').on('click', function(event) {
+	    	event.preventDefault();
+	    	add(false, editors);
+	    });
+	    $('#Modal input[type="file"]').on('change', function(event) {	    	
+	    	uploadM(this, editors);
+	    	// console.log(1);
+	    });
+	});	
+	$('#Modal').on('hidden.bs.modal', function() {
+		$('#Modal').off();
+	});
+
+	$('.edit-img-box span').click(function() {
+		var $del = $(this);
+		var imgid = $(this).next('img').attr('gimgid')
+		var _index = $(this).next('img').attr('class').replace('ylt', '');
+		var $selBtn = $('#img' + _index);
+		if (imgid) {
+			$.ajax({
+				url: ctx + "/Giftreal/delImg",
+				type: 'post',
+				dataType: 'json',
+				data: {grimId: imgid},
+			})
+			.done(function() {
+				$del.parent().removeClass('have').find('img').removeAttr('src');
+				$selBtn.removeAttr('disabled');
+			})
+			.fail(function() {
+				layer.msg('删除图片失败');
+			});		
+		} else {
+			layer.msg('图片id不存在');
+		}
+	})
+}
+
+
+
+/**
+ * 七牛上传图片
+ */
+var Qiniu_uploadM = function(f, token, key, editors) {
+	var $inputObj = $(f);
+	var filesnum = f.files.length;
+	var files = f.files;
+
+	sendimg(files);
+
+	function sendimg(files, num, callback) {
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", Qiniu_UploadUrl, true);
+		var formData, startDate;
+		formData = new FormData();
+		if (key !== null && key !== undefined) formData.append("key", key[filesnum-1]);
+		formData.append("token", token);
+		formData.append("file", files[filesnum-1]);
+		var taking;
+		xhr.upload.addEventListener("progress", function(evt) {
+			if (evt.lengthComputable) {
+				var nowDate = new Date().getTime();
+				taking = nowDate - startDate;
+				var x = (evt.loaded) / 1024;
+				var y = taking / 1000;
+				var uploadSpeed = (x / y);
+				var formatSpeed;
+				if (uploadSpeed > 1024) {
+					formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+				} else {
+					formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+				}
+			}
+		}, false);
+		xhr.onreadystatechange = function(response) {
+			if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+				var blkRet = JSON.parse(xhr.responseText);
+				//$(obj).closest('.edit-img-box').addClass('have');
+				// debugger
+				var oldval = editors.getData();
+				oldval += '<p><img alt="图片加载" src="'+qiniu+blkRet.key+'" data-cke-saved-src="'+qiniu+blkRet.key+'"><br></p>';
+				editors.setData(oldval);
+				$('#compose-textarea').val(oldval);		
+				filesnum--;
+				if (filesnum < 1) {
+					callback && callback();
+				} else {
+					sendimg(files, num);
+				}
+			} else if (xhr.status != 200 && xhr.responseText) {
+				$("#errorbodycontent").html(xhr.responseText);
+				$('#errorModal').modal({
+					keyboard : true
+				});
+			}
+		};
+		startDate = new Date().getTime();
+		xhr.send(formData);
+	}
+	
+};
+
+/**
+ * 上传预览图
+ * obj 当前对象
+ * index 对应控件id
+ */
+function uploadM(inputobj, editors){
+	var that=$(inputobj);
+	var key=$(that)[0].files;
+	var token = "";
+	$.post(ctx+"/Image/uploadInit",{type:"R",imgNum:key.length},function(result){
+		 if(result.success){
+			var token = result.obj.upToken;
+			var key1=result.obj.img;
+			if ($(that).length > 0 && token != "") {
+				Qiniu_uploadM($(that)[0], token, key1, editors);
+			} else {
+				console && console.log("form input error");
+			}
+		 }
+	});
+}
+
+</script>
+

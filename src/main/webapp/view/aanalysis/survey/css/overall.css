@@ -1,0 +1,58 @@
+#realTime .right-model-content{
+    position: relative;
+}
+#realTime .topTitle {
+    overflow: hidden;
+    border-bottom: solid 1px #cccccc;
+    height: 60px;
+}
+#realTime #realDaterangepicker{
+    width: 188px;
+    font-size: 17px;
+    text-align: center;
+}
+#realTime .topTitle .topH3 {
+    font-weight: 200;
+    font-size: 17px;
+    display: inline-block;
+    /*width: 15%;*/
+    /*min-width: 100px;*/
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-right: 120px;
+}
+
+#realTime .topTitle .topNavright {
+    display: inline-block;
+}
+
+#realTime .topTab .topUL {
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    width: 80%;
+    height: 80px;
+    margin: 20px auto;
+}
+
+#realTime .topTab .topUL li {
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+    list-style-type: none;
+    width: 33.33%;
+    margin-right: -2px;
+    background-color: #F5F5F5;
+    color: #333333;
+    text-align: center;
+
+}
+#realTime .topTab .topUL li:nth-child(2){
+    border-left: solid 1px #4b646f;
+    border-right: solid 1px #4b646f;
+}
+
+
+
+

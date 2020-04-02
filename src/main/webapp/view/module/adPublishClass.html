@@ -1,0 +1,259 @@
+<style>
+    .layui-input-block {
+        margin-left: 135px;
+    }
+
+</style>
+<section class="content-header">
+    <h1>
+        app跳转类型添加
+        <small></small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>模块管理</li>
+        <li class="active">app跳转类型添加</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">phone_type</label>
+                    <div class="layui-input-block">
+                        <select name="phone_type_s" id="phone_type_s">
+                            <option value="">全部</option>
+                            <option value="android">android</option>
+                            <option value="ios">ios</option>
+                        </select>
+                    </div>
+                </div>
+
+            </form>
+            <button class="layui-btn layui-btn-normal" id="openAdd">新增</button>
+            <button class="layui-btn layui-btn-normal" id="searchEx">搜索</button>
+        </div>
+        <div class="layui-fluid">
+            <table class="layui-hide" id="adCommerceTable" lay-filter="adCommerceTable"></table>
+        </div>
+    </div>
+</section>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div id="chat_box">
+                    <div class="layui-row">
+                        <form class="layui-form" action="" lay-filter="formTest">
+                            <input type="hidden" name="id" id="id"/>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">remark</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="remark" required lay-verify="required"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">Android/iOS</label>
+                                <div class="layui-input-block">
+                                    <select name="phone_type" id="phone_type">
+                                        <option value="android">android</option>
+                                        <option value="ios">ios</option>
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">class_name</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="class_name" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">class_param</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="class_param" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">jump_type</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="jump_type" required
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">跳转类型</label>
+                                <div class="layui-input-block">
+                                    <select name="ad_mode_param" id="ad_mode_param">
+                                        <option value="0">无跳转</option>
+                                        <option value="1">站内</option>
+                                        <option value="2">站外</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">jump_type_param</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="jump_type_param" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+<script>
+    layui.use(['form', 'upload', 'table', 'element', 'laydate'], function () {
+        //获取form模块
+        var form = layui.form, table = layui.table, element = layui.element;
+        table.render({
+            id: 'adCommerceTable',
+            elem: '#adCommerceTable',
+            url: ctx + '/adPublishAppClass/list',
+            where: {
+                phone_type: $("#phone_type_s").val()
+            },
+            //	method: 'post' //	默认 get
+            //	contentType: 'application/json'
+            toolbar: true,
+            defaultToolbar: ['filter'],
+            even: true, //	开启隔行背景
+            title: 'app跳转类型添加',
+            limits: [10, 30, 50, 100, 500, 1000],
+            limit: 30,
+            cols: [[{
+                field: 'id',
+                title: '序号',
+                type: 'numbers'
+            }, {
+                field: 'create_time',
+                title: '创建时间'
+                , templet: function (res) {
+                    if (res != null) {
+                        const date = new Date(res.create_time);
+                        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    }
+                }
+            }, {
+                field: 'remark',
+                title: 'remark'
+            }, {
+                field: 'phone_type',
+                title: 'phone_type'
+            }, {
+                field: 'class_name',
+                title: 'class_name'
+            }, {
+                field: 'class_param',
+                title: 'class_param'
+            }, {
+                field: 'jump_type',
+                title: 'jump_type'
+            }, {
+                field: 'ad_mode_param',
+                title: '跳转类型'
+                , templet: function (res) {
+                    if (res != null) {
+                        //0:无跳转1：站内2：站外
+                        switch (res.ad_mode_param) {
+                            case 0:
+                                return '无跳转';
+                            case 1:
+                                return '站内';
+                            case 2:
+                                return '站外';
+                            default:
+                                return "";
+                        }
+                    }
+                }
+            }, {
+                field: 'jump_type_param',
+                title: 'jump_type_param'
+            }, {
+                title: '操作',
+                toolbar: '#barDemo'
+            }
+            ]],
+            page: true
+        });
+        //	监听行工具事件
+        table.on('tool(adCommerceTable)', function (obj) {
+            const data = obj.data;
+            console.log(data)
+            if (obj.event === 'edit') {
+                $('#myModal').modal('show');
+                form.val("formTest", {
+                    "remark": data.remark
+                    , "phone_type": data.phone_type
+                    , "class_name": data.class_name
+                    , "class_param": data.class_param
+                    , "jump_type": data.jump_type
+                    , "ad_mode_param": data.ad_mode_param
+                    , "jump_type_param": data.jump_type_param
+                    , "id": data.id
+                });
+            } else if (obj.event === 'agree') {
+
+            }
+        });
+        //		搜索 按钮
+        $('#searchEx').click(function () {
+            table.reload('adCommerceTable', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                , where: {
+                    phone_type: $("#phone_type_s").val()
+                }
+            });
+        });
+        form.on('submit(formDemo)', function (data) {
+            $.post(ctx + "/adPublishAppClass/updateAppClass", data.field, function (result) {
+                if (result.success) {
+                    layer.msg("操作成功！");
+                    $('#myModal').modal('hide');
+                    table.reload('adCommerceTable');
+                } else {
+                    layer.msg("操作失败！")
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        $('#openAdd').click(function () {
+            $('#myModal').modal('show');
+            form.val("formTest", {
+                "remark": '' // "name": "value"
+                , "phone_type": ''
+                , "class_name": ''
+                , "class_param": ''
+                , "jump_type": ''
+                , "ad_mode_param": ''
+                , "jump_type_param": ''
+                , "id": ''
+            });
+        });
+
+    });
+
+
+</script>

@@ -1,0 +1,535 @@
+<style type="text/css">
+.marR13{margin-right:13px;}
+.widthPer70{width:70%}
+</style>
+
+
+<section class="content-header">
+    <h1>广告项管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>广告管理</li>
+        <li class="active">广告项管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+              <div class="box-header">
+              <button type="button" onclick="addaditem(1)" class="btn btn-primary">添加</button>
+              </div>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="aditem" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>广告项名称</th>
+                    <th>广告区名称</th>
+                    <th>广告区变量值</th>
+                    <th>广告项开始时间</th>
+                    <th>广告项结束时间</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        console.log(1);
+
+        $("#aditem").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 30,
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                    //aoData=gagaidorname;
+                    layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/aditem/aditemlist",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "adareaitemname",
+                "bSortable": false
+            }, {
+                "data": "adarea.adareaname",
+                "bSortable": false
+            }, {
+                "data": "adareavar",
+                "bSortable": false
+            }, {
+                "data": "adareaitembegintime",
+                "bSortable": false
+            }, {
+                "data": "adareaitemexpiretime",
+                "bSortable": false
+            }, {
+                "data": "createtime",
+                "bSortable": false,"bVisible":false
+            }, {
+                "data": "adareaitemid",
+                "bSortable": false
+            }],
+            "columnDefs": [{
+                "targets": 3,
+                "data": "adareaitembegintime",
+                "render": function(data, type, full, meta) {
+                	if(data==""||data==null){
+                		return "";
+                	}else{
+                		var date = new Date(data);
+        	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+                	}
+                }
+            }, {
+                "targets": 4,
+                "data": "adareaitemexpiretime",
+                "render": function(data, type, full, meta) {
+                	if(data==""||data==null){
+                		return "";
+                	}else{
+                		var date = new Date(data);
+        	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+                	}
+                }
+            }, {
+                "targets": 5,
+                "data": "createtime",
+                "render": function(data, type, full, meta) {
+                	if(data==""||data==null){
+                		return "";
+                	}else{
+                		var date = new Date(data);
+        	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                	}
+                }
+            }, {
+                "targets": 6,
+                "data": "adareaitemid",
+                "render": function(data, type, full, meta) {
+                	var html='<a href="javascript:void(0)" onclick="editaditem('+data+',1)">编辑</a> <a href="javascript:void(0)" onclick="deladitem('+data+')">删除</a>';
+			 	 	return html;
+                }
+            } ], 
+            "fnDrawCallback": function(oSettings) {
+              layer.closeAll();
+            }
+        });
+    });
+});
+
+/**
+ * 删除广告项
+ */
+function deladitem(id){
+	$.post(ctx+"/aditem/delitem",{aditemid:id},function(result){
+		 if(result.success){
+			 $("#errorbodycontent").html("删除成功");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+			 $("#aditem").dataTable().fnDraw(false)
+			 //alert('<spring:message code="ihome.member.text.forgetpwd.emailsentsuccess"/>'); 
+		 }else{
+			 $("#errorbodycontent").html(result.msg);
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		 }
+	});
+}
+
+//编辑
+function editaditem(id,type) {
+	if(type==1){
+		$("#ModalLabel").text("编辑广告项");
+		var content = '<span>广告项名称：</span><span><input type="text" id="itemname" ></span><br><br>'+
+		'<span>所属广告区：</span><span><select id="adarea" onchange="modelChange('+null+')"></select></span><br><br>'+
+		'<span class="marR13">开始时间： </span><span><input type="text" id="itemstarttime" ></span><br><br>'+
+		'<span class="marR13">结束时间： </span><span><input type="text" id="itemendtime" ></span><br><br>'+
+		'<input id="token" name="token" type="hidden"><input id="aditemid" name="aditemid" type="hidden">'+
+		'<span>广告区变量值：</span><span id="adareavar"></span><br><div id="addpara"></div>';
+		var selareadata ='<option value="">请选择</option>';
+		$.ajax({
+			type : "post",
+			url : ctx+"/aditem/edititem",
+			dataType : "json",
+			data:{
+				"aditemid":id
+			},
+			success : function(data) {
+				if(data!=null){
+					var adareas = data.obj.adareas;
+					var aditem = data.obj.aditem;
+					adareas.forEach(function(item){
+						selareadata+='<option value="'+item.adareaid+'">'+item.adareaname+'_'+item.arealanguage+'</option>';  
+					}); 
+					$("#adarea").html(selareadata);
+					$("#itemname").val(aditem.adareaitemname);
+					$("#adarea").val(aditem.adareaid);
+					var starttime = new Date(aditem.adareaitembegintime);
+					var endtime = new Date(aditem.adareaitemexpiretime);
+					$("#itemstarttime").val(starttime.getFullYear()+"-"+(starttime.getMonth()+1)+"-"+starttime.getDate());
+					$("#itemendtime").val(endtime.getFullYear()+"-"+(endtime.getMonth()+1)+"-"+endtime.getDate());
+					modelChange(JSON.parse(aditem.adareavar));
+				}
+			}
+		});
+		$("#bodycontent").html(content);
+		$("#modalbutton").html('<button type="button" onclick="addaditem(2)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		//$("#mailsender").val('GaGaHi');
+		$('#itemstarttime').datepicker({format: 'yyyy-mm-dd'});
+		$('#itemendtime').datepicker({format: 'yyyy-mm-dd'});
+		$('#Modal').modal({
+		    keyboard: true
+		});
+  	}
+	if(type==2){
+		var name = $("#itemname").val();
+		var adarea = $("#adarea").val();
+		var starttime = $("#itemstarttime").val();
+		var endtime = $("#itemendtime").val();
+		if(name==''){
+			$("#errorbodycontent").html("请输入广告项名称");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		}else if(adarea==''){
+			$("#errorbodycontent").html("请选择广告区");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		}else{
+			var a ={};
+			var para = $("input[name='para']");
+			for(var i=0;i<para.length;i++){
+				var spanval=$("#span_"+i).html();
+				var paraval=para[i].value;
+				if(paraval==''||paraval==null){
+					$("#errorbodycontent").html("参数值输入不完整");
+					   $('#errorModal').modal({
+							keyboard : true
+						});
+					return;
+				}else{
+					a[spanval] = paraval;
+				}
+			}
+			//$("#params").val(JSON.stringify(a));
+			 $.ajax({
+				type : "post",
+				url : ctx+"/aditem/additem",
+				dataType : "json",
+				data : {
+					"areaid":adarea,
+					"itemname":name,
+					"params":JSON.stringify(a.trim()),
+					"starttime":starttime,
+					"endtime":endtime
+				},
+				success : function(data) {
+					if(data.success){
+						$("#aditem").dataTable().fnDraw(false)
+						$("#Modal").modal('hide');
+					}else{
+						$("#errorbodycontent").html(data.msg);
+						   $('#errorModal').modal({
+								keyboard : true
+							});
+					}
+				}
+			});
+ 		}
+}
+}
+
+
+//添加
+function addaditem(type) {
+	if(type==1){
+		$("#ModalLabel").text("添加广告项");
+		var content = '<span>广告项名称：</span><span><input type="text" id="itemname" ></span><br><br>'+
+		'<span>所属广告区：</span><span><select id="adarea" onchange="modelChange('+null+')"></select></span><br><br>'+
+		'<span class="marR13">开始时间：</span><span><input type="text" id="itemstarttime" ></span><br><br>'+
+		'<span class="marR13">结束时间：</span><span><input type="text" id="itemendtime" ></span><br><br>'+
+		'<input id="token" name="token" type="hidden">'+
+		'<span>广告区变量值：</span><span id="adareavar"></span><br><div id="addpara"></div>';
+		var selareadata ='<option value="">请选择</option>';
+		$.ajax({
+			type : "post",
+			url : ctx+"/adarea/findadareas",
+			dataType : "json",
+			success : function(data) {
+				if(data!=null){
+					data.forEach(function(item){
+						selareadata+='<option value="'+item.adareaid+'">'+item.adareaname+'_'+item.arealanguage+'</option>';  
+					}); 
+					$("#adarea").html(selareadata);
+				}
+			}
+		});
+		$("#bodycontent").html(content);
+		$("#modalbutton").html('<button type="button" onclick="addaditem(2)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		//$("#mailsender").val('GaGaHi');
+		$('#itemstarttime').datepicker({format: 'yyyy-mm-dd'});
+		$('#itemendtime').datepicker({format: 'yyyy-mm-dd'});
+		$('#Modal').modal({
+		    keyboard: true
+		});
+  	}
+	if(type==2){
+		var name = $("#itemname").val();
+		var adarea = $("#adarea").val();
+		var starttime = $("#itemstarttime").val();
+		var endtime = $("#itemendtime").val();
+		if(name==''){
+			$("#errorbodycontent").html("请输入广告项名称");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		}else if(adarea==''){
+			$("#errorbodycontent").html("请选择广告区");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		}else{
+			var a ={};
+			var para = $("input[name='para']");
+			for(var i=0;i<para.length;i++){
+				var spanval=$("#span_"+i).html();
+				var paraval=para[i].value;
+				if(paraval==''||paraval==null){
+					$("#errorbodycontent").html("参数值输入不完整");
+					   $('#errorModal').modal({
+							keyboard : true
+						});
+					return;
+				}else{
+					a[spanval] = paraval;
+				}
+			}
+			//$("#params").val(JSON.stringify(a));
+			 $.ajax({
+				type : "post",
+				url : ctx+"/aditem/additem",
+				dataType : "json",
+				data : {
+					"areaid":adarea,
+					"itemname":name,
+					"params":JSON.stringify(a),
+					"starttime":starttime,
+					"endtime":endtime
+				},
+				success : function(data) {
+					if(data.success){
+						$("#aditem").dataTable().fnDraw(false)
+						$("#Modal").modal('hide');
+					}else{
+						$("#errorbodycontent").html(data.msg);
+						   $('#errorModal').modal({
+								keyboard : true
+							});
+					}
+				}
+			});
+ 		}
+}
+}
+
+
+var Qiniu_UploadUrl = "https://upload.qiniup.com";
+var Qiniu_upload = function(f, token, key,obj) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", Qiniu_UploadUrl, true);
+	var formData, startDate;
+	formData = new FormData();
+	if (key !== null && key !== undefined) formData.append("key", key);
+	formData.append("token", token);
+	formData.append("file", f);
+	var taking;
+	xhr.upload.addEventListener("progress", function(evt) {
+		if (evt.lengthComputable) {
+			var nowDate = new Date().getTime();
+			taking = nowDate - startDate;
+			var x = (evt.loaded) / 1024;
+			var y = taking / 1000;
+			var uploadSpeed = (x / y);
+			var formatSpeed;
+			if (uploadSpeed > 1024) {
+				formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+			} else {
+				formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+			}
+		}
+	}, false);
+	xhr.onreadystatechange = function(response) {
+		if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+			var blkRet = JSON.parse(xhr.responseText);
+			$(obj).prev().val(qiniu+blkRet.key);
+		} else if (xhr.status != 200 && xhr.responseText) {
+			$("#errorbodycontent").html(xhr.responseText);
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+			//$("#dialog").html(xhr.responseText).dialog();
+		}
+	};
+	startDate = new Date().getTime();
+	xhr.send(formData);
+};
+
+
+
+
+function modelChange(obj){
+	
+	$("#addpara").empty();
+	var adarea = $("#adarea").val();
+	if(adarea!=''){
+		$.ajax({
+			type : "post",
+			url : ctx+"/aditem/getparams",
+			contentType : "application/x-www-form-urlencoded",
+			dataType:"json",
+			data : {
+				"adareaid":adarea
+			},
+			success: function(data){
+				var datas = data.obj;
+				if(datas!=null){
+					for(var i=0;i<datas.length;i++){
+						var inp ="";
+						if(obj!=null&&obj!=''){
+							inp = "</br><span id=\"span_"+i+"\" class='marR13'>"+datas[i]+"</span><span>:</span><input type=\"text\" id=\"key_"+i+"\" name=\"para\" class=\"inputxt widthPer70\" value=\""+obj[datas[i]]+"\"><input id=\"file_"+i+"\" name=\"file\" class=\"ipt\" type=\"file\" />";
+						}else{
+							inp = "</br><span id=\"span_"+i+"\">"+datas[i]+"</span>:<input type=\"text\" id=\"key_"+i+"\" name=\"para\" class=\"inputxt key_0\"><input id=\"file_"+i+"\" name=\"file\" class=\"ipt\" type=\"file\" />";
+						}
+						$("#addpara").append(inp);
+						
+					}
+					for(var i=0;i<datas.length;i++){
+						$("#file_"+i).change(function(){
+							var that=this;
+							var key=$(this).val();
+							var path1 = key.lastIndexOf("\\");
+							var key = key.substring(path1+1);
+							var token = "";
+							$.post(ctx+"/Image/uploadInit",{type:"D",imgNum:1},function(result){
+								 if(result.success){
+									 token = result.obj.upToken;
+									 key=result.obj.img;
+										if ($(that).length > 0 && token != "") {
+											//console.log($(that)[0].files[0]);
+											//console.log(key);
+											Qiniu_upload($(that)[0].files[0], token,key,$(that));
+											//$(this).prev().val(key);
+										} else {
+											console && console.log("form input error");
+										}
+								 }
+							});
+						});
+					}
+					}
+				}
+		})
+		
+	}
+}
+
+
+
+
+
+/*function updatePreview(c){
+    if (parseInt(c.w) > 0) {
+      var rx = xsize / c.w;
+      var ry = ysize / c.h;
+
+      $pimg.css({
+        width: Math.round(rx * boundx) + 'px',
+        height: Math.round(ry * boundy) + 'px',
+        marginLeft: '-' + Math.round(rx * c.x) + 'px',
+        marginTop: '-' + Math.round(ry * c.y) + 'px'
+      });
+    }
+}*/
+
+//文件上传开始
+	
+	
+	
+	
+</script>
+

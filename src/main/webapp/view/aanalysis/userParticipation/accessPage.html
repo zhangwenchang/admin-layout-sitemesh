@@ -1,0 +1,535 @@
+
+<div ng-controller="AppController" class="user-participation">
+	<div class="right-top">
+		<ul class="ul-li ul-li-revenue">
+			<li ng-class="bluebgStatus == 1 ? 'blue-bg' : ''"
+				ng-click="revenueChange(1)" class="exportBtn">访问页面</li>
+			<li class="border-none exportBtn" ng-click="revenueChange(2)"
+				ng-class="bluebgStatus == 2 ? 'blue-bg' : '' ">事件转化率</li>
+		</ul>
+	</div>
+	<div class="right-model">
+		<div class="right-model-content right-model-content1"
+			style="display: block">
+			<div class="title-border">
+				<div class="title-content">
+					<div class="title-content-left">访问页面分布</div>
+					<div class="title-content-right">
+
+						<span> <input type="text" id="revenueStarttime1"
+							class="startTime" readonly ng-model="revenueStarttime1"
+							ng-change="revenueChangeVal1()">至 <input type="text"
+							id="revenueEndtime1" class="startTime" readonly
+							ng-model="revenueEndtime1" ng-change="revenueChangeVal1()">
+						</span>
+					</div>
+				</div>
+			</div>
+			<div class="addUserMain-content">
+				<div id="revenueChart" style="height: 450px; margin-top: 30px;"></div>
+			</div>
+			<div class="title-border" style="margin-top: 37px;">
+				<div class="title-content">
+					<div class="title-content-left">访问页面数据明细</div>
+					<div class="title-content-right">
+
+						<span class="blue exportBtn"
+							onclick="exportTable('tableData','访问页面数据明细')">导出</span>
+					</div>
+				</div>
+			</div>
+			<div class="box-body mailbox-messages">
+				<table id="tableData" class="table table-bordered table-hover">
+					<thead>
+						<tr>
+							<th>访问页面</th>
+							<th>访问路径</th>
+							<th>页面受访人数</th>
+							<th>页面受访比率</th>
+						</tr>
+						<tr ng-repeat="x in dataObj">
+
+							<td>{{x.description}}</td>
+							<td>{{x.path}}</td>
+							<td>{{x.count}}</td>
+							<td>{{x.accessRate}}</td>
+
+
+						</tr>
+					</thead>
+
+
+				</table>
+			</div>
+
+
+		</div>
+
+
+
+		<div class="right-model-content right-model-content2"
+			style="display: none">
+			<div class="title-border">
+				<div class="title-content">
+					<div class="title-content-left">事件转化率</div>
+					<div class="title-content-right">
+
+						<span> <input type="text" id="singleStarttime1"
+							class="startTime" readonly ng-model="singleStarttime1"
+							ng-change="revenueChangeVal2()">至 <input type="text"
+							id="singleEndtime1" class="startTime" readonly
+							ng-model="singleEndtime1" ng-change="revenueChangeVal2()">
+						</span>
+
+						<!--<span class="blue">设置路径</span>-->
+
+					</div>
+				</div>
+			</div>
+			<div class="addUserMain-content" id="totalShow">
+				<!--  <div id="singleChart{{$index}}" style="height:400px"></div> -->
+				<!--  <div id="singleChart0" style="height:400px" ></div> -->
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+<script>
+	app.controller('AppController', function($scope, $http) {
+		$scope.bluebgStatus = 1;
+
+		var firstDay = firstDate("yyyy-MM-dd");
+		var now = new Date();
+		var nowdate = now.format("yyyy-MM-dd");
+
+		$scope.revenueStarttime1 = firstDay;
+		$scope.revenueEndtime1 = nowdate;
+
+		$scope.singleStarttime1 = firstDay;
+		$scope.singleEndtime1 = nowdate;
+
+		$('#revenueStarttime1').datepicker({
+			format : 'yyyy-mm-dd'
+		});
+		$('#revenueEndtime1').datepicker({
+			format : 'yyyy-mm-dd'
+		});
+
+		$('#singleStarttime1').datepicker({
+			format : 'yyyy-mm-dd'
+		});
+		$('#singleEndtime1').datepicker({
+			format : 'yyyy-mm-dd'
+		});
+
+		initPage($scope, $http);
+		$scope.revenue();
+	});
+	angular.bootstrap(document.getElementById('App'), [ 'App' ]);
+
+	function initPage($scope, $http) {
+
+		var firstDay = firstDate("yyyy-MM-dd");
+		var now = new Date();
+		var nowdate = now.format("yyyy-MM-dd");
+
+		$scope.revenueChange = function(e) {
+			switch (e) {
+			case 1:
+				$scope.bluebgStatus = 1;
+				$(".right-model-content1").css("display", "block").siblings()
+						.css("display", "none");
+				$scope.revenue();
+				break;
+			case 2:
+				$scope.bluebgStatus = 2;
+				$(".right-model-content2").css("display", "block").siblings()
+						.css("display", "none");
+				$scope.revenueSingle();
+				break;
+			case 3:
+				$scope.bluebgStatus = 3;
+				$(".right-model-content3").css("display", "block").siblings()
+						.css("display", "none");
+				$scope.revenueGroup();
+				break;
+
+			}
+
+		};
+
+		$scope.revenueChangeVal1 = function() {
+			if ($scope.revenueStarttime1 == '') {
+				$scope.revenueStarttime1 = firstDay;
+			}
+			if ($scope.revenueEndtime1 == '') {
+				$scope.revenueEndtime1 = nowdate;
+			}
+			if ($scope.revenueStarttime1 > $scope.revenueEndtime1) {
+				alert("开始时间不能大于结束时间!");
+				$scope.revenueStarttime1 = firstDay;
+				$scope.revenueEndtime1 = nowdate;
+
+			}
+			$scope.revenue();
+
+		}
+
+		$scope.revenueChangeVal2 = function() {
+			if ($scope.singleStarttime1 == '') {
+				$scope.singleStarttime1 = firstDay;
+			}
+			if ($scope.singleEndtime1 == '') {
+				$scope.singleEndtime1 = nowdate;
+			}
+			if ($scope.singleStarttime1 > $scope.singleEndtime1) {
+				alert("开始时间不能大于结束时间!");
+				$scope.singleStarttime1 = firstDay;
+				$scope.singleEndtime1 = nowdate;
+
+			}
+			$scope.revenueSingle();
+
+		}
+
+		$scope.revenue = function() {
+
+			var dateData = {
+				startDate : $scope.revenueStarttime1,
+				endDate : $scope.revenueEndtime1
+			};
+			layer.load(1, {
+				shade : 0.3
+			});
+			$http.post(ctx + "/log/access", dateData).then(function(data) {
+
+				//debugger;
+				if (data.data.success == false) {
+
+				} else {
+					var dataObj = data.data.obj.tableList;
+					var xLineData = [];
+					var yLineData = [];
+					var zLineData = [];
+
+					for (var i = 0; i < dataObj.length; i++) {
+						xLineData.push(dataObj[i].description);
+						yLineData.push(dataObj[i].count);
+						zLineData.push({
+							name : dataObj[i].description,
+							value : dataObj[i].count
+						})
+
+					}
+
+					$scope.lineChart1(xLineData, yLineData, zLineData);
+
+					$scope.dataObj = dataObj;
+
+				}
+				layer.closeAll();
+
+			}, function(data) {
+				// layer.closeAll();
+			})
+
+		}
+
+		$scope.revenueSingle = function() {
+
+			var dateData = {
+				startDate : $scope.singleStarttime1,
+				endDate : $scope.singleEndtime1
+
+			};
+			layer.load(1, {shade: 0.3});
+			$http.post(ctx + "/log/userBehavior", dateData).then(
+					function(data) {
+						//debugger;
+						if (data.data.success == false) {
+
+						} else {
+							//debugger;
+
+							var dataObj2 = data.data.obj;
+							var totals = document.getElementById("totalShow");
+							for (var i = 0; i < dataObj2.length; i++) {
+								var div = document.createElement("div");
+								div.setAttribute("id", "singleChart" + i);
+								div.setAttribute("style",
+										"width:1000px;height:400px");
+								totals.appendChild(div);
+								var divId = "singleChart" + i;
+								var max = dataObj2[i].yList[0];
+								$scope.lineChart2(max, divId,
+										dataObj2[i].xList, dataObj2[i].xList,
+										dataObj2[i].yList, dataObj2[i].yList,dataObj2[i].ruleName);
+							}
+							$scope.dataObj2 = dataObj2;
+
+						}
+						layer.closeAll();
+					}, function(data) {
+
+					})
+
+		}
+
+		$scope.lineChart1 = function(xLineData, yLineData, zLineData) {
+			// debugger;
+
+			var myChart1 = echarts
+					.init(document.getElementById('revenueChart'));
+
+			// 圆环图各环节的颜色
+			var color = [ '#CC5CB7', '#7E58AF', '#DB4F82', '#9BAD4E',
+					'#CC4A5A', '#FDAA82' ];
+
+			// 圆环图各环节的名称和值(系列中各数据项的名称和值)
+			var data = zLineData;
+
+			// 指定图表的配置项和数据
+			var option = {
+
+				// 图例
+				legend : [ {
+					selectedMode : true, // 图例选择的模式，控制是否可以通过点击图例改变系列的显示状态。默认开启图例选择，可以设成 false 关闭。
+					right : 60,
+					top : 20,
+					textStyle : { // 图例的公用文本样式。
+						fontSize : 14
+
+					},
+					data : xLineData
+				} ],
+
+				// 提示框
+				tooltip : {
+					show : true, // 是否显示提示框
+					formatter : '{b} </br> 受访人数{c}' // 提示框显示内容,此处{b}表示各数据项名称，此项配置为默认显示项，{c}表示数据项的值，默认不显示，({d}%)表示数据项项占比，默认不显示。
+				},
+
+				// // graphic 是原生图形元素组件。可以支持的图形元素包括：image, text, circle, sector, ring, polygon, polyline, rect, line, bezierCurve, arc, group,
+				// graphic: {
+				//     type: 'text',               // [ default: image ]用 setOption 首次设定图形元素时必须指定。image, text, circle, sector, ring, polygon, polyline, rect, line, bezierCurve, arc, group,
+				//     top: 'center',              // 描述怎么根据父元素进行定位。top 和 bottom 只有一个可以生效。如果指定 top 或 bottom，则 shape 里的 y、cy 等定位属性不再生效。『父元素』是指：如果是顶层元素，父元素是 echarts 图表容器。如果是 group 的子元素，父元素就是 group 元素。
+				//     left: 'center',             // 同上
+				//     style: {
+				//         text: '各服装销量对比',       // 文本块文字。可以使用 \n 来换行。[ default: '' ]
+				//         fill: '#fff',           // 填充色。
+				//         fontSize: 16,           // 字体大小
+				//         fontWeight: 'bold'		// 文字字体的粗细，可选'normal'，'bold'，'bolder'，'lighter'
+				//     }
+				// },
+
+				// 系列列表
+				series : [ {
+					name : '圆环图系列名称', // 系列名称
+					type : 'pie', // 系列类型
+					center : [ '50%', '50%' ], // 饼图的中心（圆心）坐标，数组的第一项是横坐标，第二项是纵坐标。[ default: ['50%', '50%'] ]
+					radius : [ '40%', '60%' ], // 饼图的半径，数组的第一项是内半径，第二项是外半径。[ default: [0, '75%'] ]
+					hoverAnimation : true, // 是否开启 hover 在扇区上的放大动画效果。[ default: true ]
+					color : color, // 圆环图的颜色
+					label : { // 饼图图形上的文本标签，可用于说明图形的一些数据信息，比如值，名称等.
+						normal : {
+							color : '#000',
+							show : true, // 是否显示标签[ default: false ]
+							position : 'outside', // 标签的位置。'outside'饼图扇区外侧，通过视觉引导线连到相应的扇区。'inside','inner' 同 'inside',饼图扇区内部。'center'在饼图中心位置。
+							formatter : '{b} : {c}' // 标签内容
+						}
+					},
+					labelLine : { // 标签的视觉引导线样式,在 label 位置 设置为'outside'的时候会显示视觉引导线。
+						normal : {
+							show : true, // 是否显示视觉引导线。
+							length : 15, // 在 label 位置 设置为'outside'的时候会显示视觉引导线。
+							length2 : 30, // 视觉引导项第二段的长度。
+							lineStyle : { // 视觉引导线的样式
+							//color: '#000',
+							//width: 1
+							}
+						}
+					},
+					data : data
+				// 系列中的数据内容数组。
+				} ]
+			};
+
+			myChart1.setOption(option);
+
+			window.onresize = function() {
+				$('.addUserMain-content').width('100%');
+				myChart1.resize();
+			};
+
+		}
+
+		$scope.lineChart2 = function(maxvalue, divId, allAgentName, xLineData,
+				y1LineData, y2LineData,titleName) {
+			// debugger;
+
+			var myChart2 = echarts.init(document.getElementById(divId));
+
+			var colors = [ '#5793f3' ];
+
+			var option = {
+				tooltip : {
+					trigger : 'axis',
+					axisPointer : {
+						type : 'cross',
+						crossStyle : {
+							color : '#999'
+						}
+					}
+				},
+				title : {
+					left : 'center',
+					text : titleName,
+					textStyle : {
+
+					}
+				},
+				// toolbox: {
+				//     feature: {
+				//         dataView: {show: true, readOnly: false},
+				//         magicType: {show: true, type: ['line', 'bar']},
+				//         restore: {show: true},
+				//         saveAsImage: {show: true}
+				//     }
+				// },
+				grid : {
+					bottom : '20%',//距离下边距
+				},
+				legend : {
+					data : allAgentName,
+					bottom : 0
+				},
+				xAxis : [ {
+					type : 'category',
+					data : xLineData,
+					axisPointer : {
+						type : 'shadow'
+					}
+				} ],
+				yAxis : [
+				 {
+					type : 'value',
+
+					axisLine : {
+						show : false
+
+					}
+				}, {
+					type : 'value',
+					axisLine : {
+						show : false
+
+					}
+				}/*, {
+					type : 'value',
+
+					axisLine : {
+						show : false
+
+					}
+				}, {
+					type : 'value',
+
+					axisLine : {
+						show : false
+
+					}
+				}, {
+					type : 'value',
+
+					axisLine : {
+						show : false
+
+					}
+				} */ ],
+				series : [ {
+					name : "用户数",
+					type : 'bar',
+					data : y1LineData,
+					color : '#5793f3'
+				}, {
+					name:"参与计算",
+					type : 'line',
+					data : y2LineData,
+					itemStyle : {
+						normal : {
+							label : {
+								show : true,
+								position : 'top',
+								formatter : function(a,b,c){
+									if(maxvalue == 0){
+										return "0%用户";
+									}
+									return a.value/maxvalue*100+"%用户";
+								}
+							}
+						}
+					}
+				} /* ,
+				                    {
+				                        name:allAgentName[2],
+				                        type:'bar',
+				                        data:y3LineData
+				                    },
+				                    {
+				                        name:allAgentName[3],
+				                        type:'line',
+				                        data:y4LineData
+				                    },
+				                    {
+				                        name:allAgentName[4],
+				                        type:'line',
+				                        data:y5LineData
+				                    } */
+				]
+			};
+
+			myChart2.setOption(option);
+
+			window.onresize = function() {
+				$('.addUserMain-content').width('100%');
+				myChart2.resize();
+
+			};
+
+		}
+
+	}
+	// lineChart();
+
+	function exportTable(tableid, tableName) {
+
+		if (!!window.ActiveXObject || "ActiveXObject" in window) {
+			window.document.write(document.getElementById(tableid).outerHTML);
+			window.document.execCommand("SaveAs", false, tableName + ".xls");
+			history.go(-1);
+		} else {
+			var tb = document.getElementById(tableid); //获取table对像
+			var rows = tb.rows;
+			var str = "";
+			for (var i = 0; i < rows.length; i++) { //---循环--行---
+				var cells = rows[i].cells;
+				for (var j = 0; j < cells.length; j++) { //---循环--列---
+					str = str + cells[j].innerText + ",";
+				}
+				str = str + "\n";
+			}
+			str = encodeURIComponent(str);
+			var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+			var downloadLink = document.createElement("a");
+			downloadLink.href = uri;
+			downloadLink.download = tableName + ".csv";
+			document.body.appendChild(downloadLink);
+			downloadLink.click();
+			document.body.removeChild(downloadLink);
+		}
+	}
+</script>
+
+

@@ -1,0 +1,241 @@
+<style type="text/css">
+.fleft-item{ float: left; margin-right: 24px; }
+.box-tools.fleft-item { position: static; right: inherit;  margin-left: 32px;  position: relative;  top: 2px;}
+</style>
+<section class="content-header">
+    <h1>公司管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>系统设置</li>
+        <li class="active">公司管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+                  <th>公司编码</th>
+                  <th>公司名称</th>
+                  <th>推广URL</th>
+                  <th>操作</th>
+                  </tr>
+                  </thead>
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+var departIdTmp='',userIdTmp='',userNameTmp='';
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 ], function() {
+        console.log(1);
+
+        var t=$("#tableData").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 20,
+
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var userName = $("#srhUserName").val();
+                aoData.push({
+                        "name": "userName",
+                        "value": userName
+                    })
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/Company/companyList",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "id",
+                "bSortable": false
+            },{
+                "data": "id",
+                "bSortable": false
+            },{
+                "data": "companyCode",
+                "bSortable": false
+            }, {
+                "data": "companyName",
+                "bSortable": false
+            }, {
+                "data": "jumpUrl",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 1,                
+                "render": function(data, type, full, meta) {                	
+                    return '<input type="checkbox" value="' + data + '" title="' + data + '" name="id" />';
+                }
+            },{
+                "targets": 5,
+                "data": "id",
+                "render": function(data, type, full, meta) {
+                	var lnks='<a href="javascript:upd(\''+data+'\');">编辑</a>'; 
+                    return lnks;
+                }
+            } ],
+          
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+    });
+});
+
+
+<!-- 编辑对话框 -->
+function upd(companyId){
+	//编辑
+    companyIdTmp=companyId;
+	companyNameTmp=name;
+	doPost("Company/companyUpdatePage", {"id":companyId},userUpdHd,errorHd);
+}
+function userUpdHd(data){
+	 if(data.success){
+		console.dir(data);
+		$("#companyId").val(data.obj.id);
+		$("#companyNameUpd").val(data.obj.companyName);
+		$('#jumpUrlUpd').val(data.obj.jumpUrl);
+        $('#companyUpdModal').modal({keyboard: true});
+	  }else{
+		$.msg(data.msg);
+	  }	  
+}
+<!-- end 编辑对话框 -->
+
+/*编辑角色提交*/
+$('#companyUpdModal').find('[field="companyUpdTj"]').click(function(){			
+	var companyId=$('#companyId').val();
+	var companyName=$("#companyNameUpd").val();	
+	var jumpUrl=$('#jumpUrlUpd').val();
+	doPost("Company/companyUpdate", {"id":companyId,"jumpUrl":jumpUrl,"companyName":companyName},userUpdSaveHd,errorHd);	
+});
+
+function userUpdSaveHd(data){
+	if(data.success){
+		$('#companyUpdModal').find('[field="closeModal"]').click();
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+
+function errorHd(xreq){	 
+	  $.msg(xreq.statusText+"["+xreq.status+"]");
+}
+/* end编辑角色提交*/
+
+//刷新表格
+function refreshdata() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+</script>
+
+
+<!-- 角色编辑 -->
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="companyUpdModal" tabindex="-1" role="dialog" 
+   aria-labelledby="companyUpdModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="roleUpdModalLabel">
+               	编辑
+            </h4>
+         </div>
+         <div class="modal-body" id="roleUpdModalCon">
+           <!-- 模态内容 -->
+    <form role="form">
+    <input type="hidden" id="companyId"  />
+	<div class="box-body">
+		<div class="form-group">
+			<label for="roleName">公司名称</label> <input type="text"
+				class="form-control" id="companyNameUpd" placeholder="公司名称">
+		</div>
+		<div class="form-group">
+			<label for="roleName">推广URL</label> <input type="text"
+				class="form-control" id="jumpUrlUpd" placeholder="推广URL">
+		</div>
+	</div>
+	<!-- /.box-body -->
+
+	<div class="box-footer">		
+	</div>
+</form>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" field="closeModal">关闭
+            </button>
+            <button type="button" class="btn btn-primary" field="companyUpdTj">提交</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->

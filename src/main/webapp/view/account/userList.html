@@ -1,0 +1,540 @@
+<style type="text/css">
+.fleft-item{ float: left; margin-right: 24px; }
+.box-tools.fleft-item { position: static; right: inherit;  margin-left: 32px;  position: relative;  top: 2px;}
+</style>
+<section class="content-header">
+    <h1>用户管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>系统设置</li>
+        <li class="active">用户管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+              <div class="box-header">
+              <button type="button" onclick="userAdd()" class="btn btn-primary fleft-item">添加</button>
+              <button type="button" onclick="batchDel()" class="btn btn-primary fleft-item">删除</button>
+                            
+              <div class="box-tools fleft-item">
+                      <div class="input-group" style="width: 200px;">
+                        <input name="table_search" id="srhUserName" class="form-control input-sm pull-right" placeholder="用户名" type="text">
+                        <div class="input-group-btn">
+                          <button class="btn btn-sm btn-default" onclick="search()"><i class="fa fa-search"></i></button>
+                        </div>
+                      </div>
+              </div>
+
+              </div>
+
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+                  <th>帐号</th>
+                  <th>姓名</th>
+                  <th>角色</th>
+                  <th>部门</th>
+                  <th>小组</th>
+                  <th>最后登录ip</th>
+                  <th>最后登录时间</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+var departIdTmp='',userIdTmp='',userNameTmp='';
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 ], function() {
+
+        var userListt=$("#tableData").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 20,
+
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var userName = $("#srhUserName").val();
+                aoData.push({
+                        "name": "userName",
+                        "value": userName
+                    })
+               var url=(userListt)?(ctx + "/Account/userList"):"#";     
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": url,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "syusId",
+                "bSortable": false
+            }, {
+                "data": "syusId",
+                "bSortable": false
+            }, {
+                "data": "syusUsername",
+                "bSortable": false
+            },{
+                "data": "syusRealname",
+                "bSortable": false
+            }, {
+                "data": "roleList",
+                "bSortable": false
+            }, {
+                "data": "roleList",
+                "bSortable": false
+            }, {
+                "data": "groupName",
+                "bSortable": false
+            },  {
+                "data": "syusLoginip",
+                "bSortable": false
+            }, {
+                "data": "syusLogintime",
+                "bSortable": false
+            }, {
+                "data": "syusId",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 1,                
+                "render": function(data, type, full, meta) {                	
+                    return '<input type="checkbox" value="' + data + '" title="' + data + '" name="userId" />';
+                }
+            },{
+                "targets": 4,                
+                "render": function(data, type, full, meta) {
+                	if(data!=null){
+                		data=data[0].syroName;
+                	}
+                    return data;
+                }
+            },{
+                "targets": 5,                
+                "render": function(data, type, full, meta) {
+                	if(full.syusDepartObj!=null){
+                		data=full.syusDepartObj.sydeName;
+                	}
+                    return data;
+                }
+            },{
+                "targets": 8,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 9,
+                "data": "syusId",
+                "render": function(data, type, full, meta) {
+                	var lnks='';
+                	if(full.syusState==1){
+                		lnks="启用";
+                	}else{
+                		lnks="禁用";
+                	}
+                    return lnks;
+                }
+            },{
+                "targets": 10,
+                "data": "syusId",
+                "render": function(data, type, full, meta) {
+                	var lnks='<a href="javascript:upd('+data+');">编辑</a>'; 
+                    return lnks;
+                }
+            } ],
+          
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+    });
+});
+
+<!-- 添加用户中的角色列表 -->
+function userAdd(){
+	//获取本部门及下级部门的角色信息
+	doPost("Account/departRoleList", {},userHd,errorHd);
+}
+
+function userHd(data){
+	  if(data.success){
+		//初始化部门信息
+		var html = template('roleTmp', data);	
+		$('#userAddModal').find('[field="role"]').html(html);
+		  $('#userAddModal').modal({keyboard: true});
+		  
+		doPost("sysgroup/list", {},function(data){
+			//初始化部门信息
+			var html = template('groupTmp', data);
+			$('#userAddModal').find('#selectGroup').html(html);
+		});  
+		  
+	  }else{
+		$.msg(data.msg);
+	  }	  
+}
+<!-- end 添加用户中的角色列表 -->
+function errorHd(xreq){	 
+	  $.msg(xreq.statusText+"["+xreq.status+"]");
+}
+
+<!-- 添加用户提交  -->
+$('#userAddModal').find('[field="userAddTj"]').click(function(){	
+	var userName=$.trim($("#userName").val());
+	var realName=$.trim($("#realName").val());
+	var roleDepart=$("#roleDepart").val();
+	var _modal = $('#userAddModal');
+	var groupId = _modal.find("#groupId").val();
+	var state=$('input[name="state"]:checked').val();
+	var rd=roleDepart.split(',');
+	if(userName==''){
+		$.msg("请正确填写账号名称");
+		return;
+	}
+	if(rd.length==2){
+		if(rd[0]==''){
+			$.msg("角色信息有误["+roleDepart+"]");
+			return;
+		}
+		if(rd[1]==''){
+			$.msg("部门信息有误["+roleDepart+"]");
+			return;
+		}
+	}else{
+		$.msg("请正确选择角色名称["+roleDepart+"]");
+		return;
+	}
+	//alert("rd[0]:"+rd[0]+" rd[1]:"+rd[1]+" state:"+state);
+	//return;
+	//用户保存
+	doPost("Account/userAdd", {"syusUsername":userName,"syusDepart":rd[1], "roleId":rd[0], "syusState":state,"syusRealname":realName,"groupId":groupId},userAddHd,errorHd);	
+});
+
+function userAddHd(data){
+	if(data.success){
+		$('#userAddModal').find('[field="closeModal"]').click();
+		$("#userName").val("");
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+<!-- end 添加用户提交  -->
+
+//删除角色
+function del(id){
+	var t=confirm("确定要删除用户吗？");
+	if(t){
+		doPost("Account/userDel", {"syroIds[]":[id]},userDelHd,errorHd);
+	}
+} 
+
+//批量删除
+function batchDel(){
+	var chk_value =[]; 
+	$('input[name="userId"]:checked').each(function(){ 
+	chk_value.push($(this).val()); 
+	}); 
+	if(chk_value.length==0){
+		$.msg("请选择要删除的用户");
+	}else{    
+    var delIndex = layer.confirm('确定要删除选定的用户吗？', function() {
+      doPost("Account/userDel", {"userIds[]":chk_value},userDelHd,errorHd);
+      layer.close(delIndex);
+    });		
+	}
+}
+function userDelHd(data){
+	if(data.success){
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+
+<!-- 编辑对话框 -->
+function upd(userId){
+	//编辑
+	userIdTmp=userId;
+	doPost("Account/departRoleList", {"userId":userId},userUpdHd,errorHd);
+	doPost("sysgroup/list", {},function(data){
+			//初始化部门信息
+			var html = template('groupTmp', data);
+			$('#userUpdModal').find('#selectGroup').html(html);
+			//选中状态
+			doPost("Account/getById", {"userId":userId},function(data){
+				 $('#userUpdModal').find("#groupId").val(data.obj.groupId);
+			});
+		});
+}
+function userUpdHd(data){
+	 if(data.success){
+		var html = template('roleTmp', data);	
+		$('#userUpdModal').find('[field="role"]').html(html);
+		var roleDepart=data.attributes.roleId+","+data.attributes.user.syusDepart;
+
+		 $("#roleDepart  option[value='"+roleDepart+"']").attr("selected",true);
+		 $("#userId").html(data.attributes.user.syusUsername);
+		 $("#realNameU").val(data.attributes.user.syusRealname);
+
+     $('#userUpdModal').modal({keyboard: true});
+     
+     
+   
+		 //设置状态
+		//$("#stateUpd").removeAttr("checked");		
+		 if(data.attributes.user.syusState==1){
+			// alert(data.attributes.user.syusState);			 
+			 $(".modal-dialog :radio[name='stateUpd'][value='1']").attr("checked",'checked').click();
+      $(".modal-dialog :radio[name='stateUpd'][value='2']").removeAttr("checked");
+		 }
+		if(data.attributes.user.syusState==2){
+			// alert(data.attributes.user.syusState);
+      $(".modal-dialog :radio[name='stateUpd'][value='1']").removeAttr("checked");
+			$(".modal-dialog :radio[name='stateUpd'][value='2']").attr("checked",'checked').click();
+		}
+		  
+	  }else{
+		$.msg(data.msg);
+	  }	  
+}
+<!-- end 编辑对话框 -->
+
+/*编辑角色提交*/
+$('#userUpdModal').find('[field="userUpdTj"]').click(function(){	
+	var pwd=$.trim($("#pwd").val());	
+	var realName=$.trim($("#realNameU").val());	
+	var state=$('input[name="stateUpd"]:checked').val();
+	var roleDepart=$("#roleDepart").val();	
+	var rd=roleDepart.split(',');
+	var _modal = $('#userUpdModal');
+	var groupId = _modal.find("#groupId").val();
+	if(rd.length==2){
+		if(rd[0]==''){
+			$.msg("角色信息有误["+roleDepart+"]");
+			return;
+		}
+		if(rd[1]==''){
+			$.msg("部门信息有误["+roleDepart+"]");
+			return;
+		}
+	}else{
+		$.msg("请正确选择角色名称["+roleDepart+"]");
+		return;
+	}
+	if(state==null&&state==undefined){
+		$.msg("请正确设置状态["+state+"]");
+		return;
+	}	
+	doPost("Account/userUpd", {"syusId":userIdTmp,"syusDepart":rd[1], "roleId":rd[0], "syusState":state, "pwd":pwd,"syusRealname":realName,"groupId":groupId},userUpdSaveHd,errorHd);	
+});
+
+function userUpdSaveHd(data){
+	if(data.success){
+		$('#userUpdModal').find('[field="closeModalUpd"]').click();
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+/* end编辑角色提交*/
+
+//刷新表格
+function refreshdata() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+
+function search() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+</script>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="userAddModal" tabindex="-1" user="dialog"
+	aria-labelledby="userAddModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="userAddModalLabel">添加用户</h4>
+			</div>
+			<div class="modal-body" id="userAddModalCon">
+				<!-- 模态内容 -->
+				<form user="form">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="userName">请输入账号：</label> <input type="text"
+								class="form-control" id="userName" placeholder="请输入账号(工号)">
+						</div>
+						<div class="form-group">
+							<label for="realName">请输入姓名：</label> <input type="text"
+								class="form-control" id="realName" placeholder="请使用真实姓名">
+						</div>
+						<div class="form-group" field="role"></div>
+						<div class="form-group" id="selectGroup"></div>
+						<div class="form-group">
+							<label for="state">请选择状态：</label> <input type="radio"
+								name="state" id="state" value="1" checked>启用&nbsp;&nbsp;&nbsp;&nbsp;
+							<input type="radio" name="state" id="state" value="2">禁用
+						</div>
+						<div class="form-group">
+							<label for="pwd">初始密码：</label>&nbsp;&nbsp;<font color=red>888888</font>
+						</div>
+					</div>
+					<!-- /.box-body -->
+
+					<div class="box-footer"></div>
+				</form>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"
+					field="closeModal">关闭</button>
+				<!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+				<button type="button" class="btn btn-primary" field="userAddTj">提交</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- /.modal -->
+
+<script id="roleTmp" type="text/html">
+		<label for="role">请选择角色：</label>
+				<select class="form-control"  id="roleDepart">
+					<option value="">-- 请选择 --</option>
+                    {{each obj as value i}}
+						<option value="{{value.syroId}},{{value.syroDepartid}}">{{value.syroName}} - 【{{value.syroDepartname}}】</option>
+                    {{/each}}
+                  </select>
+</script>
+<script id="groupTmp" type="text/html">
+		<label for="role">请选择小组：</label>
+				<select class="form-control"  id="groupId">
+					<option value="">-- 请选择 --</option>
+                    {{each obj as value i}}
+						<option value="{{value.groupId}}">{{value.groupName}}】</option>
+                    {{/each}}
+                  </select>
+</script>
+<!-- 角色编辑 -->
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="userUpdModal" tabindex="-1" user="dialog"
+	aria-labelledby="userUpdModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="userUpdModalLabel">编辑用户</h4>
+			</div>
+			<div class="modal-body" id="userUpdModalCon">
+				<!-- 模态内容 -->
+				<form user="form">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="userName">账号：</label><span id="userId"></span>
+						</div>
+						<div class="form-group">
+							<label for="userName">姓名：</label> <input type="text"
+								class="form-control" id="realNameU" placeholder="姓名">
+						</div>
+						<div class="form-group">
+							<label for="exampleInputPassword1">密码：</label> <input
+								type="password" class="form-control" id="pwd" placeholder="密码">
+						</div>
+						<div class="form-group" field="role"></div>
+						<div class="form-group" id="selectGroup"></div>
+						<div class="form-group">
+							<label for="state">请选择状态：</label> <input type="radio"
+								name="stateUpd" value="1">启用&nbsp;&nbsp;&nbsp;&nbsp; <input
+								type="radio" name="stateUpd" value="2">禁用
+						</div>
+					</div>
+					<!-- /.box-body -->
+					<div class="box-footer"></div>
+				</form>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"
+					field="closeModalUpd">关闭</button>
+				<!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+				<button type="button" class="btn btn-primary" field="userUpdTj">提交</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- /.modal -->

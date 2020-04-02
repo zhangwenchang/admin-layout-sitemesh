@@ -1,0 +1,462 @@
+<div id="trend_all" class="right-model">
+    <div ng-controller="AppController" class="right-model-content">
+        <section class="trend_top">
+            <ul>
+                <li class="type_id" ng-repeat="data in trend_data.chal_type" ng-click="chal_type(data.type)"
+                    ng-class="{'isActive':data.isClick}">
+                    {{data.name}}
+                </li>
+            </ul>
+        </section>
+        <section class="trend_body">
+            <div class="top_nav">
+                <p class="top_title">
+                    <span>整体趋势</span>
+                    <input type="text" id="AD_trend" value="" readonly>
+                </p>
+                <ul class="user_type">
+                    <li ng-repeat="user in trend_data.user_type" ng-click="userType_click(user.type)"
+                        ng-class="{'user_Click':user.isClick}">
+                        {{user.name}}
+                    </li>
+                </ul>
+            </div>
+            <div class="echarts_nums">
+                <div id="newuser_id" style="width: 100%;height: 500px" ng-show="trend_data.user_type[0].isClick"></div>
+                <div id="activeuser_id" style="width: 100%;height: 500px"
+                     ng-show="trend_data.user_type[1].isClick"></div>
+                <div id="trunon_id" style="width: 100%;height: 500px" ng-show="trend_data.user_type[2].isClick"></div>
+                <div id="addup_id" style="width: 100%;height: 500px" ng-show="trend_data.user_type[3].isClick"></div>
+                <div id="activedo_id" style="width: 100%;height: 500px" ng-show="trend_data.user_type[4].isClick"></div>
+            </div>
+        </section>
+        <section class="trend_table">
+            <div class="table_title">
+                <span>整体趋势数据明细</span>
+                <button  onclick="exportTable('newInvitation','整体趋势数据明细')" style="float: right;height: 35px;line-height:35px; ">导出</button>
+            </div>
+            <table id="newInvitation" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>新增用户</th>
+                    <th>活跃用户</th>
+                    <th>新用户占比</th>
+                <tr ng-repeat="item_data in trend_data.day_data">
+                    <td>{{item_data.dtime}}</td>
+                    <td>{{item_data.con}}</td>
+                    <td>{{trend_data.active_data[$index].con}}</td>
+                    <td>{{newuserBL[$index]}}</td>
+                </tr>
+                </thead>
+
+            </table>
+        </section>
+    </div>
+</div>
+<script>
+    // var app = angular.module('App',[]);
+    app.controller('AppController', function ($scope, $http) {
+        $scope.trend_data = {
+            chal_type: [
+                {
+                    type: 'pc',
+                    isClick: true,
+                    name: 'PC'
+                },
+                {
+                    type: 'app',
+                    isClick: false,
+                    name: 'APP'
+                }
+            ],
+            user_type: [
+                {
+                    type: 1,
+                    isClick: true,
+                    url: '/gaiKuang/QuShiListXZYH',
+                    name: '新增用户'
+                },
+                {
+                    type: 2,
+                    isClick: false,
+                    url: '/gaiKuang/QuShiListHYYH',
+                    name: '活跃用户'
+                },
+                {
+                    type: 3,
+                    isClick: false,
+                    url: '/gaiKuang/QuShiListQDCS',
+                    name: '启动次数'
+                },
+                {
+                    type: 4,
+                    isClick: false,
+                    url: '/gaiKuang/QuShiListQDCS',
+                    name: '累计用户'
+                },
+                {
+                    type: 5,
+                    isClick: false,
+                    url: '/gaiKuang/QuShiListHYYHGC',
+                    name: '活跃用户构成'
+                },
+                // {
+                //     type: 6,
+                //     isClick: false,
+                //     name: '次日存留'
+                // }
+            ],
+           day_data:[],
+           newuser_data:[],
+           active_data:[]
+        };
+        var daterangepickerBox = $("#AD_trend");
+        var defaultDateObj = new Date();
+        var currentYear = defaultDateObj.getFullYear();
+        var currentMonth = defaultDateObj.getMonth() + 1;
+        var defaultStartDate = currentYear + '-' + currentMonth + '-01';
+        var isOverYear = (currentMonth + 1) > 12;
+        var defaultEndDate = (isOverYear ? (currentYear + 1) : currentYear) + '-' + (isOverYear ? '01' : currentMonth + 1) + '-01';
+        var trend_datas = {
+            stime: defaultStartDate,
+            etime: defaultEndDate,
+            flag: 'pc'
+        }
+        var myChart00 = echarts.init(document.getElementById("newuser_id"));
+        var myChart01 = echarts.init(document.getElementById("activeuser_id"));
+        var myChart02 = echarts.init(document.getElementById("trunon_id"));
+        var myChart03 = echarts.init(document.getElementById("addup_id"));
+        var myChart04 = echarts.init(document.getElementById("activedo_id"));
+        var myCharts = [myChart00, myChart01, myChart02, myChart03, myChart04]
+        var data_url = $scope.trend_data.user_type[0].url;
+        var divId = myChart00;
+        var typeName = $scope.trend_data.user_type[0].name
+
+        daterangepickerBox.daterangepicker({
+            timePicker: false,
+            timePickerIncrement: 10,
+            format: 'YYYY-MM-DD',
+            opens: 'right',
+            timePicker12Hour: false,
+            timePicker: false,
+            showDropdowns: true,
+            startDate: defaultStartDate,
+            endDate: defaultEndDate
+        }, function (start, end, label) {
+            // console.log(daterangepickerBox.val())
+            // console.log(this.startDate.format(this.locale.format));
+            // console.log(this.endDate.format(this.locale.format));
+            var starInit = this.startDate.format(this.locale.format);
+            var endInit = this.endDate.format(this.locale.format);
+            var timeIndex = starInit.indexOf('T');
+            var startTimes = starInit.substr(0, timeIndex);
+            var endTimes = endInit.substr(0, timeIndex);
+            trend_datas.stime = startTimes;
+            trend_datas.etime = endTimes;
+            trend_newadd(data_url, divId, typeName);
+            trend_newadd01();
+            trend_newadd02();
+        });
+
+        //折线图方法配置
+        function line_userNum(data, echartsId, dataType) {
+            var option = {
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: [dataType]
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLabel: {
+                        interval: 5,
+                        // rotate:-30
+                    },
+                    data: function () {
+                        var add_new = [];
+                        add_new.splice(0, add_new.length)
+                        for (var ins in data) {
+                            add_new.push(data[ins].dtime)
+                        }
+                        return add_new
+                    }()
+                },
+                yAxis: {
+                    type: 'value',
+                    "axisLine": {       //y轴
+                        "show": false
+
+                    },
+                    "axisTick": {       //y轴刻度线
+                        "show": false
+                    },
+                },
+                series: [
+                    {
+                        name: dataType,
+                        type: 'line',
+                        stack: dataType,
+                        data: function () {
+                            var today_num = [];
+                            today_num.splice(0, today_num.length)
+                            for (var ins in data) {
+                                today_num.push(data[ins].con)
+                            }
+                            // console.log(today_num)
+                            return today_num
+                        }()
+                    }
+
+                ]
+            };
+            echartsId.setOption(option);
+            window.addEventListener('resize', function () {
+                echartsId.resize();
+            })
+        };
+
+        //柱状堆积折线图配置
+        function userModel_bar(data, echartsId, dataType) {
+            var option = {
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                toolbox: {
+                    feature: {
+                        dataView: {show: true, readOnly: false},
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+                    }
+                },
+                legend: {
+                    data: ['新用户', '老用户']
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        axisLabel: {
+                            interval: 3,
+                            // rotate:-30
+                        },
+                        data: function () {
+                            var active_xdata = [];
+                            active_xdata.splice(0, active_xdata.length)
+                            for (var ins in data) {
+                                if (data[ins].isNewUser == 0) {
+                                    active_xdata.push(data[ins].dtime)
+                                }
+                            }
+                            return active_xdata;
+                        }(),
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: {
+                    type: 'value',
+                    "axisLine": {       //y轴
+                        "show": false
+
+                    },
+                    "axisTick": {       //y轴刻度线
+                        "show": false
+                    },
+                },
+                series: [
+                    {
+                        name: '新用户',
+                        type: 'bar',
+                        stack: 'name',
+                        data: function () {
+                            var newuser_data = [];
+                            newuser_data.splice(0, newuser_data.length);
+                            for (var ins in data) {
+                                if (data[ins].isNewUser == 1) {
+                                    newuser_data.push(data[ins].con)
+                                }
+                            }
+                            return newuser_data;
+                        }()
+                    },
+                    {
+                        name: '老用户',
+                        type: 'bar',
+                        stack: 'name',
+                        data: function () {
+                            var olduser_data = [];
+                            olduser_data.splice(0, olduser_data.length);
+                            for (var ins in data) {
+                                if (data[ins].isNewUser == 0) {
+                                    olduser_data.push(data[ins].con)
+                                }
+                            }
+                            return olduser_data;
+                        }()
+                    },
+                ]
+            };
+            echartsId.setOption(option);
+            window.addEventListener('resize', function () {
+                echartsId.resize();
+            })
+        }
+
+        trend_newadd(data_url, divId, typeName);
+        trend_newadd01();
+        trend_newadd02();
+        function trend_newadd01() {
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + '/gaiKuang/QuShiListXZYH',
+                data: trend_datas,
+                cache: false,
+            }).then(function (resData) {
+
+
+                $scope.trend_data.day_data = resData.data.obj;
+
+            }, function (errData) {
+
+            })
+        }
+        function trend_newadd02() {
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + '/gaiKuang/QuShiListHYYH',
+                data: trend_datas,
+                cache: false,
+            }).then(function (resData) {
+                $scope.trend_data.active_data = resData.data.obj;
+                var newuserBL = [];
+                var all = resData.data.obj;
+                var newu = $scope.trend_data.day_data;
+                for(var i = 0;i< all.length;i++){
+                	if(all[i].con == 0){
+                		newuserBL[i] = 0+"%";
+                		continue;
+                	}
+                	newuserBL[i] = Math.round((newu[i].con/all[i].con)*1000)/10+"%";
+                }
+                $scope.newuserBL = newuserBL;
+            }, function (errData) {
+
+            })
+        }
+        //新增用户
+        function trend_newadd(data_url, divId, typeName) {
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + data_url,
+                data: trend_datas,
+                cache: false,
+            }).then(function (resData) {
+                if (divId == myCharts[4]) {
+                    userModel_bar(resData.data.obj, divId, typeName)
+                } else {
+                    line_userNum(resData.data.obj, divId, typeName)
+                }
+
+            }, function (errData) {
+
+            })
+        }
+
+        // 设备点击
+        $scope.chal_type = function (datas) {
+            for (var ins in this.trend_data.chal_type) {
+                if (this.trend_data.chal_type[ins].type == datas) {
+                    this.trend_data.chal_type[ins].isClick = true;
+                    trend_datas.flag = datas;
+                    trend_newadd(data_url, divId, typeName);
+                    trend_newadd01();
+                    trend_newadd02();
+                } else {
+                    this.trend_data.chal_type[ins].isClick = false
+                }
+            }
+        }
+        //用户类型选择
+        $scope.userType_click = function (data) {
+            for (var ins in this.trend_data.user_type) {
+                if (this.trend_data.user_type[ins].type == data) {
+                    this.trend_data.user_type[ins].isClick = true;
+                    // var myCharts = 'myChart0'+ins;
+                    console.log(myChart00);
+                    data_url = this.trend_data.user_type[ins].url;
+                    divId = myCharts[ins];
+                    typeName = this.trend_data.user_type[ins].name;
+                    // trend_newadd(this.trend_data.user_type[ins].url, myCharts[ins], this.trend_data.user_type[ins].name)
+                    trend_newadd(data_url, divId, typeName)
+                } else {
+                    this.trend_data.user_type[ins].isClick = false
+                }
+            }
+        }
+        daterangepickerBox.data('daterangepicker').setStartDate(daterangepickerBox.daterangepicker);
+
+    });
+    angular.bootstrap(document.getElementById('trend_all'), ['App']);
+    
+    
+    function exportTable(tableid, tableName) {
+
+    	if (!!window.ActiveXObject || "ActiveXObject" in window) {
+    		window.document.write(document.getElementById(tableid).outerHTML);
+    		window.document.execCommand("SaveAs", false, tableName + ".xls");
+    		history.go(-1);
+    	} else {
+    		var tb = document.getElementById(tableid); //获取table对像
+    		var rows = tb.rows;
+    		var str = "";
+    		for (var i = 0; i < rows.length; i++) { //---循环--行---
+    			var cells = rows[i].cells;
+    			for (var j = 0; j < cells.length; j++) { //---循环--列---
+    				str = str + cells[j].innerText + ",";
+    			}
+    			str = str + "\n";
+    		}
+    		str = encodeURIComponent(str);
+    		var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+    		var downloadLink = document.createElement("a");
+    		downloadLink.href = uri;
+    		downloadLink.download = tableName + ".csv";
+    		document.body.appendChild(downloadLink);
+    		downloadLink.click();
+    		document.body.removeChild(downloadLink);
+    	}
+    }
+</script>

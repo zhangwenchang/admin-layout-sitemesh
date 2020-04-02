@@ -1,0 +1,836 @@
+<div class="user-participation">
+    <div class="right-model">
+        <div ng-controller="AppController" class="right-model-content">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        活动页面功能点击量
+                    </div>
+                    <div class="title-content-right">
+                        <select name="" id="revenueSel1" class="select-value" style="width: 300px;" ng-click="revenueSel1()">
+                            <option value="{{item.act_id}}" ng-repeat="item in allAgent">{{item.act_name}}</option>
+                            <!--<option value="">洛阳畅游</option>-->
+                            <!--<option value="">商丘点创</option>-->
+                        </select>
+
+                        <ul class="ul-li" id="deviceUl1">
+                            <li ng-class="bluebgflag1 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange1(1)">全部</li>
+                            <li class="border-none" ng-click="bluebgflagChange1(2)" ng-class="bluebgflag1 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange1(3)" ng-class="bluebgflag1 == 3 ? 'blue-bg' : '' ">APP</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="revenueChart" style="height:400px"></div>
+            </div>
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        活动页面功能点击量明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('revenueTable','活动页面功能点击量明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="revenueTable" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>第1个充值档次</th>
+                            <th>第2个充值档次</th>
+                            <th>第3个充值档次</th>
+                            <th>为他升级</th>
+                            <th>虚拟礼物</th>
+                            <th>砸金蛋</th>
+                        </tr>
+
+                        <tr ng-repeat="x in dataObj2">
+
+                            <td>{{x.datet}}</td>
+                            <td>{{x.diyi}}</td>
+                            <td>{{x.dier}}</td>
+                            <td>{{x.disan}}</td>
+                            <td>{{x.shengji}}</td>
+                            <td>{{x.xuni}}</td>
+                            <td>{{x.zadan}}</td>
+                        </tr>
+                    </thead>
+
+                </table>
+                <!--<div id="userPages"></div>-->
+            </div>
+
+            <div class="title-border" style="margin-top: 40px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        活动页面充值量
+                    </div>
+                    <div class="title-content-right">
+                        <select name="" id="revenueSel2" class="select-value" style="width: 280px;" ng-click="revenueSel2()">
+                            <option value="{{item.act_id}}" ng-repeat="item in allAgent">{{item.act_name}}</option>
+                            <!--<option value="">洛阳畅游</option>-->
+                            <!--<option value="">商丘点创</option>-->
+                        </select>
+                        <ul class="ul-li" id="deviceUl2">
+                            <li ng-class="bluebgflag2 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange2(1)">全部</li>
+                            <li class="border-none" ng-click="bluebgflagChange2(2)" ng-class="bluebgflag2 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange2(3)" ng-class="bluebgflag2 == 3 ? 'blue-bg' : '' ">APP</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="singleChart" style="height:400px"></div>
+            </div>
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        活动页面充值量明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('singleTable','活动页面充值量明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="singleTable" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>第1个充值档次</th>
+                            <th>第2个充值档次</th>
+                            <th>第3个充值档次</th>
+                        </tr>
+
+                        <tr ng-repeat="x in dataObj4">
+
+                            <td>{{x.datet}}</td>
+                            <td>{{x.diyi}}</td>
+                            <td>{{x.dier}}</td>
+                            <td>{{x.disan}}</td>
+
+                        </tr>
+                    </thead>
+
+                </table>
+                <!--<div id="userPages"></div>-->
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    app.controller('AppController',function($scope,$http){
+        // $scope.name='笑话';
+        // $scope.price='99';
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.Date1 = firstDay;
+        $scope.Date2 = nowdate;
+
+        $('#starttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#endtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        $scope.bluebgflag1 = 1;
+        $scope.revenuebgflag1 = '';
+
+        $scope.bluebgflag2 = 1;
+        $scope.revenuebgflag2 = '';
+
+        var revenueSelId1 = '';
+        var revenueSelName1 = '';
+
+        var revenueSelId2 = '';
+        var revenueSelName2 = '';
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.revenueStarttime1 = firstDay;
+        $scope.revenueEndtime1 = nowdate;
+
+        $scope.singleStarttime1 = firstDay;
+        $scope.singleEndtime1 = nowdate;
+
+        $('#revenueStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#revenueEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        $('#singleStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#singleEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+
+
+
+        initPage($scope,$http);
+        $scope.getAllAgent();
+
+
+
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http){
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.getAllAgent = function(){
+        	layer.load(1,{shade:0.3});
+            $http.post(ctx + "/useBase/getActivity")
+                .then(function(data){
+                    if(data.data.success == false){
+
+                    }else if(data.data.obj == []){
+                        return;
+                    }else{
+                        //debugger;
+                        $scope.allAgent = data.data.obj;
+                        revenueSelId1 = data.data.obj[0].act_id;
+                        revenueSelName1 = data.data.obj[0].act_name;
+
+                        revenueSelId2 = data.data.obj[0].act_id;
+                        revenueSelName2 = data.data.obj[0].act_name;
+
+
+                        $scope.revenue();
+                        $scope.revenueSingle();
+
+
+                    }
+                    layer.closeAll();
+                },function(data){
+                	layer.closeAll();
+                })
+
+
+        };
+
+        $scope.bluebgflagChange1 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag1 = 1;
+                    $scope.revenuebgflag1 = '';
+
+                    $scope.revenue();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag1 = 2;
+                    $scope.revenuebgflag1 = 'pc';
+                    $scope.revenue();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag1 = 3;
+                    $scope.revenuebgflag1 = 'app';
+                    $scope.revenue();
+
+                    break;
+
+            }
+
+        };
+
+        $scope.bluebgflagChange2 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag2 = 1;
+                    $scope.revenuebgflag2 = '';
+
+                    $scope.revenueSingle();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag2 = 2;
+                    $scope.revenuebgflag2 = 'pc';
+                    $scope.revenueSingle();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag2 = 3;
+                    $scope.revenuebgflag2 = 'app';
+                    $scope.revenueSingle();
+
+                    break;
+
+            }
+
+        };
+
+        $scope.revenueSel1 = function(e){
+            revenueSelId1 = $('#revenueSel1 option:selected').val();
+            revenueSelName1 = $('#revenueSel1 option:selected').text();
+            $scope.revenue();
+
+        };
+
+        $scope.revenueSel2 = function(e){
+            revenueSelId2 = $('#revenueSel2 option:selected').val();
+            revenueSelName2 = $('#revenueSel2 option:selected').text();
+            $scope.revenueSingle();
+
+        };
+
+
+        $scope.revenueChangeVal1 =function(){
+            if($scope.revenueStarttime1 == ''){
+                $scope.revenueStarttime1 = firstDay;
+            }
+            if($scope.revenueEndtime1 == ''){
+                $scope.revenueEndtime1 = nowdate;
+            }
+            if($scope.revenueStarttime1 > $scope.revenueEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.revenueStarttime1 = firstDay;
+                $scope.revenueEndtime1 = nowdate;
+
+            }
+            $scope.revenue();
+
+
+        }
+
+        $scope.revenueChangeVal2 =function(){
+            if($scope.singleStarttime1 == ''){
+                $scope.singleStarttime1 = firstDay;
+            }
+            if($scope.singleEndtime1 == ''){
+                $scope.singleEndtime1 = nowdate;
+            }
+            if($scope.singleStarttime1 > $scope.singleEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.singleStarttime1 = firstDay;
+                $scope.singleEndtime1 = nowdate;
+
+            }
+            $scope.revenueSingle();
+
+
+        }
+
+
+        $scope.revenue = function(){
+
+            var dateData1 = {
+                cli_activity_id:revenueSelId1,
+                cli_flag:$scope.revenuebgflag1,
+
+            };
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/useBase/getActivityClick",dateData1)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj1 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+                        var y2LineData = [];
+                        var y3LineData = [];
+                        var y4LineData = [];
+                        var y5LineData = [];
+                        var y6LineData = [];
+                        for(var i = 0;i<dataObj1[1].length; i++){
+                            xLineData.push(dataObj1[1][i].datet);
+                            y1LineData.push(dataObj1[1][i].num);
+
+                        }
+
+                        for(var i = 0;i<dataObj1[2].length; i++){
+                            y2LineData.push(dataObj1[2][i].num);
+
+                        }
+                        for(var i = 0;i<dataObj1[3].length; i++){
+                            y3LineData.push(dataObj1[3][i].num);
+
+                        }
+                        for(var i = 0;i<dataObj1[4].length; i++){
+                            y4LineData.push(dataObj1[4][i].num);
+
+                        }
+                        for(var i = 0;i<dataObj1[5].length; i++){
+                            y5LineData.push(dataObj1[5][i].num);
+
+                        }
+                        for(var i = 0;i<dataObj1[6].length; i++){
+                            y6LineData.push(dataObj1[6][i].num);
+
+                        }
+
+                        $scope.lineChart1(xLineData,y1LineData,y2LineData,y3LineData,y4LineData,y5LineData,y6LineData);
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                	layer.closeAll();
+                })
+
+
+
+            var dateData2 = {
+                cli_activity_id:revenueSelId1,
+                cli_flag:$scope.revenuebgflag1,
+
+            };
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/useBase/getActivityClickDetail",dateData2)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj2 =  data.data.data;
+                       $scope.dataObj2 = dataObj2;
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                	layer.closeAll();
+                })
+
+
+
+        }
+
+        $scope.revenueSingle = function(){
+
+
+            var dateData3 = {
+                cli_activity_id:revenueSelId2,
+                cli_flag:$scope.revenuebgflag2,
+
+            };
+            
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/useBase/getActivityRecharge",dateData3)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+
+                        var dataObj3 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+                        var y2LineData = [];
+                        var y3LineData = [];
+
+                        for(var i = 0;i<dataObj3[1].length; i++){
+                            xLineData.push(dataObj3[1][i].datet);
+                            y1LineData.push(dataObj3[1][i].totalgold);
+
+                        }
+
+                        for(var i = 0;i<dataObj3[2].length; i++){
+                            y2LineData.push(dataObj3[2][i].totalgold);
+
+                        }
+                        for(var i = 0;i<dataObj3[3].length; i++){
+                            y3LineData.push(dataObj3[3][i].totalgold);
+
+                        }
+
+                        $scope.lineChart2(xLineData,y1LineData,y2LineData,y3LineData);
+
+
+
+                    }
+                    layer.closeAll();
+
+                },function(data){
+                	layer.closeAll();
+                })
+
+
+            var dateData4 = {
+                cli_activity_id:revenueSelId2,
+                cli_flag:$scope.revenuebgflag2,
+
+            };
+            
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/useBase/getActivityRechargeDetail",dateData4)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj4 =  data.data.data;
+                        $scope.dataObj4 = dataObj4;
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                	layer.closeAll();
+                })
+
+
+        }
+
+
+
+        $scope.lineChart1 = function(xLineData,y1LineData,y2LineData,y3LineData,y4LineData,y5LineData,y6LineData){
+            //debugger;
+
+            var myChart1 = echarts.init(document.getElementById('revenueChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+
+                },
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                legend: {
+                    data:['第1个充值档次','第2个充值档次','第3个充值档次','为他升级','虚拟礼物','砸金蛋'],
+                    bottom:0
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+                        // name: '营收',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    }
+                ],
+                series: [
+                    {
+                        name:'第1个充值档次',
+                        type:'bar',
+                        data:y1LineData
+                    },
+                    {
+                        name:'第2个充值档次',
+                        type:'bar',
+                        data:y2LineData,
+
+                    },
+                    {
+                        name:'第3个充值档次',
+                        type:'bar',
+                        data:y3LineData
+                    },
+                    {
+                        name:'为他升级',
+                        type:'line',
+                        data:y4LineData,
+
+                    },
+                    {
+                        name:'虚拟礼物',
+                        type:'line',
+                        data:y5LineData
+                    },
+                    {
+                        name:'砸金蛋',
+                        type:'line',
+                        data:y6LineData,
+
+                    }
+                ]
+            };
+
+            myChart1.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart1.resize();
+
+            };
+
+
+        }
+
+
+
+
+        $scope.lineChart2 = function(xLineData,y1LineData,y2LineData,y3LineData){
+            //debugger;
+
+            var myChart2 = echarts.init(document.getElementById('singleChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+
+                },
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                legend: {
+                    data:['第1个充值档次','第2个充值档次','第3个充值档次'],
+                    bottom:0
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+                        // name: '营收',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    }
+                ],
+                series: [
+                    {
+                        name:'第1个充值档次',
+                        type:'bar',
+                        data:y1LineData
+                    },
+                    {
+                        name:'第2个充值档次',
+                        type:'bar',
+                        data:y2LineData,
+
+                    },
+                    {
+                        name:'第3个充值档次',
+                        type:'bar',
+                        data:y3LineData
+                    }
+                ]
+            };
+
+
+
+
+            myChart2.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart2.resize();
+
+            };
+
+
+        }
+
+
+
+
+
+
+    }
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+
+
+</script>

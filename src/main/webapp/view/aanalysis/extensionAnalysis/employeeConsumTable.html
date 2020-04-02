@@ -1,0 +1,239 @@
+
+<div ng-controller="AppController" class="user-participation">
+
+    <div class="right-model">
+        <div class="right-model-content right-model-content1" style="display: block">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        员工消费项分析表
+                    </div>
+                    <div class="title-content-right">
+                        <select name="" id="revenueSel1" class="select-value" style="width: 300px;" ng-click="revenueSel1()">
+                            <option value="{{item.group_id}}" ng-repeat="item in allAgent">{{item.group_name}}</option>
+                            <!--<option value="">洛阳畅游</option>-->
+                            <!--<option value="">商丘点创</option>-->
+                        </select>
+                        <span>
+							<input type="text" id="revenueStarttime1" class="startTime" readonly ng-model="revenueStarttime1" ng-change="revenueChangeVal1()">至
+                            <input type="text" id="revenueEndtime1" class="startTime" readonly ng-model="revenueEndtime1" ng-change="revenueChangeVal1()">
+						</span>
+                        <span class="blue exportBtn" onclick="exportTable('revenueTable','员工消费项分析表')">导出</span>
+
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="revenueTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>团队</th>
+                        <th>工号</th>
+                        <th>姓名</th>
+                        <th>总消费额</th>
+                        <th>红包</th>
+                        <th>会员升级</th>
+                        <th>翻译</th>
+                        <th>翻译字符包</th>
+                        <th>礼物</th>
+                        <th>模糊图</th>
+                        <th>一键异性50封</th>
+                        <th>GaGaTalk</th>
+                        <th>小视频</th>
+
+                    </tr>
+                    <tr ng-repeat="x in dataObj1">
+
+                        <td>{{revenueSelName1}}</td>
+                        <th>{{x.syus_username}}</th>
+                        <th>{{x.syus_realname}}</th>
+                        <th>{{x.totalGold}}</th>
+                        <th>{{x.hb}}</th>
+                        <th>{{x.hysj}}</th>
+                        <th>{{x.fy}}</th>
+                        <th>{{x.fyb}}</th>
+                        <th>{{x.lw}}</th>
+                        <th>{{x.mht}}</th>
+                        <th>{{x.yjyx50}}</th>
+                        <th>{{x.gagatalk}}</th>
+                        <th>{{x.xsp}}</th>
+
+
+                    </tr>
+                    </thead>
+
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+<script>
+
+    app.controller('AppController',function($scope,$http){
+
+
+
+        var revenueSelId1 = '';
+        var revenueSelName1 = '';
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.revenueStarttime1 = firstDay;
+        $scope.revenueEndtime1 = nowdate;
+
+
+        $('#revenueStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#revenueEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        initPage($scope,$http);
+        $scope.getAllAgent();
+
+
+
+
+
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http) {
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+
+        $scope.getAllAgent = function(){
+            $http.post(ctx + "/useBase/getSysuserGroup")
+                .then(function(data){
+                    if(data.data.success == false){
+
+                    }else if(data.data.obj == []){
+                        return;
+                    }else{
+                        //debugger;
+                        $scope.allAgent = data.data.obj;
+                        revenueSelId1 = data.data.obj[0].group_id;
+                        revenueSelName1 = data.data.obj[0].group_name;
+
+                        $scope.revenue();
+
+                    }
+
+                },function(data){
+
+                })
+
+
+        };
+
+
+
+
+        $scope.revenueSel1 = function(e){
+            revenueSelId1 = $('#revenueSel1 option:selected').val();
+            revenueSelName1 = $('#revenueSel1 option:selected').text();
+            $scope.revenue();
+
+        };
+
+
+        $scope.revenueChangeVal1 =function(){
+            if($scope.revenueStarttime1 == ''){
+                $scope.revenueStarttime1 = firstDay;
+            }
+            if($scope.revenueEndtime1 == ''){
+                $scope.revenueEndtime1 = nowdate;
+            }
+            if($scope.revenueStarttime1 > $scope.revenueEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.revenueStarttime1 = firstDay;
+                $scope.revenueEndtime1 = nowdate;
+
+            }
+            $scope.revenue();
+
+
+        }
+
+        $scope.revenue = function(){
+
+            var dateData = {
+                startTime:$scope.revenueStarttime1,
+                endTime:$scope.revenueEndtime1,
+                group_id:revenueSelId1
+
+            };
+
+            layer.load(1,{shade: 0.3});
+            $http.post(ctx + "/useBase/getSysuserConsumAnalysis",dateData)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj1 =  data.data.data;
+
+                        $scope.dataObj1 = dataObj1;
+
+                        $scope.revenueSelName1 = revenueSelName1;
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                    layer.closeAll();
+                })
+
+        }
+
+
+    }
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+
+
+
+
+
+
+</script>
+
+

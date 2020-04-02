@@ -1,0 +1,187 @@
+
+<div ng-controller="AppController" class="user-participation">
+
+    <div class="right-model">
+        <div class="right-model-content">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        留存用户
+                    </div>
+                    <div class="title-content-right">
+						<span>
+							<input type="text" id="starttime1" class="startTime" readonly ng-model="Date1" ng-change="changeVal()">至
+                            <input type="text" id="endtime1" class="startTime" readonly ng-model="Date2" ng-change="changeVal()">
+						</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>首次使用时间</th>
+                        <th>新增用户</th>
+                        <th>留存率</th>
+                        <th colspan="8"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th colspan="2"></th>
+                            <th>1天后</th>
+                            <th>7天后</th>
+                            <th>14天后</th>
+                            <th>30天后</th>
+                        </tr>
+                        <tr ng-repeat="x in tableData">
+                            <td>{{x.statisticDate}}</td>
+                            <td>{{x.userIncreaseCount}}</td>
+                            <td>{{x.after1DayRetainPercent}}</td>
+                            <td>{{x.after7DayRetainPercent}}</td>
+                            <td>{{x.after14DayRetainPercent}}</td>
+                            <td>{{x.after30DayRetainPercent}}</td>
+
+                        </tr>
+                    </tbody>
+
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+
+    app.controller('AppController',function($scope,$http){
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.Date1 = firstDay;
+        $scope.Date2 = nowdate;
+
+        $('#starttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#endtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        initPage($scope,$http);
+        $scope.getChartDate();
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http) {
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.getChartDate = function(){
+            var dateData = {
+                startDate:$scope.Date1,
+                endDate:$scope.Date2
+
+            };
+            layer.load(1, {shade: 0.3});
+            $http.post(ctx + "/participate/retainUser",dateData)
+                .then(function(data){
+                	layer.closeAll();
+                    if(data.data.success == false){
+
+                    }else{
+                        ///debugger;
+
+                        $scope.tableData = data.data.obj.tableList;
+
+                        //分页
+                        // var totalPages;
+                        // if(totalPages % 10 == 0){
+                        //     totalPages = totalPages / 10;
+                        // }else{
+                        //     totalPages = parseInt(totalPages / 10) + 1;
+                        // }
+                        //
+                        // $('#userPages').pagination({
+                        //     pageCount: totalPages,
+                        //     totalData: resData.data.recordsTotal,
+                        //     showData: resData.data.length,
+                        //     isHode: true,
+                        //     jump: true,
+                        //     coping: true,
+                        //     keepShowPN: true,
+                        //     current: 1,
+                        //     count: 3,
+                        //     prevContent: '<上一页',
+                        //     nextContent: '下一页>',
+                        //     jumpIptCls: '跳转到',
+                        //     jumpBtn: '确定',
+                        //     callback: function (api) {
+                        //         console.log(api)
+                        //         var pageData = {
+                        //             start: api.getCurrent(),
+                        //             length: 10,
+                        //         }
+                        //         $http({
+                        //             method: 'post',
+                        //             dataType: "json",
+                        //             // headers: {'Content-Type': 'application/json'},
+                        //             url: ctx + "/participate/userIncrease",
+                        //             data: JSON.stringify(pageData),
+                        //             cache: false,
+                        //         }).then(function (data) {
+                        //             console.log(data)
+                        //         }, function () {
+                        //             console.log("pageError");
+                        //         })
+                        //     }
+                        // })
+
+
+
+
+
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+        }
+
+        $scope.changeVal =function(){
+            if($scope.Date1 == ''){
+                $scope.Date1 = firstDay;
+            }
+            if($scope.Date2 == ''){
+                $scope.Date2 = nowdate;
+            }
+            if($scope.Date1 > $scope.Date2){
+                alert("开始时间不能大于结束时间!");
+                $scope.Date1 = firstDay;
+                $scope.Date2 = nowdate;
+            }
+            $scope.getChartDate();
+
+
+        }
+
+
+
+
+
+
+    }
+
+
+</script>
+

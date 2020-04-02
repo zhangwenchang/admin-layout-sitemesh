@@ -1,0 +1,218 @@
+
+<div ng-controller="AppController" class="user-participation">
+
+    <div class="right-model">
+        <div class="right-model-content">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        汇总统计
+                    </div>
+                    <div class="title-content-right">
+						<span>
+							<input type="text" id="starttime1" class="startTime" readonly ng-model="Date1" ng-change="changeVal()">至
+                            <input type="text" id="endtime1" class="startTime" readonly ng-model="Date2" ng-change="changeVal()">
+						</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>代理商名称</th>
+                            <th>部门</th>
+                            <th>充值营收<br/>(PC+APP)</th>
+                            <th>团队合计</th>
+                            <th>新用户充值营收<br/>(PC+APP)</th>
+                            <th>小计</th>
+                            <th>新充值占比</th>
+                            <th>新用户邀请量</th>
+                            <th>新用户邀请且充值量</th>
+                            <th>新邀请用户转化率</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in vm">
+                            <td ng-bind="item.productItem.teamName" rowspan="{{item.productItem.rowspan}}"  ng-hide="!item.productItem.rowspan"></td>
+                            <td>{{item.groupName}}</td>
+                            <td>{{item.totalCount}}</td>
+                            <td ng-bind="item.productItem.totalCount" rowspan="{{item.productItem.rowspan}}"  ng-hide="!item.productItem.rowspan"></td>
+                            <td>{{item.newUserRechargeCount}}</td>
+                            <td ng-bind="item.productItem.newUserRechargeCount" rowspan="{{item.productItem.rowspan}}"  ng-hide="!item.productItem.rowspan"></td>
+                            <td>{{item.newUserRechargePercent}}</td>
+                            <td>{{item.newUserNum}}</td>
+                            <td>{{item.newUserRechargeNum}}</td>
+                            <td ng-bind="item.productItem.newUserConvertionPercent" rowspan="{{item.productItem.rowspan}}"  ng-hide="!item.productItem.rowspan"></td>
+
+                        </tr>
+
+                        <!--<tr>-->
+                            <!--<td colspan="2">郑州小计</td>-->
+                            <!--<td colspan="2"></td>-->
+                            <!--<td colspan="2"></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td>洛阳掌端</td>-->
+                            <!--<td>曹战防</td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td colspan="2">代理商合计</td>-->
+                            <!--<td colspan="2"></td>-->
+                            <!--<td colspan="2"></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                        <!--</tr>-->
+                        <!--<tr>-->
+                            <!--<td colspan="2">GaGa平台总营收合计</td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                            <!--<td colspan="2"></td>-->
+                            <!--<td></td>-->
+                            <!--<td></td>-->
+                        <!--</tr>-->
+                    </tbody>
+
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+
+    app.controller('AppController',function($scope,$http){
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+        $scope.vm = '';
+
+        $scope.Date1 = firstDay;
+        $scope.Date2 = nowdate;
+
+        $('#starttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#endtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        initPage($scope,$http);
+        $scope.getChartDate();
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http) {
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.getChartDate = function(){
+            var dateData = {
+                startDate:$scope.Date1,
+                endDate:$scope.Date2
+
+            };
+            layer.load(1,{shade: 0.3});
+
+            $http.post(ctx + "/tuiguang/rechargeSum",dateData)
+                .then(function(data){
+                    if(data.data.success == false){
+
+                    }else{
+                        ///debugger;
+
+
+                        // $scope.tableData = data.data.obj;
+
+                        var trItems = [];
+                        var seq = 0;//表示第几行
+                        data.data.obj.forEach(function (productItem) {
+                            seq++;
+                            if (productItem.groupList.length > 0) {
+                                productItem.groupList.forEach(function (part) {
+                                    part.newUserConvertionPercent = productItem.newUserConvertionPercent;
+                                    part.newUserRechargeCount1 = productItem.newUserRechargeCount;
+                                    part.newUserRechargeTotalNum = productItem.newUserRechargeTotalNum;
+                                    part.newUserTotalNum = productItem.newUserTotalNum;
+                                    part.teamId = productItem.teamId;
+                                    part.teamName = productItem.teamName;
+                                    part.totalCount1 = productItem.totalCount;
+
+                                    trItems.push(part);
+                                    if (!productItem.rowspan) {
+                                        productItem.rowspan = 1;
+                                        part.productItem = productItem;
+                                    } else {
+                                        productItem.rowspan = productItem.rowspan + 1;
+                                    }
+                                })
+                            } else {
+                                trItems.push({
+                                    "productItem": productItem
+                                });
+                                productItem.rowspan = 1;
+                            }
+                        });
+
+                        $scope.vm = trItems;
+                        console.log($scope.vm);
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                    layer.closeAll();
+                })
+
+        }
+
+
+        $scope.changeVal =function(){
+            if($scope.Date1 == ''){
+                $scope.Date1 = firstDay;
+            }
+            if($scope.Date2 == ''){
+                $scope.Date2 = nowdate;
+            }
+            if($scope.Date1 > $scope.Date2){
+                alert("开始时间不能大于结束时间!");
+                $scope.Date1 = firstDay;
+                $scope.Date2 = nowdate;
+            }
+            $scope.getChartDate();
+
+
+        }
+
+
+
+
+
+
+    }
+
+
+</script>
+

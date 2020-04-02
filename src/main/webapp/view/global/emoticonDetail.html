@@ -1,0 +1,392 @@
+
+<style type="text/css">
+.page-search-box .form-group {
+	width: 50%;
+	float: left;
+}
+
+.page-search-box .form-group .form-control {
+	height: 30px;
+}
+
+.jingque {
+	position: absolute;
+	top: 29px;
+	left: 15px;
+	font-size: 11px;
+	line-height: 11px;
+}
+
+.jingque input {
+	position: relative;
+	top: -2px;
+}
+
+.higher-group {
+	height: 30px;
+}
+
+.relative-top6 {
+	position: relative;
+	top: 6px;
+}
+
+.edit-member-ul li {
+	list-style-type: none;
+}
+
+.edit-member-ul li .labels {
+	display: inline-block;
+	width: 112px;
+}
+
+.edit-member-ul li input, .edit-member-ul li select {
+	width: 137px;
+	margin-right: 12px;
+}
+
+</style>
+<style>
+.clearfix:after{height: 0;overflow:hidden; clear: both;display: block;}
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.modal .dataTables_wrapper .dataTables_length { position: relative; left: 0; top: 0; }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+</style>
+<section class="content">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<form class="form-horizontal page-search-box" id="queryForm">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">表情包 :</label>
+							<div class="col-sm-9">
+								<select aria-controls="example1" id="emoticonId" class="form-control input-sm">
+									
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="box-footer">
+						<button type="button" onclick="search()" class="btn btn-primary search-btn">查询</button>
+					</div>
+				</form>
+
+				<!-- /.box-header -->
+				<div class="box-body mailbox-messages">
+					<table id="memberinfo" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>表情ID</th>
+								<th>表情图片地址</th>
+								<th>中文名</th>
+								<th>英文名</th>
+								<th>表情包ID</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+					</table>
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</div>
+
+		<!-- /.box -->
+	</div>
+	<!-- /.col -->
+	</div>
+	<!-- /.row -->
+</section>
+<!-- /.content -->
+</div>
+<!-- 更新弹窗 -->
+<div class="modal fade" id="modifyModal" tabindex="-1" user="dialog"
+	aria-labelledby="detailAddModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title">修改表情素材</h4>
+			</div>
+			<div class="modal-body">
+				<!-- 模态内容 -->
+				<form>
+					<div class="box-body">
+						<input type="hidden" id="id">
+						<div class="form-group">
+							<label for="realName">表情包ID：</label><input type="text"
+								class="form-control" id="emoticonId" readonly="readonly">
+						</div>
+						<div class="form-group">
+							<label for="realName">中文名：</label> <input type="text"
+								class="form-control" id="langZh" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="realName">英文名：</label> <input type="text"
+								class="form-control" id="langEn" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">表情图片：</label> <img id="imgUrl" style="width:100px;" alt="" src=""><input type="file"  id="imgUrlFile"  style="width:200px" onchange="upload(this, $('#imgUrl'))"></input>
+						</div>
+					</div>
+				</form>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"	field="closeModal">关闭</button>
+				<button type="button" class="btn btn-primary" id="modifySubmit">提交</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+</div>
+<script>
+	$(function() {
+		$.ajax({
+			url : ctx + "/emoticon/getAll",
+			success : function(data) {
+				if (data.success) {
+					var _html = '<option value="">-不限-</option>';
+					var _head = '<option value="';
+					var _end = '</option>';
+					var _list = data.obj;
+					for(var i=0;i<_list.length;i++){
+						var _e = _list[i];
+						
+						_html += _head;
+						_html += _e.id;
+						_html += '">';
+						_html += _e.name;
+						_html += _end;
+					}
+					$("#queryForm").find("#emoticonId").html(_html)
+				}
+			}
+		});
+		$.addFields([
+					'/plugins/datatables/dataTables.bootstrap.min.js',
+					'/plugins/iCheck/icheck.min.js',
+			        '/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js',     
+					'/plugins/datepicker/datepicker3.css',
+					'/plugins/datepicker/bootstrap-datepicker.js',
+					'/plugins/daterangepicker/daterangepicker-bs3.css',
+					'/plugins/daterangepicker/daterangepicker.js' ],
+					function() {
+					var tabs = $("#memberinfo").dataTable({
+								//"bProcessing": true,
+								// "bServerSide": true,
+								"bStateSave" : true, //保存客户端搜索条件等状态
+								"paging" : false, //是否开启本地分页
+								//"processing": true,   正在处理
+								"serverSide" : true, //加载就请求后台
+								"lengthChange" : false, //是否允许用户修改每页显示条数
+								"searching" : false, //是否启用本地搜索
+								"ordering" : true, //是否排序
+								"info" : true, //是否显示左下角表格信息
+								"autoWidth" : false, //自适应宽度
+								"pageLength" : 10,
+								//"ajax" : ctx+"/adminmember/notauditedimgList",
+								"fnServerData" : function(
+										sSource, aoData,
+										fnCallback, oSettings) { //从服务器返回数据
+									var membNickname = $(
+											"#membNickname")
+											.val();
+									var ischeck = $("#nolike")
+											.is(':checked');
+									var nolike = "";
+									if (ischeck) {
+										nolike = 1
+									}
+									var queryForm = $("#queryForm");
+									var _emoticonId = queryForm.find("#emoticonId").val();
+									var _langId = queryForm.find("#langId").val();
+									aoData.push(
+												{"name" : "emoticonId","value" : _emoticonId},
+												{"name" : "langId","value" : _langId}
+												)
+													layer.load(1, {
+														shade : 0.3
+													}); //加遮罩层
+													oSettings.jqXHR = $.ajax({
+														"dataType" : 'json',
+														"type" : "post",
+														"url" : ctx + "/emoticon/detail/list",
+														"data" : aoData,
+														"success" : fnCallback
+													});
+												},
+												"columns" : [
+															{"data": "id","bSortable": false },
+											   				{"data": "imgUrl","bSortable": false,"render": function ( data, type, full, meta ) {
+																	 return '<img style="width:100px;" alt="" src="'+data+'" />';
+															}},
+											   				{"data": "langZh","bSortable": false},
+											   				{"data": "langEn","bSortable": false},
+											   				{"data": "emoticonId","bSortable": false},
+											   				{"data": "操作","bSortable": false,"render": function ( data, type, full, meta ) {
+											   					return '<a href="javascript:void(0)" onclick="modifyView(\''+ full.id +'\')">编辑</a> | <a href="javascript:void(0)" onclick="deleteView(\''+ full.id +'\')">删除</a>';
+															}}
+														],
+												"columnDefs" : [
+														],
+												"fnDrawCallback" : function(oSettings) {//这个应该是重绘的回调函数
+													layer.closeAll();													
+												}
+											});
+						})
+		//更新				
+		$("#modifySubmit").click(function(){
+			var _emoticonModifyModal = $("#modifyModal");
+			var _id = _emoticonModifyModal.find("#id").val();
+			var _langZh = _emoticonModifyModal.find("#langZh").val();
+			var _langEn = _emoticonModifyModal.find("#langEn").val();
+			var _imgUrl = _emoticonModifyModal.find("#imgUrl").attr("src");
+			var data = {};
+			data["id"]= _id;
+			data["langZh"]= _langZh;
+			data["langEn"]= _langEn;
+			data["imgUrl"]= _imgUrl;
+			$.ajax({
+				url : ctx+ "/emoticon/detail/modify",
+				dataType : "json",
+				type : 'post',
+				data : data,
+				success : function(data) {
+					$('#modifyModal').modal("hide");
+					if (data.success) {
+						alert("操作成功");
+						search();
+					}else{
+						alert("操作失败");
+					}
+				}
+			})
+		})				
+			
+	});
+	function search() {
+		// $("#memberinfo").dataTable();
+		$("#memberinfo").dataTable().fnDraw(true);
+	}
+	
+	/**
+	 * 删除窗口
+	 */
+	function deleteView(id){
+		if (!confirm("确认删除此会员相关信息吗？")) {
+			return;
+		}
+		$.ajax({
+			url : ctx + "/emoticon/detail/delete",
+			data : {
+				"id" : id
+			},
+			success : function(data) {
+				if (data.success) {
+					alert("操作成功");
+					search();
+				}else{
+					alert("操作失败");
+				}
+			}
+		});
+	}
+	function modifyView(id){
+		$.ajax({
+			url : ctx + "/emoticon/detail/getById",
+			type : 'post',
+			data : {
+				"id" : id
+			},
+			success : function(data) {
+				if (data.success) {
+					var _obj = data.obj;
+					var _modifyModal = $("#modifyModal");
+					_modifyModal.find("#id").val(_obj.id);
+					_modifyModal.find("#emoticonId").val(_obj.emoticonId);
+					_modifyModal.find("#langZh").val(_obj.langZh);
+					_modifyModal.find("#langEn").val(_obj.langEn);
+					_modifyModal.find("#imgUrl").attr("src",_obj.imgUrl);
+					$('#modifyModal').modal({
+					    keyboard: true
+					});
+				}else{
+					alert("操作失败");
+				}
+			}
+		});
+	}
+	/**
+	 * 七牛上传图片
+	 */
+	//var Qiniu_UploadUrl = "http://up.qiniu.com";
+	var Qiniu_UploadUrl = "https://upload.qiniup.com";
+	var Qiniu_upload = function(f, token, key, callback) {
+		var xhr = new XMLHttpRequest();
+		xhr.open("post", Qiniu_UploadUrl, true);
+		var formData, startDate;
+		formData = new FormData();
+		if (key !== null && key !== undefined) formData.append("key", key);
+		formData.append("token", token);
+		formData.append("file", f);
+		var taking;
+		xhr.upload.addEventListener("progress", function(evt) {
+			if (evt.lengthComputable) {
+				var nowDate = new Date().getTime();
+				taking = nowDate - startDate;
+				var x = (evt.loaded) / 1024;
+				var y = taking / 1000;
+				var uploadSpeed = (x / y);
+				var formatSpeed;
+				if (uploadSpeed > 1024) {
+					formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+				} else {
+					formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+				}
+			}
+		}, false);
+		xhr.onreadystatechange = function(response) {
+			if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+				var blkRet = JSON.parse(xhr.responseText);
+				if(callback){
+					callback(qiniu+blkRet.key);
+				}
+			} else if (xhr.status != 200 && xhr.responseText) {
+				alert("上传失败!");
+			}
+		};
+		startDate = new Date().getTime();
+		xhr.send(formData);
+	};
+	/**
+	 * 上传预览图
+	 * obj 当前对象
+	 * index 对应控件id
+	 */
+	function upload(obj, imgSrcObj, imgTextObj){
+		var that=obj;
+		var key=$(that).val();
+		var token = "";
+		$.post(ctx+"/Image/uploadInit",{type:"R",imgNum:1},function(result){
+			 if(result.success){
+				token = result.obj.upToken;
+				key=result.obj.img;
+				if ($(that).length > 0 && token != "") {
+					Qiniu_upload($(that)[0].files[0], token,key,function(fileUrl){
+						imgSrcObj.attr('src',fileUrl);
+						imgTextObj.val(fileUrl);
+					});
+				} else {
+					console && console.log("form input error");
+				}
+			 }
+		});
+	}
+</script>
+</body>
+</html>

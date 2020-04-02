@@ -1,0 +1,43 @@
+#rectyperListr{
+    width: 100%;
+    height: auto;
+    position: relative;
+    font-size: 17px;
+}
+#rectyperListr .recharge_all{
+    padding: 15px 0;
+    border-bottom: solid 1px #4c4c4c;
+    position: relative;
+    width: 100%;
+}
+#rectyperListr #new_times{
+    position: relative;
+    left: 66px;
+}
+#rectyperListr .recharge_all ul{
+    overflow: hidden;
+    width: 30%;
+    height: 30px;
+    line-height: 30px;
+    border: #4c4c4c 1px solid;
+    text-align: center;
+    display: inline-block;
+    position: absolute;
+    right: 1px;
+    cursor: pointer;
+}
+
+#rectyperListr .recharge_all ul li{
+    float: left;
+    width: 33.33%;
+    height: 100%;
+
+}
+#rectyperListr .recharge_all ul li:nth-child(2){
+    border-left: #4c4c4c 1px solid;
+    border-right: #4c4c4c 1px solid;
+}
+#rectyperListr .recharge_all ul li.type_active{
+    background-color: #00a7d0;
+    color: #ffffff;
+}

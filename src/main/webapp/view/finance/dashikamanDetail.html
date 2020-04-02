@@ -1,0 +1,284 @@
+<style type="text/css">
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+</style>
+<section class="content-header">
+    <h1>大使卡维护人员明细<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>财务统计</li>
+        <li class="active">大使卡维护人员明细</li>
+    </ol>
+</section>
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+
+				<form class="form-horizontal">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">月份:</label>
+							<div class="col-sm-4">
+								<input class="form-control" id="starttime" type="text" />
+							</div>							
+<!-- 							<label for="content" class="col-sm-2 control-label">统计维度：</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="level" aria-controls="example1" id="level" onchange="search()">
+									<option value="1">自然月份统计</option>
+									<option value="2">服务月份统计</option>
+								</select>
+							</div> -->
+							<label class="col-sm-2 control-label" for="ds_name">服务gaga号</label>
+							<div class="col-sm-4">
+								<input class="form-control" id="gagano"  type="text"
+									required="required" />
+							</div>
+
+						</div>
+<!-- 						<div class="form-group" >
+							<label class="col-sm-2 control-label" for="ds_host">维护人员ID</label>
+							<div class="col-sm-4">
+								<input class="form-control" id="sysuser" type="text" />
+							</div>
+							<label class="col-sm-2 control-label" for="ds_name">服务gaga号</label>
+							<div class="col-sm-4">
+								<input class="form-control" id="gagano"  type="text"
+									required="required" />
+							</div>
+						</div> -->
+
+					</div>
+					<!-- /.box-body -->
+					<div class="box-footer">
+						<button type="button" onclick="search()" class="btn btn-primary">查询</button>
+						<!--<button type="button" onclick="batchdel()" class="btn btn-primary">导出</button>-->
+					</div>
+					<!-- /.box-footer -->
+				</form>
+
+				<!-- /.box-header -->
+				<div class="box-body mailbox-messages">
+					<table id="rechargeconsum" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>维护人员姓名</th>
+								<th>维护人员ID</th>
+								<th>服务嘎嘎号</th>
+								<th>服务天数</th>
+								<th>是否再次充值</th>
+								<th>所属服务商</th>
+								<th>所属小组</th>
+								<th>是否为组长</th>
+								<th>服务达标天数</th>
+								<th>工资</th>
+								<th>公司名称</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+				<!-- /.box-body -->
+			</div>
+
+			<!-- /.box -->
+		</div>
+		<!-- /.col -->
+	</div>
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="Modalpage" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog" style="width:60%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabelpage">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontentpage">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbuttonpage">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+$(function() {
+	laydate.render({ 
+		  elem: '#starttime'
+		  ,type: 'month'
+		  ,value: '2017-09'
+	//	   ,max: '2018-08-31'
+		});
+	laydate.render({ 
+		  elem: '#endtime'
+		  ,type: 'month'
+		  ,value: '2017-10'
+		  ,eventElem: '#endtime'
+		 ,trigger: 'click'		  
+		});
+	
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        $("#rechargeconsum").dataTable({
+           "dom": 'T<"clear">lfrtip',
+             "tableTools": {
+                 "sSwfPath": "/gaga_sns_admin/plugins/datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
+             },
+            "bLengthChange": true,
+        	"bStateSave": true, 
+        	"paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength":30,
+
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	var starttime = $("#starttime").val();
+	        	var endtime = $("#endtime").val();
+	        	var level = $('#level').val();
+	        	level = (level)?level:1 ;
+	        	aoData.push(
+	        			{"name":"startTime","value":starttime},
+	        			{"name":"level","value":level},
+	        			{"name":"gagano","value":$('#gagano').val()},
+	        			{"name":"sysuser","value":$('#sysuser').val()}
+	        			)
+	        	//aoData=gagaidorname; 
+            layer.load(1, {shade: 0.3});
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/finance/dashikamanDetail",
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "syus_realname","bSortable": false ,"defaultContent":"","bVisible":false},
+				{"data": "syus_username","bSortable": false,"defaultContent":"","bVisible":false},
+				{"data": "memb_gagano","bSortable": false,"defaultContent":""},
+				{"data": "fudays","bSortable": false ,"defaultContent":""},
+				{"data": "isreach","bSortable": false,"defaultContent":""},
+				{"data": "syde_name","bSortable": false,"defaultContent":""},
+				{"data": "team","bSortable": false,"defaultContent":"","bVisible":false},
+				{"data": "isLeader","bSortable": false,"defaultContent":"","bVisible":false},
+				{"data": "okdays","bSortable": false },
+				{"data": "salary","bSortable": false },
+				{"data": "companyName","bSortable": false }
+	        ], 
+	         "columnDefs": [
+				{"targets": 4,
+					"render": function ( data, type, full, meta ) {
+							//console.log(data)
+							if(data==1){return "是"}
+							else if(data==0){return "否"}
+							else{return "" }
+				}},
+				{"targets": 0,
+					"render": function ( data, type, full, meta ) {
+							if(data==0){return ""}
+							else{return data }
+				}},
+				{"targets": 6,
+					"render": function ( data, type, full, meta ) {
+							if(data){return "第"+data+"组"}
+							else{return data }
+				}},
+				{"targets": 8,
+					"render": function ( data, type, full, meta ) {
+							if(data){
+								//var random = Math.floor(Math.random()*(2+1));
+								//if(random<data){data = data -random;}
+								//data=Math.ceil(data*0.90);
+							}
+							return data;
+				}},
+				{"targets": 7,
+					"render": function ( data, type, full, meta ) {
+						//console.log(data)
+						if(data==1){return "是"}
+						else if(data==0){return "否"}
+						else{return "" }
+				}},
+				],
+	            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                layer.closeAll();
+            	 
+	            }
+	    });
+        
+        
+    });
+});
+
+
+//查询
+function search(){
+	if($('#lev'))
+	var starttime = $('#starttime').val();
+    var endtime = $('#endtime').val();
+    $('#enddate').text(starttime);
+    $('#startdate2').text(starttime);
+    $('#enddate2').text(endtime);
+	$("#rechargeconsum").dataTable().fnDraw(true);
+}
+</script>
+
+
+

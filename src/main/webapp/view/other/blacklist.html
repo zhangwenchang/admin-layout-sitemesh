@@ -1,0 +1,454 @@
+<style type="text/css">
+.retop-label { position: relative; margin-right: 15px;}
+.retop-label input { margin-right: 3px; }
+li{list-style: none;}
+</style>
+<section class="content-header">
+    <h1>黑名单管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>其他管理</li>
+        <li class="active">黑名单管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+              <div class="box-header">
+              <div class="form-group">
+                <label class="retop-label">
+                  <input type="radio" name="querynaidip" class="minimal" value="1">昵称
+                </label>
+                <label class="retop-label">
+                  <input type="radio" name="querynaidip" class="minimal" value="2">GAGA号
+                </label>
+                <label class="retop-label">
+                  <input type="radio" name="querynaidip" class="minimal" value="3">IP
+                </label>
+                <label class="vertical-middle">
+                       <div class="input-group" style="width: 150px;">
+                        <input name="table_search" id="gagaidorname" class="form-control input-sm pull-right" placeholder="" type="text">
+                        <div class="input-group-btn">
+                          <button class="btn btn-sm btn-default" onclick="search()">查询</button>
+                        </div>
+                      </div>
+                </label>
+              </div>
+               <div class="input-group-btn">
+                          <button class="btn btn-sm btn-default" onclick="add(1)">添加</button>
+                        </div>
+              </div>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="blacklist" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>昵称</th>
+                    <th>GAGA号</th>
+                    <th>IP</th>
+                    <th>备注</th>
+                    <th>是否解除</th>
+                    <th>编辑</th>
+                    <th>拉黑日期</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        $("#blacklist").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var gagaidorname = $("#gagaidorname").val();
+                var type="";
+                var checkval = $('input[name="querynaidip"]:checked ').val();
+            	if(checkval=='1'){
+            		type=1;
+            	}else if(checkval=='2'){
+            		type=2;
+            	}else if(checkval=='3'){
+            		type=3;
+            	}
+                aoData.push({
+                        "name": "content",
+                        "value": gagaidorname
+                    },{
+                        "name": "type",
+                        "value": type
+                    })
+                    //aoData=gagaidorname; 
+                    layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/blacklist/findblacklist",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+             "columns": [{
+                "data": "sbliId",
+                "bSortable": false
+            }, {
+                "data": "member.membNickname",
+                "bSortable": false
+            }, {
+                "data": "member.membGagano",
+                "bSortable": false
+            }, {
+                "data": "sbliIp",
+                "bSortable": false
+            }, {
+                "data": "sbliReason",
+                "bSortable": false
+            },{
+                "data": "sbliGagaid",
+                "bSortable": false
+            },{
+                "data": "sbliId",
+                "bSortable": false
+            },{
+                "data": "sbliStime",
+                "bSortable": false
+            }],
+            "columnDefs": [{
+                "targets": 1,
+                "data": "member.membNickname",
+                "render": function(data, type, full, meta) {
+                	if(data==null||data==''){
+                		return "";
+                	}
+                    return data;
+                }
+            },{
+                "targets": 2,
+                "data": "member.membGagano",
+                "render": function(data, type, full, meta) {
+                	if(data==null||data==''){
+                		return "";
+                	}
+                    return data;
+                }
+            },{
+                "targets": 3,
+                "data": "sbliIp",
+                "render": function(data, type, full, meta) {
+                	if(data==null||data==''){
+                		return "";
+                	}
+                    return data;
+                }
+            }, {
+                "targets": 4,
+                "data": "sbliReason",
+                "render": function(data, type, full, meta) {
+                    if (data == null||data=='') {
+                        return "";
+                    } else {
+                        return data;
+                    }
+                }
+            }, {
+                "targets": 5,
+                "data": "sbliGagaid",
+                "render": function(data, type, full, meta) {
+                    return '<a href="javascript:void(0)" onclick="unbundling('+data+','+full.sbliId+',1)">解除</a>';
+                }
+            }, {
+                "targets": 6,
+                "data": "sbliId",
+                "render": function(data, type, full, meta) {
+                    return '<a href="javascript:void(0)" onclick="edit('+data+',1)">编辑</a>';
+                }
+            }, {
+                "targets": 7,
+                "data": "sbliStime",
+                "render": function(data, type, full, meta) {
+                	if(data==null||data==''){
+                		return "";
+                	}else{
+	                	var date = new Date(data);
+    	    	    	return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                	}
+                }
+            }],
+            "fnDrawCallback": function(oSettings) {
+              layer.closeAll();
+            }
+        });
+        //序号相关
+        var table = $('#blacklist').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+    })
+    })
+    
+//解除黑名单
+function unbundling(id,sbid,type){
+	if(type==1){
+		$("#ModalLabel").text("提示");
+		   var html='<button type="button" onclick="unbundling('+id+','+sbid+',2)" class="btn btn-primary">确定 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>';
+		   $("#modalbutton").html(html);
+		   var body = '<span>确定要解除所选项吗？</span>';
+		   $("#bodycontent").html(body);
+		   $('#Modal').modal({
+			      keyboard: true
+		   })
+	}
+	if(type==2){
+		if(id=='undefined'||id==''||id==null){
+			id="";
+		}
+		$.ajax({
+			type: "post",
+	        url: ctx + "/blacklist/relieveblack",
+	        dataType: "json",
+	        data: {
+	            "gagaid": id,
+	            "sbid":sbid
+	        },
+	        success: function(data) {
+	        	$("#blacklist").dataTable().fnDraw(false);
+	        	$('#Modal').modal('hide');
+	        }
+		})
+	}
+}
+//查询
+function search() {
+	$("#blacklist").dataTable().fnDraw(false);
+    
+}
+
+//添加
+function add(type){
+	if(type=="1"){
+		$("#ModalLabel").text("编辑黑名单用户");
+		   var html='<button type="button" onclick="add(2)" class="btn btn-primary">确定 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>';
+		   $("#modalbutton").html(html);
+		   var content = '<li><span>选择类型：</span><select id="blacktype"><option value="1">GAGA号</option><option value="2">会员IP</option></select></li><br>'+
+		   '<li><span>ID/IP：</span><input type="text" id="idorip"></li><br>'+
+		   '<li><span>备注：</span><textarea rows="3" cols="" class="vertical-top" id="remark"></textarea></li><br>';
+		   $("#bodycontent").html(content);
+		   
+		   $('#Modal').modal({
+			      keyboard: true
+		   })
+		   
+	}
+	if(type=="2"){
+		var ipcheck = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+		var idorip = $("#idorip").val();
+		var blacktype = $("#blacktype").val();
+		var remark = $("#remark").val();
+		var flag = true;
+		if(blacktype=="2"){
+			if(!ipcheck.test(idorip)){
+				if(idorip!='0:0:0:0:0:0:0:1'){
+					flag=false;
+				}	
+			}
+		}else{
+			var numcheck =/^[0-9]*$/;
+			if(!numcheck.test(idorip)){
+				$("#errorbodycontent").html("请输入正确的嘎嘎号数字");
+				   $('#errorModal').modal({
+						keyboard : true
+					});
+				return;
+			}else if(!idorip){
+				$("#errorbodycontent").html("请输入嘎嘎号数字");
+				   $('#errorModal').modal({
+						keyboard : true
+					});
+				return;
+			}
+		}
+		if(flag){
+			$.ajax({
+				type : "post",
+				url : ctx+"/blacklist/addblack",
+				dataType : "json",
+				data : {
+					"type":blacktype,
+					"content":idorip,
+					"remark":remark
+				},
+				success : function(data) {
+					if(data.success){
+						$("#blacklist").dataTable().fnDraw(false);
+						$('#Modal').modal('hide');
+					}else{
+						$("#errorbodycontent").html(data.msg);
+						   $('#errorModal').modal({
+								keyboard : true
+							});
+					}
+				}
+			})
+		}else{
+			$("#errorbodycontent").html("请输入正确的IP");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		}
+	}
+}
+//编辑修改
+function edit(id,type){
+	if(type=='1'){
+		$("#ModalLabel").text("编辑黑名单用户");
+		   var html='<button type="button" onclick="edit('+id+',2)" class="btn btn-primary">确定 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>';
+		   $("#modalbutton").html(html);
+		   var content = '<li><span>选择类型：</span><select id="blacktype"><option value="1">GAGA号</option><option value="2">会员IP</option></select></li><br>'+
+		   '<li><span>ID/IP：</span><input type="text" id="idorip"></li><br>'+
+		   '<li><span>备注：</span><textarea rows="3" cols="" class="vertical-top" id="remark"></textarea></li><br>';
+		   $("#bodycontent").html(content);
+		   
+		   $.ajax({
+				type : "post",
+				url : ctx+"/blacklist/editblack",
+				dataType : "json",
+				data : {
+					"blickid":id,
+				},
+				success : function(data) {
+					if(data.success){
+						$("#blacktype").val(data.obj.sbliType);
+						if(data.obj.sbliType==1){
+							$("#idorip").val(data.obj.member.membGagano);
+						}else{
+							$("#idorip").val(data.obj.sbliIp);
+						}
+						$("#remark").val(data.obj.sbliReason);
+					}
+				}
+			})
+		   
+		   $('#Modal').modal({
+			      keyboard: true
+		   })
+	}
+	if(type=='2'){
+		var ipcheck = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+		var idorip = $("#idorip").val();
+		var blacktype = $("#blacktype").val();
+		var remark = $("#remark").val();
+		var flag = true;
+		if(blacktype=="2"){
+			if(!ipcheck.test(idorip)){
+				if(idorip!='0:0:0:0:0:0:0:1'){
+					flag=false;
+				}	
+			}
+		}
+		if(flag){
+			$.ajax({
+				type : "post",
+				url : ctx+"/blacklist/updateblack",
+				dataType : "json",
+				data : {
+					"blickid":id,
+					"type":blacktype,
+					"content":idorip,
+					"remark":remark
+				},
+				success : function(data) {
+					if(data.success){
+						$("#blacklist").dataTable().fnDraw(false);
+						$('#Modal').modal('hide');
+					}else{
+						$("#errorbodycontent").html(data.msg);
+						   $('#errorModal').modal({
+								keyboard : true
+							});
+					}
+				}
+			})
+		}else{
+			$("#errorbodycontent").html("请输入正确的IP");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		}
+	}
+}
+</script>
+

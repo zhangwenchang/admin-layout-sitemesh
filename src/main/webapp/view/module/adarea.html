@@ -1,0 +1,459 @@
+<section class="content-header">
+    <h1>广告区管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>广告管理</li>
+        <li class="active">广告区管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+              <div class="box-header">
+              <button type="button" onclick="addadarea(1)" class="btn btn-primary">添加</button>
+              </div>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="adarea" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>广告区名称</th>
+                    <th>广告分类</th>
+                    <th>广告区描述</th>
+                    <th>广告区标识</th>
+                    <th>广告区语言</th>
+                    <th>广告区排序</th>
+                    <th>广告区模板</th>
+                    <th>广告区结果</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="Modalalert" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabelalert">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontentalert">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbuttonalert">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        console.log(1);
+
+        $("#adarea").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                    //aoData=gagaidorname;
+                    layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/adarea/adarealist",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) { 
+            	$(".htmltemlpath",$(nRow)).text(aData['adareatemplatepath']);
+            	$(".htmlteml",$(nRow)).text(aData['adareatemplateresult']);
+            	
+            },
+            "columns": [{
+                "data": "adareaname",
+                "bSortable": false
+            }, {
+                "data": "adcategory.categoryname",
+                "bSortable": false
+            }, {
+                "data": "adareamemo",
+                "bSortable": false
+            }, {
+                "data": "areacode",
+                "bSortable": false
+            }, {
+                "data": "arealanguage",
+                "bSortable": false
+            }, {
+                "data": "adareaorder",
+                "bSortable": false
+            }, {
+                "data": "adareatemplatepath",
+                "bSortable": false
+            }, {
+                "data": "adareatemplateresult",
+                "bSortable": false
+            },{
+                "data": "createtime",
+                "bSortable": false,"bVisible":false
+            },{
+                "data": "adareaid",
+                "bSortable": false
+            }] ,
+            "columnDefs": [{
+                "targets": 2,
+                "data": "adareamemo",
+                "render": function(data, type, full, meta) {
+                	 if (data == ""||data==null) {
+                         return "";
+                     } else {
+                         return data;
+                     }
+                }
+            }, {
+                "targets": 5,
+                "data": "adareaorder",
+                "render": function(data, type, full, meta) {
+                    if (data == ""||data==null) {
+                        return "";
+                    } else {
+                        return data;
+                    }
+                }
+            }, {
+                "targets": 6,
+                "data": "adareatemplatepath",
+                "width":"360px",
+                "render": function(data, type, full, meta) {
+                	if (data == ""||data==null) {
+                        return "";
+                    } else {
+                    	var htmlstr="<span class='htmltemlpath' style='width:350px;display:inline-block;max-height: 100px;overflow: auto;'></span>";
+                        return htmlstr;
+                    }
+                }
+            }, {
+                "targets": 7,
+                "data": "adareatemplateresult",
+                "width":"360px",
+                "render": function(data, type, full, meta) {
+                	if (data == ""||data==null) {
+                        return "";
+                    } else {
+                    	var htmlstr="<span class='htmlteml' style='width:350px;display:inline-block;max-height: 100px;overflow: auto;'></span>";
+                        return htmlstr;
+                    }
+                }
+            }, {
+            
+                "targets": 8,
+                "data": "createtime",
+                "render": function(data, type, full, meta) {
+                	if(data==""||data==null){
+                		return "";
+                	}else{
+                		var date = new Date(data);
+        	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                	}
+                }
+            }, {
+                "targets": 9,
+                "data": "categoryid",
+                "render": function(data, type, full, meta) {
+                	var html='<a href="javascript:void(0)" onclick="editadarea('+data+',1)">编辑</a> <a href="javascript:void(0)" onclick="delarea('+data+')">删除</a>';
+			 	 	return html;
+                }
+            } ], 
+            "fnDrawCallback": function(oSettings) {
+              layer.closeAll();
+            }  
+        });
+    });
+});
+
+/**
+ * 删除分类
+ */
+function delarea(id){
+	$.post(ctx+"/adarea/deladarea",{adid:id},function(result){
+		 if(result.success){
+			 $("#errorbodycontent").html("删除成功");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+			 $("#adarea").dataTable().fnDraw(false)
+			 //alert('<spring:message code="ihome.member.text.forgetpwd.emailsentsuccess"/>'); 
+		 }else{
+			 $("#errorbodycontent").html(result.msg);
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		 }
+	});
+}
+
+//编辑广告区
+function editadarea(id,type){
+	if(type==1){
+		$("#ModalLabel").text("添加广告区");
+		   var content = '<span>广告区名称：</span><input type="text" id="areaname" ><br><br>'+
+		   '<span>广告区语言：</span><span id="arealanguage"></span><br><br>'+
+		   '<span>广告区分类：</span><select id="areacategory"></select><br><br>'+
+		   '<span>广告区描述：</span><span><textarea class="vertical-top" rows="3" cols="60" id="arearemark"></textarea></span><br><br>'+
+		   '<span>广告区模板：</span><span><textarea class="vertical-top" rows="8" cols="60" id="areatemplate"></textarea></span>';
+		var seldata ='<option value="">请选择</option>';
+		$("#bodycontent").html(content);
+		$.ajax({
+			type : "post",
+			url : ctx+"/adarea/editadarea",
+			dataType : "json",
+			data:{adid:id},
+			success : function(data) {
+				if(data.success){
+					var adarea = data.obj.adarea
+					var category = data.obj.category
+					category.forEach(function(item){  
+						seldata+='<option value="'+item.categoryid+'">'+item.categoryname+'</option>';  
+					}); 
+					$("#areacategory").html(seldata);
+					
+					$("#areacategory").val(adarea.adcategoryid);
+					$("#areaname").val(adarea.adareaname);
+					
+					$("#arealanguage").text(adarea.arealanguage);
+					$("#arearemark").val(adarea.adareamemo);
+					$("#areatemplate").val(adarea.adareatemplatepath);
+				}else{
+					$("#errorbodycontent").html(data.msg);
+					   $('#errorModal').modal({
+							keyboard : true
+						});
+				}
+			}
+		})
+		  
+		   
+		   $("#modalbutton").html('<button type="button" onclick="editadarea('+id+',2)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		   //$("#mailsender").val('GaGaHi');
+		   $('#Modal').modal({
+			      keyboard: true
+		   });
+	   }
+	  if(type==2){
+		  var areaname = $("#areaname").val();
+		  var areacategory = $("#areacategory").val();
+		  var arearemark = $("#arearemark").val();
+		  var areatemplate = $("#areatemplate").val();
+		  if(areaname==''){
+			  $("#errorbodycontent").html("请输入广告区名称");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		  }else if(areacategory==''){
+			  $("#errorbodycontent").html("请选择广告分类");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		  }else if(areatemplate==''){
+			  $("#errorbodycontent").html("请输入广告区模板");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		  }else{
+			$('#Modalalert').modal({
+			      keyboard: true
+		   	});
+		   	$("#ModalLabelalert").text("修改广告区");
+		   	$("#bodycontentalert").html('<span>修改广告区,其下所有广告项将被删除，广告区结果需重新添加广告项进行生成</span>');
+		   	$("#modalbuttonalert").html('<button type="button" onclick="updateadarea('+id+')" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		  }
+	  }
+}
+
+//修改广告区
+function updateadarea(id){
+	var areaname = $("#areaname").val();
+	var areacategory = $("#areacategory").val();
+	var arearemark = $("#arearemark").val();
+	var areatemplate = $("#areatemplate").val();
+	$.ajax({
+		type : "post",
+		url : ctx+"/adarea/updateadarea",
+		dataType : "json",
+		data : {
+			"adid":id,
+			"areaname":areaname,
+			"categoryid":areacategory,
+			"remark":arearemark,
+			"adareatemplate":areatemplate
+		},
+		success : function(data) {
+			if(data.success){
+				$("#adarea").dataTable().fnDraw(false)
+				$("#Modal").modal('hide');
+				$("#Modalalert").modal('hide');
+			}else{
+				$("#errorbodycontent").html(data.msg);
+				   $('#errorModal').modal({
+						keyboard : true
+					});
+			}
+		}
+	})
+}
+//添加
+function addadarea(type) {
+	if(type==1){
+		 $("#ModalLabel").text("添加广告区");
+		   var content = '<span>广告区名称：</span><span><input type="text" id="areaname" ></span><br><br>'+
+		   '<span>广告区分类：</span><span><select id="areacategory"></select></span><br><br>'+
+		   '<span>广告区描述：</span><span><textarea class="vertical-top" rows="3" cols="60" id="arearemark"></textarea></span><br><br>'+
+		   '<span>广告区模板：</span><span><textarea class="vertical-top" rows="8" cols="60" id="areatemplate"></textarea></span>';
+		var seldata ='<option value="">请选择</option>';
+		$.ajax({
+			type : "post",
+			url : ctx+"/adcategory/findcategorys",
+			dataType : "json",
+			success : function(data) {
+				if(data!=null){
+					data.forEach(function(item){  
+						seldata+='<option value="'+item.categoryid+'">'+item.categoryname+'</option>';  
+					}); 
+					$("#areacategory").html(seldata);
+				}
+			}
+		})
+		  
+		   $("#bodycontent").html(content);
+		   $("#modalbutton").html('<button type="button" onclick="addadarea(2)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		   //$("#mailsender").val('GaGaHi');
+		   $('#Modal').modal({
+			      keyboard: true
+		   });
+	   }
+	  if(type==2){
+		  var areaname = $("#areaname").val();
+		  var areacategory = $("#areacategory").val();
+		  var arearemark = $("#arearemark").val();
+		  var areatemplate = $("#areatemplate").val();
+		  if(areaname==''){
+			  $("#errorbodycontent").html("请输入广告区名称");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		  }else if(areacategory==''){
+			  $("#errorbodycontent").html("请选择广告分类");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		  }else if(areatemplate==''){
+			  $("#errorbodycontent").html("请输入广告区模板");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		  }else{
+			  $.ajax({
+					type : "post",
+					url : ctx+"/adarea/addadarea",
+					dataType : "json",
+					data : {
+						"areaname":areaname,
+						"categoryid":areacategory,
+						"remark":arearemark,
+						"adareatemplate":areatemplate
+					},
+					success : function(data) {
+						if(data.success){
+							$("#adarea").dataTable().fnDraw(false)
+							$("#Modal").modal('hide');
+						}else{
+							$("#errorbodycontent").html(data.msg);
+							   $('#errorModal').modal({
+									keyboard : true
+								});
+						}
+					}
+				})
+		  }
+	  }
+}
+
+function search() {
+    $("#category").dataTable().fnDraw(false);
+}
+</script>
+

@@ -1,0 +1,859 @@
+<style>
+<!--
+.con{
+word-wrap: break-word;
+word-break: normal;
+}
+.zone-head { margin-bottom: 12px; }
+.zone-main { border: solid 1px #b7b7b7;  margin-bottom: 12px; }
+.zone-main .lan { border-bottom: solid 1px #b7b7b7; height: 24px; padding: 0; }
+.zone-main .lan li { border-right: solid 1px #b7b7b7;  list-style: none;  float: left; line-height: 24px; width: 13%; text-align: center; cursor: pointer; }
+.zone-main .lan li.last { width: 9%; border: none; }
+.zone-main .lan li.on { background-color: #e6e6e6; }
+.zone-main .lan li sup { color: #F00; }
+.zone-word { padding: 0;  margin-bottom: 0;}
+.zone-word li { list-style: none;  float: left; width: 100%; position: relative; }
+.zone-word li textarea { border: none; width: 100%; height: 161px;  }
+.zone-word li .textCode { height: 30px;  position: absolute;  right: 0;  top: 139px;  width: 70px; text-align: center; }
+.zone-main .zone-bottom { position: relative;  top: -3px; right: 0;  height: 24px; }
+.zone-main .zone-bottom i { font-style: normal; position: absolute; right: 0px; cursor: pointer; }
+.zone-main .zone-bottom i.links { right: 141px;  }
+.zone-main .zone-bottom i.qface { right: 84px; }
+.qqFace { bottom: 32px; right: -3px; }
+.zone-main .zone-bottom .qqFace .qqFaceTriangle { right: 91px; }
+.datepicker { z-index: 1051 !important; }
+.itemImgBox { padding-left: 0; }
+.itemImgBox li { float: left; height: 92px; width: 92px; position: relative; }
+.itemImgBox li img { width: 100%; height: 100%; }
+.itemImgBox li span { position: absolute; display: block; top: 0; right: 0; background: #F00; cursor: pointer; }
+#zoneTop { padding: 16px 22px 0; }
+.zone-word ul.wysihtml5-toolbar>li { width: auto; }
+-->
+</style>
+<section class="content-header">
+  <h1>发布置顶动态<small></small></h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+    <li>官方消息管理</li>
+    <li class="active">发布置顶动态</li>
+  </ol>
+</section>
+<section class="content-main">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+        <form class="form-horizontal">
+          <div class="box-body">
+            
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer">
+            <button type="button" class="btn btn-default" onclick="search()">刷新</button>
+            <button type="button" onclick="batchDel()" class="btn btn-primary">删除</button>
+            <button type="button" class="btn btn-primary addDZone">发布新动态</button>
+          </div>
+          <!-- /.box-footer -->
+        </form>
+        <div class="box-body mailbox-messages">
+          <table id="tableData" class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th width="70">序号</th>
+                <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+                <th width="90">发布账号</th>
+                <th>发布内容</th>
+                <!--<th  width="90">创建时间</th>-->
+                <th width="90">发布时间</th>
+                <th width="90">结束时间</th>
+                <th width="110">操作</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      
+      <!-- /.box -->
+    </div>
+    <!-- /.col -->
+  </div>
+</section>
+<script type="text/javascript">
+var departIdTmp = '',
+  roleIdTmp = '',
+  roleNameTmp = '';
+$(function() {
+  $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js', '/plugins/daterangepicker/daterangepicker.js', '/plugins/datepicker/bootstrap-datepicker.js', '/plugins/datepicker/datepicker3.css', '/plugins/qqface/jquery.qqFace.js', '/plugins/qqface/webuploader.js'], function() {
+    console.log(1);
+
+    $('#sendDate').daterangepicker({
+      timePicker: true,
+      timePickerIncrement: 30,
+      format: 'YYYY-MM-DD HH:mm'
+    });
+
+    /*
+    , {
+        "data": "zone_datetime",
+        "bSortable": false
+      }
+      , {
+        "targets": 4,
+        "render": function(data, type, full, meta) {
+          var dstr = '';
+          if (data != null) {
+            dstr = new Date(data).format('yyyy-MM-dd hh:mm:ss');
+          }
+          return dstr;
+        }
+      }
+    */
+
+    var t = $("#tableData").dataTable({
+      "bStateSave": true,
+      "paging": true,
+      //"processing": true,
+      "serverSide": true,
+      "lengthChange": false,
+      "searching": false,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "pageLength": 20,
+      "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+        layer.load(1, {shade: 0.3});
+        oSettings.jqXHR = $.ajax({
+          "dataType": 'json',
+          "type": "POST",
+          "url": ctx + "/Message/zoneTopList",
+          "data": aoData,
+          "success": fnCallback
+        });
+      },
+      "columns": [{
+        "data": "zone_id",
+        "bSortable": false
+      }, {
+        "data": "zone_zoneid",
+        "bSortable": false
+      }, {
+        "data": "syme_gagano",
+        "bSortable": false
+      }, {
+        "data": "zone_content",
+        "bSortable": false
+      }, {
+        "data": "zone_stime",
+        "bSortable": false
+      }, {
+        "data": "zone_etime",
+        "bSortable": false
+      }, {
+        "data": "zone_id",
+        "bSortable": false
+      }],
+
+      "columnDefs": [{
+        "targets": 1,
+        "render": function(data, type, full, meta) {
+          return '<input type="checkbox" value="' + data + '" title="' + data + '" name="groupId" />';
+        }
+      }, {
+        "targets": 2,
+        "render": function(data, type, full, meta) {
+          var dstr = "";
+          if (data != null && data != undefined) {
+            dstr = data;
+          }
+          return dstr;
+        }
+      },/* {
+        "targets": 3,
+        "render": function(data, type, full, meta) {
+          var dstr = "";
+          if (data != null && data != undefined) {
+            var tmpCon = $.getFaceImg(data);
+            if (tmpCon.length > 20) {
+              dstr = "<div class='con'>" + tmpCon.substring(0, 20) + "...</div>";
+            } else {
+              dstr = "<div class='con'>" + tmpCon + "</div>";
+            }
+          }
+          return dstr;
+        }
+      },*/ {
+        "targets": 3,
+        "render": function(data, type, full, meta) {
+          var dstr = "";
+          if (data != null && data != undefined) {
+            var tmpCon = $.getFaceImg(data);
+            /*
+            if (tmpCon.length > 20) {
+              dstr = "<div class='con'>" + tmpCon.substring(0, 20) + "...</div>";
+            } else {
+              dstr = "<div class='con'>" + tmpCon + "</div>";
+            } */
+            dstr = "<div class='con'>" + tmpCon + "</div>";
+          }
+          if (full.imgList && full.imgList.length > 0) {
+            dstr += "<br/>";
+            dstr += "<img src='" + qiniu + full.imgList[0].zoimImgurl + "' border=1 width='80' />";
+            /*for(var i=0;i<full.imgList.length;i++){
+              dstr+="<img src='"+qiniu+full.imgList[i].zoimImgurl+"' border=1 width='80' />";
+            }*/
+          }
+          return dstr;
+        }
+      }, {
+        "targets": 4,
+        "render": function(data, type, full, meta) {
+          var dstr = '';
+          if (data != null) {
+            //dstr = new Date(data).format('yyyy-MM-dd hh:mm:ss', true);
+            dstr = data;
+          }
+          return dstr;
+        }
+      }, {
+        "targets": 5,
+        "render": function(data, type, full, meta) {
+          var dstr = '';
+          if (data != null) {
+            //dstr = new Date(data).format('yyyy-MM-dd hh:mm:ss', true);  
+            dstr = data;
+          }
+          return dstr;
+        }
+      }, {
+        "targets": 6,
+        "render": function(data, type, full, meta) {
+          var lnks = '';
+          if (full.is_end == 1) {
+            lnks += '已结束';
+          } else {
+            lnks += '<a href="javascript:end(' + data + ', \'' + full.zone_zoneid + '\');">立即结束</a>';
+          }
+          lnks += '<br/><a href="javascript:upd(\'' + full.zone_zoneid + '\');">编辑</a>';
+          lnks += ' <a href="javascript:content(\'' + full.zone_zoneid + '\');">查看</a>';
+          lnks += ' <a href="javascript:del(\'' + full.zone_zoneid + '\');">删除</a>';
+          return lnks;
+        }
+      }],
+
+      "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+        $(".mailbox-messages input[type='checkbox']").iCheck({
+          checkboxClass: 'icheckbox_flat-blue',
+          radioClass: 'iradio_flat-blue'
+        });
+        layer.closeAll();
+        $("#tableData .fa").removeClass('fa-check-square-o').addClass('fa-square-o');
+      }
+    });
+
+    //序号相关
+    var table = $('#tableData').DataTable();
+    table.on('order.dt search.dt', function() {
+      //获取页信息
+      //debugger
+      var page = table.page.info();
+      table.column(0, {}).nodes().each(function(cell, i) {
+        cell.innerHTML = page.page * page.length + i + 1;
+      });
+    }).draw();
+
+    $(".checkbox-toggle").click(function() {
+      if ($(this).find('i.fa').hasClass('fa-check-square-o')) {
+        $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+        $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+      } else {
+        $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+        $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+      }
+    });
+  });
+});
+
+$('.addDZone').click(function(){
+  add(undefined, 'add');
+});
+function add(zoneData, zType) {
+  var zoneHtmlTpl = $('#zoneTopTmp').html();
+  /*
+  $('#zoneTopConModal').modal({
+    keyboard: true
+  });
+  $('#zoneTopConModal').on('show.bs.modal', function() {
+    modalInit();
+    $('#zoneTopConModal button[field="closeModal"]').click(function() {
+      refreshdata();
+  });
+  });
+  */  
+  //console.log(zoneData, zType);
+  modalInit();
+  
+  function modalInit() {
+      layer.open({
+      type: 1,
+      title: '评论详情',
+      content: '<div id="zoneTop">' + $('#zoneTopTmp').html() + '</div>',
+      skin: 'add-dzone-box',
+      area: ['700px','575px'],
+      btn: ['保存','返回列表'],
+      shadeClose: true,
+      zIndex: 1041,
+      yes: function() {
+          var _newData = pushZone();
+          //console.log(_newData);
+          if (_newData) {
+              if (zType == 'edit') {
+                  editZoneMethod(_newData);
+              } else if (zType == 'add') {
+                  addZoneMethod(_newData);
+              }        
+          }
+      },
+      end: function() {
+          refreshdata();
+      }
+    });      
+    var $zoneBox = $('#zoneTop');
+    var pushObj = {};
+    if (zType != 'view') {
+      $zoneBox.find('.zoneTime').daterangepicker({timePicker: true, timePickerIncrement: 1, format: 'YYYY-MM-DD HH:mm:ss'});
+    }
+    $zoneBox.find('.lan li').removeClass('on').first().addClass('on');
+    $zoneBox.find('.zone-word .lanitem').hide().first().show();
+    $zoneBox.find('.lan li').click(function() {
+      $(this).siblings().removeClass('on').end().addClass('on');
+      $zoneBox.find('.zone-word .lanitem:visible .upLoad_box').hide().empty();
+      var index = $(this).index();
+      $zoneBox.find('.zone-word .lanitem').hide().eq(index).show();
+    });
+    
+    $.post(apiUrl + '/OffiAccount/dicList', function(data) {
+        if (data.success) {
+          if (data.obj && data.obj.length) {
+            var html = '';
+            $.each(data.obj, function(i, n) {
+              html += '<option value="' + n.syme_gagaid + '">' + n.memb_nickname + '</option>';
+            });
+            $zoneBox.find('.gaganos').html(html);
+
+            $zoneBox.find('.zone-word .lanitem').each(function(i, n) {
+              pushObj[$(n).attr('field')] = new langPushObj($(n));
+            });
+            if (zType != 'add') {
+              setZoneData(zoneData);
+            }            
+
+            if (zType != 'view') {
+              $('.add-dzone-box .layui-layer-btn0').removeClass('hide');
+            } else {
+              $('.add-dzone-box .layui-layer-btn0').addClass('hide');
+            }            
+          }
+        } else {
+          layer.msg(data.msg);
+        }
+    });
+
+    function langPushObj(obj) {
+      var $container = $(obj);
+      var $textArea = $container.find('textarea');
+      var $wordLen = $container.find('.textNum');
+      var $linkI = $container.find('.links');
+      var $faceI = $container.find('.qface');
+      var $imgUploadI = $container.find('.upimg');
+      var $upImgBox = $container.find('.upLoad_box');
+      var $addLink = $container.find('.links');
+      var imgArr;
+      var textName = $textArea.attr('name');
+      var start = 0, 
+          end = 0;
+      var newImgArr = [];
+
+      $textArea.attr('id', textName);      
+      //$textArea.wysihtml5();      
+      //$container.find('[data-wysihtml5-command="insertImage"]').hide();
+      $textArea.select(function(event) {
+        if ($(this)[0].selectionStart != undefined && $(this)[0].selectionEnd != undefined) {
+          start = $(this)[0].selectionStart;
+          end = $(this)[0].selectionEnd;
+        }
+      });
+      $addLink.click(function() {
+        if (start != undefined && end != undefined) {
+          var $thisTextArea = $(this).closest('.lanitem').find('textarea')
+          var oldTxt = $thisTextArea.val();
+          var startTxt, centerTxt, endTxt;
+          startTxt = oldTxt.substring(0, start);
+          centerTxt = oldTxt.substring(start, end);
+          endTxt = oldTxt.substring(end);
+          var propIndex = layer.prompt({
+            title: '请输入链接',
+          }, function(link) {
+            layer.close(propIndex);
+            if (link.indexOf('http') == -1) {
+              link = 'http://' + link;
+            }
+            $thisTextArea.val(startTxt + '<a href="' + link + '" target="_blank">' + centerTxt + '</a>' + endTxt)
+          });
+        }
+      });
+      $faceI.qqFace({
+        assign: textName,
+        path: facePath
+      });
+      //发布图片动态
+      $imgUploadI.click(function() {
+        if (!$container.attr('zoneid')) {
+          layer.msg('上传图片之前必须先创建动态。', {time: 1000});
+          layer.close('all');
+          return;
+        }
+        if (Number($container.attr('imgCount')) >= 9) {
+          layer.msg('不能上传更多图片');
+          return;
+        }
+        if ($upImgBox.is(':visible')) {
+          return;
+        }
+        $upImgBox.show();
+        if ($upImgBox.html() == '') {
+          $upImgBox.append('<div class="upLoad_main"><i class="triangle"></i><span class="fr"><i class="z_dt_icon inlineblock dt_upCancel mr10">x</i></span><span class="inlineblock mb10">本地上传</span><div id="uploader"class="wu-example"><div class="info inlineblock mb10"></div><div class="queueList"><div id="dndArea"class="placeholder"><div id="filePicker"></div></div><div id="filePicker2"></div></div><div class="btns"><div class="uploadBtn">开始上传</div></div></div></div>');
+        }
+        $('#js_publish').addClass('on');
+        var oldNum = Number($container.attr('imgCount'));
+        $.fn.uploadImg({
+          'num': 9 - Number($container.attr('imgCount'))
+        }, function(data, block) {
+           $container.attr('imgCount', oldNum + Number($container.attr('upImgNum')));
+           $container.removeAttr('upImgNum');
+           var $showImgBox = $zoneBox.find('.lanitem:visible .itemImgBox');
+           $showImgBox.show();
+           var imgHtml = '';
+           $.each(imgArr, function(i, n) {
+              imgHtml += '<li class="new"><img src="' + qiniu + n + '" zoimid="' + (newImgArr.length > 0 ? newImgArr[i] : '') + '"><span class="delImg">删除</span></li>';
+           });
+           $showImgBox.append(imgHtml);
+           $upImgBox.hide();
+           $upImgBox.empty();
+        });
+        $.ajaxSetup({
+          cache: true
+        });
+      });
+      $container.on("click", ".dt_upCancel", function() {
+        $upImgBox.hide();
+        $upImgBox.empty();
+      });
+      $container.on("click", ".uploadBtn", function() {
+        //上传图片功能, 1、判断是否以后id 2、根据id（或空）上传图片，更新已有动态图片（产生新动态）
+        //console.log($container);        
+        var imgNum = $upImgBox.find("li").size();
+        $.post(apiUrl + "/Image/uploadInit", {
+            "type": "D",
+            "imgNum": imgNum
+        }, function(z) {
+          $upImgBox.attr('id','upLoad_box');
+          if (z.success) {
+              imgArr = z.obj.img;
+              $container.attr('upImgNum', imgArr.length);
+              $upImgBox.attr({
+                  "data-upToken": z.obj.upToken,
+                  "data-key": imgArr
+              });
+              $.post(apiUrl + "/Message/zoneTopPublishImg", {
+                    "zoneId": $container.attr('zoneId'),
+                    "img": imgArr
+              }, function(f) {
+                  if (f.success) {
+                      console.log('动态中图片更新成功');
+                      if (f.obj && f.obj.length > 0) {
+                        newImgArr = f.obj;
+                        var $newli = $container.find('.itemImgBox li.new');
+                        if ($newli.length > 0) {
+                          $.each(newImgArr, function(i, n) {
+                            $($newli[i]).attr('zoimid', n);
+                          });
+                          newImgArr.length = 0;
+                        }
+                      }                      
+                  }
+              })
+          }
+        });
+      });
+
+      $container.on("click", ".delImg", function() {
+        var $thisLi = $(this).closest('li');
+        var $thisZoneLi = $(this).closest('.lanitem');
+        var imgCount = Number($thisZoneLi.attr('imgcount'));
+        var delImgArr = [$thisLi.find('img').attr('zoimid')];
+        $.post(apiUrl + "/Message/zoneTopDelImg", {
+          'zoimId': delImgArr
+        }, function(data) {
+          if (data.success) {
+            $thisLi.remove();
+            $thisZoneLi.attr('imgcount', (imgCount-1));
+          } else {
+            layer.msg(data.msg);
+          } 
+        })
+      });
+
+      this.getData = function() {
+        var content = $.trim($textArea.val());
+        if (content) {
+          return content.replace(/\</g, '&lt;').replace(/\>/g, '&gt;');
+        } else {
+          return;
+        }
+      };
+
+      this.setUpImg = function() {
+
+      };
+    }
+
+    function pushZone() {
+      var time = $zoneBox.find('.zoneTime').val();  
+      var data = {
+        'gagaId': Number($zoneBox.find('.gaganos').val()),
+        'beginTime': time.split(' - ')[0],
+        'endTime': time.split(' - ')[1],
+        'content': [],
+        'language': []
+      };
+      if (data.gagaId && data.beginTime && data.endTime) {
+        if (!pushObj['zh-cn'].getData() || !pushObj['en-us'].getData()) {
+          layer.msg('中文、英文动态不能为空!');
+          return;
+        }
+        $.each(pushObj, function(i, n) {
+          var _data = n.getData();
+          if (_data) {            
+            data.content.push(_data);
+            data.language.push(i);
+          }
+        });
+        if (zType == 'edit' && $zoneBox.find('.zone-word').attr('groupid')) {
+          data.groupId = $zoneBox.find('.zone-word').attr('groupid');
+        }
+        return data;
+      } else {
+        layer.msg('数据不完整');
+        return false;
+      }
+    };
+
+    function setZoneData(zoneData) {
+        var timeTxt = (new Date(zoneData.obj[0].zoneStime).format('yyyy-MM-dd hh:mm:ss', true)) + ' - ' + (new Date(zoneData.obj[0].zoneEtime).format('yyyy-MM-dd hh:mm:ss', true));
+        $zoneBox.find('.zoneTime').val(timeTxt);
+        $zoneBox.find('.zoneTime').data('daterangepicker').setStartDate(new Date(zoneData.obj[0].zoneStime).format('yyyy-MM-dd hh:mm:ss', true));
+        $zoneBox.find('.zoneTime').data('daterangepicker').setEndDate(new Date(zoneData.obj[0].zoneEtime).format('yyyy-MM-dd hh:mm:ss', true));
+        $zoneBox.find('.gaganos').val(zoneData.obj[0].zoneGagaid);
+        if (zType == 'view') {
+          $zoneBox.find('.gaganos option').each(function(i, n) {
+              if ($(n).attr('value') != zoneData.obj[0].zoneGagaid) {
+                $(n).remove();
+              }
+          });
+        }
+        $zoneBox.find('.zone-word').attr({
+          'groupId': zoneData.obj[0].zoneZoneid,
+          'zoneGagaid': zoneData.obj[0].zoneGagaid
+        });
+        $.each(zoneData.obj, function(i, n) {
+          var $liObj = $zoneBox.find('li[field=' + n.zoneLanguage + ']');
+          $liObj.attr('zoneId', n.zoneId);
+          $liObj.attr('imgCount', n.imgList.length);
+          $liObj.find('textarea').val($.string.decodeHtml(n.zoneContent));
+          if (n.imgList && n.imgList.length) {
+              $liObj.find('.itemImgBox').show();
+               var imgHtml = '';
+               $.each(n.imgList, function(i, n) {
+                  imgHtml += '<li><img src="' + qiniu + n.zoimImgurl + '" zoimId="' + n.zoimId + '" alt="动态图片">' + (zType == 'edit'? '<span class="delImg">删除</span>' : '') + '</li>';
+               });
+               $liObj.find('.itemImgBox').html(imgHtml);
+          }          
+        });
+        if (zType == 'view') {
+          $zoneBox.find('.zone-word .zone-bottom').remove();
+          $zoneBox.find('.zone-word .textCode').remove();
+        }
+    }
+
+    function addZoneMethod(_Data) {
+      $.post(apiUrl + '/Message/zoneTopPublish', _Data, function(data) {
+        if (data.success) {
+            $('.layui-layer-btn1').click();
+            /*
+            $zoneBox.find('.zone-word').attr('groupId', data.attributes.groupId);
+            $.each(_Data.language, function(i, n) {
+                $zoneBox.find('.zone-word li[field' + n + ']').attr('zoneId', data.obj[i]);
+            });*/
+            layer.msg(data.msg);
+        } else {
+            layer.msg(data.msg);
+        }
+      }) 
+    }
+
+    function editZoneMethod(_Data) {
+      $.post(apiUrl + '/Message/zoneTopMod', _Data, function(data) {
+        if (data.success) {
+            layer.msg(data.msg);
+        } else {
+            layer.msg(data.msg);
+        }
+      }) 
+    }
+
+  }
+}
+
+function content(zoneTopId) {
+  //获取信息
+  doPost("Message/zoneTopGet", {
+    "groupId": zoneTopId
+  }, function(data) {
+      conHd(data, 'view')
+  }, errorHd);
+}
+
+
+function upd(zoneTopId) {
+  //获取信息
+  doPost("Message/zoneTopGet", {
+    "groupId": zoneTopId
+  }, function(data) {
+      conHd(data, 'edit')
+  }, errorHd);
+}
+
+function conHd(data, type) {
+  if (data.success) {
+    //详情
+    /*
+    var tmp = "";
+    tmp += "<div class='con'>"
+    var con = data.obj.zoco_content;
+    if (con != null && con != undefined) {
+      tmp += $.getFaceImg(con);
+    }
+    tmp += "</div><br/>";
+    $("#zoneTopTmp").html(tmp);
+    $('#zoneTopConModal').modal({
+      keyboard: true
+    }); */
+    add(data, type);
+  } else {
+    $.msg(data.msg);
+  }
+}
+
+function errorHd(xreq) {
+  $.msg(xreq.statusText + "[" + xreq.status + "]");
+}
+//立即结束
+function end(id, groupId) {
+  var t = confirm("确定要立即结束此组置顶动态吗？");
+  if (t) {
+    doPost("Message/zoneTopEnd", {
+      "groupId": groupId
+    }, endHd, errorHd);
+  }
+}
+
+function endHd(data) {
+  if (data.success) {
+    $.msg(data.msg);
+    refreshdata();
+  } else {
+    $.msg(data.msg);
+  }
+}
+//删除
+function del(groupId) {
+  var t = confirm("确定要删除选定的置顶动态吗？删除将会一并删除同组其他语言置顶动态！");
+  if (t) {
+    doPost("Message/zoneTopDel", {
+      "groupIds[]": [groupId]
+    }, delHd, errorHd);
+  }
+}
+
+function delHd(data) {
+  if (data.success) {
+    refreshdata();
+  } else {
+    $.msg(data.msg);
+  }
+}
+//批量删除
+function batchDel() {
+  var chk_value = [];
+  $('input[name="groupId"]:checked').each(function() {
+    chk_value.push($(this).val());
+  });
+  if (chk_value.length == 0) {
+    $.msg("请选择要删除的置顶动态");
+  } else {
+    var t = confirm("确定要删除选定的置顶动态吗？删除将会一并删除同组其他语言置顶动态！");
+    if (t) {
+      doPost("Message/zoneTopDel", {
+        "groupIds[]": chk_value
+      }, delHd, errorHd);
+    }
+  }
+}
+//刷新表格
+function refreshdata() {
+  $("#tableData").dataTable().fnDraw(false);
+}
+
+function search() {
+  $("#tableData").dataTable().fnDraw(false);
+}
+</script>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="zoneTopConModal" tabindex="-1" role="dialog"
+aria-labelledby="zoneTopConModalLabel" aria-hidden="true">
+<div class="modal-dialog" style="width:60%;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+      &times;
+      </button>
+      <h4 class="modal-title" id="zoneTopConModalLabel">
+      评论详情
+      </h4>
+    </div>
+    <div class="modal-body" id="zoneTopConModalCon">
+      <!-- 模态内容 -->
+      <div id="zoneTop1"></div>
+      <!-- /模态内容 -->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default push" class="push">保存</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal" field="closeModal">返回列表</button>
+    </div>
+    </div><!-- /.modal-content -->
+  </div>
+</div>
+<div id="zoneTopTmp" class="hide">
+        <div class="zone-head">
+          <span>持续时间：</span><input type="text" class="zoneTime" style="width: 40%; margin-right: 6px;">
+          <!--<span>结束时间：</span><input type="text" id="zoneendtime" style="width: 23%;  margin-right: 6px;">-->
+          <span>使用账号：</span>
+          <select class="form-control input-sm gaganos" style="width: 23%; display:inline-block;">
+            <option value="1">gagahi</option>
+            <option value="2">微博</option>
+          </select>
+        </div>
+        <div class="zone-main">
+          <ul class="lan clearfix">
+            <li>简体中文<sup>*</sup></li>
+            <li>繁体中文</li>
+            <li>英文<sup>*</sup></li>
+            <li>西班牙文</li>
+            <li>韩文</li>
+            <li>日语</li>
+            <li>德语</li>
+            <li class="last">俄语</li>
+          </ul>
+          <ul class="zone-word clearfix">
+            <li class="lanitem" field="zh-cn">
+              <textarea name="zone_text0" id="" placeholder="发布动态-简体中文"></textarea>
+              <div class="textCode position_r"><div class="textCode_bg"><span class="textNum">0/500</span></div></div>
+              <div class="zone-bottom">
+                <i class="links">链接地址</i>
+                <i class="qface">表情</i>
+                <i class="upimg">上传图片</i>
+                <div class="upLoad_box" style="display:none"></div>
+              </div>
+              <ul class="itemImgBox clearfix" style="display:none"></ul>
+            </li>
+            <li class="lanitem" field="zh-tw">
+              <textarea name="zone_text1" id="" placeholder="发布动态-繁体中文"></textarea>
+              <div class="textCode position_r"><div class="textCode_bg"><span class="textNum">0/500</span></div></div>
+              <div class="zone-bottom">
+                <i class="links">链接地址</i>
+                <i class="qface">表情</i>
+                <i class="upimg">上传图片</i>
+                <div class="upLoad_box" style="display:none"></div>
+              </div>
+              <ul class="itemImgBox clearfix" style="display:none"></ul>
+            </li>
+            <li class="lanitem" field="en-us">
+              <textarea name="zone_text2" id="" placeholder="发布动态-英文"></textarea>
+              <div class="textCode position_r"><div class="textCode_bg"><span class="textNum">0/500</span></div></div>
+              <div class="zone-bottom">
+                <i class="links">链接地址</i>
+                <i class="qface">表情</i>
+                <i class="upimg">上传图片</i>
+                <div class="upLoad_box" style="display:none"></div>
+              </div>
+              <ul class="itemImgBox clearfix" style="display:none"></ul>
+            </li>
+            <li class="lanitem" field="es-es">
+              <textarea name="zone_text3" id="" placeholder="发布动态-西班牙文"></textarea>
+              <div class="textCode position_r"><div class="textCode_bg"><span class="textNum">0/500</span></div></div>
+              <div class="zone-bottom">
+                <i class="links">链接地址</i>
+                <i class="qface">表情</i>
+                <i class="upimg">上传图片</i>
+                <div class="upLoad_box" style="display:none"></div>
+              </div>
+              <ul class="itemImgBox clearfix" style="display:none"></ul>
+            </li>
+            <li class="lanitem" field="ko-kr">
+              <textarea name="zone_text4" id="" placeholder="发布动态-韩文"></textarea>
+              <div class="textCode position_r"><div class="textCode_bg"><span class="textNum">0/500</span></div></div>
+              <div class="zone-bottom">
+                <i class="links">链接地址</i>
+                <i class="qface">表情</i>
+                <i class="upimg">上传图片</i>
+                <div class="upLoad_box" style="display:none"></div>
+              </div>
+              <ul class="itemImgBox clearfix" style="display:none"></ul>
+            </li>
+            <li class="lanitem" field="ja-jp">
+              <textarea name="zone_text5" id="" placeholder="发布动态-日文"></textarea>
+              <div class="textCode position_r"><div class="textCode_bg"><span class="textNum">0/500</span></div></div>
+              <div class="zone-bottom">
+                <i class="links">链接地址</i>
+                <i class="qface">表情</i>
+                <i class="upimg">上传图片</i>
+                <div class="upLoad_box" style="display:none"></div>
+              </div>
+              <ul class="itemImgBox clearfix" style="display:none"></ul>
+            </li>
+            <li class="lanitem" field="de-de">
+              <textarea name="zone_text6" id="" placeholder="发布动态-德文"></textarea>
+              <div class="textCode position_r"><div class="textCode_bg"><span class="textNum">0/500</span></div></div>
+              <div class="zone-bottom">
+                <i class="links">链接地址</i>
+                <i class="qface">表情</i>
+                <i class="upimg">上传图片</i>
+                <div class="upLoad_box" style="display:none"></div>
+              </div>
+              <ul class="itemImgBox clearfix" style="display:none"></ul>
+            </li>
+            <li class="lanitem" field="ru-ru">
+              <textarea name="zone_text7" id="" placeholder="发布动态-俄文"></textarea>
+              <div class="textCode position_r"><div class="textCode_bg"><span class="textNum">0/500</span></div></div>
+              <div class="zone-bottom">
+                <i class="links">链接地址</i>
+                <i class="qface">表情</i>
+                <i class="upimg">上传图片</i>
+                <div class="upLoad_box" style="display:none"></div>
+              </div>
+              <ul class="itemImgBox clearfix" style="display:none"></ul>
+            </li>
+          </ul>
+        </div>
+</div>
+<!-- /.modal -->

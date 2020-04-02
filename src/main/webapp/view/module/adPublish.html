@@ -1,0 +1,497 @@
+<style>
+    .layui-input-block {
+        margin-left: 135px;
+    }
+
+    .layui-form-label {
+        width: 100px;
+    }
+
+</style>
+<section class="content-header">
+    <h1>
+        广告发布管理
+        <small></small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>模块管理</li>
+        <li class="active">广告发布管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="layui-fluid">
+        <div class="layui-row">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">广告名称</label>
+                        <div class="layui-input-block">
+                            <input id="ad_title_s" type="text" name="ad_title_s" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">广告位置</label>
+                        <div class="layui-input-block">
+                            <select name="ad_position_s" id="ad_position_s">
+                                <option value="">全部</option>
+                                <option value="0">app发现</option>
+                                <option value="1">app我的</option>
+                                <option value="2">app国际圈</option>
+                                <option value="3">app偶遇</option>
+                                <option value="100">pc偶遇</option>
+                                <option value="101">pc动态</option>
+                                <option value="102">pc左栏</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <select name="ad_state_s" id="ad_state_s">
+                                <option value="">全部</option>
+                                <option value="3">待审核</option>
+                                <option value="6">已拒绝</option>
+                                <option value="9">已通过</option>
+                                <option value="10">投放中</option>
+                                <option value="12">到期已结束</option>
+                                <option value="15">余额不足已结束</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">app/pc</label>
+                        <div class="layui-input-block">
+                            <select name="ad_flag_s" id="ad_flag_s">
+                                <option value="">全部</option>
+                                <option value="app">app</option>
+                                <option value="pc">pc</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <button class="layui-btn layui-btn-normal" id="searchEx">搜索</button>
+            <button class="layui-btn layui-btn-normal" id="openAdd">发布广告</button>
+        </div>
+        <div class="layui-fluid">
+            <table class="layui-hide" id="adCommerceTable" lay-filter="adCommerceTable"></table>
+        </div>
+    </div>
+</section>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <div id="chat_box">
+                    <div class="layui-row">
+                        <form class="layui-form" action="" lay-filter="formTest">
+                            <input type="hidden" name="ad_id" id="ad_id"/>
+                            <input type="hidden" name="ad_type" id="ad_type" value="0"/>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">标题</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="ad_title" required lay-verify="required"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">跳转地址</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="click_url" required
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">app/pc</label>
+                                <div class="layui-input-block">
+                                    <select name="ad_flag" id="ad_flag">
+                                        <option value="app">app</option>
+                                        <option value="pc">pc</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">语言</label>
+                                <div class="layui-input-block">
+                                    <select name="lang_id" id="lang_id">
+                                        <option value="zh_CN">zh_CN</option>
+                                        <option value="en">en</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">状态</label>
+                                <div class="layui-input-block">
+                                    <select name="ad_state" id="ad_state">
+                                        <option value="10">投放中</option>
+                                        <option value="12">到期已结束</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">广告图片上传</label>
+                                <div class="layui-input-block">
+                                    <input type="file" name="adimg" onchange="upload(this)"
+                                           class="layui-input">
+                                    <input type="hidden" name="image_url" id="image_url"/>
+                                    <img src="" id="image_url_img" onclick="imageclick(this)" class="min"
+                                         style="width: 200px;">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">广告位置</label>
+                                <div class="layui-input-block">
+                                    <select name="ad_position" id="ad_position">
+                                        <option value="">全部</option>
+                                        <option value="0">app发现</option>
+                                        <option value="1">app我的</option>
+                                        <option value="2">app国际圈</option>
+                                        <option value="3">app偶遇</option>
+                                        <option value="4">app国际圈投放广告</option>
+                                        <option value="100">pc动态</option>
+                                        <option value="101">pc偶遇</option>
+                                        <option value="102">pc左栏</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">图片宽度</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="image_width" required
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">图片高度</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="image_height" required
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">app跳转类型</label>
+                                <div class="layui-input-block">
+                                    <select name="ad_mode" id="ad_mode">
+                                        <option value="0">无跳转</option>
+                                        <option value="1">站内</option>
+                                        <option value="2">站外</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">app站内跳转页面</label>
+                                <div class="layui-input-block">
+                                    <select name="jump_type" id="jump_type">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+<script>
+    layui.use(['form', 'upload', 'table', 'element', 'laydate'], function () {
+        //获取form模块
+        var form = layui.form, table = layui.table, element = layui.element;
+        table.render({
+            id: 'adCommerceTable',
+            elem: '#adCommerceTable',
+            url: ctx + '/adPublish/list',
+            where: {
+                ad_position: $("#ad_position_s").val()
+                , ad_title: $("#ad_title_s").val()
+                , ad_state: $("#ad_state_s").val()
+                , ad_flag: $("#ad_flag_s").val()
+            },
+            //	method: 'post' //	默认 get
+            //	contentType: 'application/json'
+            toolbar: true,
+            defaultToolbar: ['filter'],
+            even: true, //	开启隔行背景
+            title: '广告发布管理',
+            limits: [10, 30, 50, 100, 500, 1000],
+            limit: 30,
+            cols: [[{
+                field: 'i',
+                title: '序号',
+                type: 'numbers'
+            }, {
+                field: 'create_time',
+                title: '创建时间'
+                , templet: function (res) {
+                    if (res != null) {
+                        const date = new Date(res.create_time);
+                        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    }
+                }
+                , width: 150
+            }, {
+                field: 'ad_title',
+                title: '广告标题'
+            }, {
+                field: 'lang_id',
+                title: '语言'
+            }, {
+                field: 'ad_position',
+                title: '广告位置'
+                , templet: function (res) {
+                    if (res != null) {
+                        //0：app发现1：app我的2：app国际圈100:pc动态101:pc偶遇
+                        switch (res.ad_position) {
+                            case 0:
+                                return 'app发现';
+                            case 1:
+                                return 'app我的';
+                            case 2:
+                                return 'app国际圈系统广告';
+                            case 3:
+                                return 'app偶遇';
+                            case 4:
+                                return 'app国际圈投放广告';
+                            case 100:
+                                return 'pc偶遇';
+                            case 101:
+                                return 'pc动态';
+                            case 102:
+                                return 'pc左栏';
+                        }
+                    }
+                }
+            }, {
+                field: 'click_url',
+                title: '落地页链接'
+            }, {
+                field: 'image_url',
+                title: '投放图片'
+                , templet: function (res) {
+                    return '<img class="min" onclick="imageclick(this)" src="' + res.image_url + '" />'
+                }
+            }, {
+                field: 'ad_state',
+                title: '状态'
+                , templet: function (res) {
+                    switch (res.ad_state) {
+                        case 0:
+                            return "未支付";
+                        case 3:
+                            return "待审核";
+                        case 6:
+                            return "已拒绝";
+                        case 9:
+                            return "已通过";
+                        case 10:
+                            return "投放中";
+                        case 12:
+                            return "到期已结束";
+                        case 15:
+                            return "余额不足已结束";
+                    }
+                }
+            }, {
+                field: 'ad_flag',
+                title: 'app/pc'
+            }, {
+                field: 'jump_type',
+                title: 'jump_type'
+            }, {
+                field: 'ad_mode',
+                title: 'app跳转类型'
+                , templet: function (res) {
+                    if (res != null) {
+                        //0:无跳转1：站内2：站外
+                        switch (res.ad_mode) {
+                            case 0:
+                                return '无跳转';
+                            case 1:
+                                return '站内';
+                            case 2:
+                                return '站外';
+                        }
+                    }
+                }
+            }, {
+                field: 'image_width',
+                title: 'image_width'
+            }, {
+                field: 'image_height',
+                title: 'image_height'
+            }, {
+                title: '操作',
+                toolbar: '#barDemo'
+            }
+            ]],
+            page: true
+        });
+        //	监听行工具事件
+        table.on('tool(adCommerceTable)', function (obj) {
+            const data = obj.data;
+            console.log(data)
+            $('#jump_type').empty();
+            if (obj.event === 'edit') {
+                $('#myModal').modal('show');
+                $("#image_url_img").attr('src', data.image_url);
+                $.ajax({
+                    url: ctx + "/adPublishAppClass/getAppClass",
+                    async: false,
+                    success: function (res) {
+                        if (res.success) {
+                            $.each(res.obj, function (index, item) {
+                                $('#jump_type').append(new Option(item.jump_type + item.remark, item.jump_type));// 下拉菜单里添加元素
+                            });
+                            form.render("select");
+                        }
+                    }
+                });
+                form.val("formTest", {
+                    "ad_flag": data.ad_flag
+                    , "ad_id": data.ad_id
+                    , "ad_state": data.ad_state
+                    , "ad_title": data.ad_title
+                    , "ad_type": data.ad_type
+                    , "click_url": data.click_url
+                    , "ad_mode": data.ad_mode
+                    , "ad_position": data.ad_position
+                    , "image_url": data.image_url
+                    , "jump_type": data.jump_type
+                    , "lang_id": data.lang_id
+                    , "image_height": data.image_height
+                    , "image_width": data.image_width
+                });
+            }
+        });
+        //		搜索 按钮
+        $('#searchEx').click(function () {
+            table.reload('adCommerceTable', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                , where: {
+                    ad_position: $("#ad_position_s").val()
+                    , ad_title: $("#ad_title_s").val()
+                    , ad_state: $("#ad_state_s").val()
+                    , ad_flag: $("#ad_flag_s").val()
+                }
+            });
+        });
+        form.on('submit(formDemo)', function (data) {
+            $.post(ctx + "/adPublish/update", data.field, function (result) {
+                if (result.success) {
+                    layer.msg("操作成功！");
+                    $('#myModal').modal('hide');
+                    table.reload('adCommerceTable');
+                } else {
+                    layer.msg("操作失败！")
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        $('#openAdd').click(function () {
+            $('#myModal').modal('show');
+            $("#image_url_img").attr('src', '');
+            form.val("formTest", {
+                "ad_flag": ''
+                , "ad_id": ''
+                , "ad_state": ''
+                , "ad_title": ''
+                , "ad_type": ''
+                , "click_url": ''
+                , "ad_mode": ''
+                , "ad_position": ''
+                , "image_url": ''
+                , "jump_type": ''
+                , "lang_id": ''
+                , "image_height": ''
+                , "image_width": ''
+            });
+            $('#jump_type').empty();
+            $.ajax({
+                url: ctx + "/adPublishAppClass/getAppClass",
+                async: false,
+                success: function (res) {
+                    if (res.success) {
+                        $.each(res.obj, function (index, item) {
+                            $('#jump_type').append(new Option(item.jump_type + item.remark, item.jump_type));// 下拉菜单里添加元素
+                        });
+                        form.render("select");
+                    }
+                },
+            });
+
+        });
+
+
+    });
+    /**
+     * 七牛上传图片
+     */
+    const Qiniu_UploadUrl = "https://upload.qiniup.com";
+    const Qiniu_upload = function (f, token, key, name) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", Qiniu_UploadUrl, true);
+        var formData, startDate;
+        formData = new FormData();
+        if (key !== null && key !== undefined) {
+            formData.append("key", key);
+        }
+        formData.append("token", token);
+        formData.append("file", f);
+        xhr.onreadystatechange = function (response) {
+            if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+                var blkRet = JSON.parse(xhr.responseText);
+                $("#image_url_img").attr('src', qiniu + blkRet.key);
+                $("#image_url").val(qiniu + blkRet.key);
+            } else if (xhr.status != 200 && xhr.responseText) {
+                alert("上传失败!");
+            }
+        };
+        startDate = new Date().getTime();
+        xhr.send(formData);
+    };
+
+    function upload(obj) {
+        var that = obj;
+        //  console.log(that);
+        var key = $(that).val();
+        var imageType = key.split(".");
+        $("#imageType").val(imageType[1]);
+        var token = "";
+        $.post(ctx + "/Image/uploadInit", {type: "R", imgNum: 1}, function (result) {
+            if (result.success) {
+                token = result.obj.upToken;
+                key = result.obj.img;
+                if ($(that).length > 0 && token != "") {
+                    Qiniu_upload($(that)[0].files[0], token, key, that.name);
+                } else {
+                    console && console.log("form input error");
+                }
+            }
+        });
+    }
+
+    function imageclick(obj) {
+        layer.photos({
+            photos: {"data": [{"src": obj.src}]}
+        });
+    }
+
+</script>

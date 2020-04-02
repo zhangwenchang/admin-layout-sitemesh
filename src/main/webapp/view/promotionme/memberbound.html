@@ -1,0 +1,555 @@
+<section class="content-header">
+    <h1>账号绑定<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>推广管理</li>
+        <li class="active">账号绑定</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          <form class="form-horizontal">
+              <div class="box-body">
+             <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">开始时间：</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="starttime">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">结束时间：</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="endtime">
+                  </div>
+                </div>
+                          
+              </div>
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>
+               <button type="button" onclick="boundmember(1)" class="btn btn-primary">绑定账号</button>
+               <!-- <button type="button" onclick="deldata()" class="btn btn-primary">删除</button>  -->
+              </div>
+              </form>
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="memberbound" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+                    <th>会员</th>
+                    <th>现推广链接</th>
+                    <th>现推广链接二维码</th>
+                    <th>旅游推广链接</th>
+                    <th>邀请时间</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table> 
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+       <!--   按钮触发模态框 -->
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">	
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+        
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="erweima" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width: 375px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body" style="padding:0;"> <div id="tup" style="text-align: center;margin: 0 auto;"></div>
+            	<img id="avatar" src="">
+             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="downloadIamge('avatar', '图片名称')">图片另存为</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<script type="text/javascript">
+$(function() {
+	 $('#starttime').datepicker({format: 'yyyy-mm-dd'});
+	 $('#endtime').datepicker({format: 'yyyy-mm-dd'});
+		 
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+
+       var tabs= $("#memberbound").dataTable({
+            "bStateSave": true,//开关，是否打开客户端状态记录功能。这个数据是记录在cookies中的，  
+          //打开了这个记录后，即使刷新一次页面，或重新打开浏览器，之前的状态都是保存下来的-  ------当值为true时aoColumnDefs不能隐藏列  
+            "paging": true,
+            //"processing": true,	//如果想加上一点页面加载效果，可以增加 { "processing" : true } 】。
+            "serverSide": true,	//已保证页面在加载时就请求后台，以及每次对 datatable 进行操作时也是请求后台。
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            //处理服务器返回来的数据  fnServerData
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var starttime = $("#starttime").val();
+                var endtime = $("#endtime").val();
+                 aoData.push(
+                		 {"name": "starttime","value": starttime},
+                		 {"name": "endtime","value": endtime}
+                		 ) 
+                var url=(tabs)?(ctx + "/extensionUser/memberbinding"):"#";
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": url,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "stmeId",
+                "bSortable": false	//设置不允许排序
+            }, {
+                "data": "stmeId",
+                "bSortable": false
+            }, {
+                "data": "member.membNickname",
+                "bSortable": false
+                
+            },  {
+                "data": "member.membGagaid",
+                "bSortable": false
+            },   {
+                "data": "stmeUrlname",
+                "bSortable": false,"defaultContent":""
+            },{
+                "data": "member.membGagaid",
+                "bSortable": false
+            },
+            {
+                "data": "stmeTime",
+                "bSortable": false
+            }, {
+                "data": "stmeId",
+                "bSortable": false
+            }],
+            "columnDefs": [{
+                "targets": 1,
+                "data": "stmeId",
+                "render": function(data, type, full, meta) {
+                    return '<input type="checkbox" value="' + data + '" title="' + data + '" name="checkbox" />';
+                }
+            },{
+                "targets": 3,
+                "render": function(data, type, full, meta) {
+                	//这里做修正  以后用k  不进行加密    stmeUrlname是用户自定义推广链接后缀字段
+                	if(full.stmeUrlname==''){
+                		return '';
+                	}else{
+                		return "https://www.gagahi.com/k/"+full.stmeUrlname;
+                	}
+                }
+            },{
+                "targets": 4,
+                "render": function(data, type, full, meta) {
+                	if(full.stmeUrlname){
+                		return ' <a href="javascript:void(0)" onclick="openQrcode(\''+ data +'\')">生成</a>';
+                		// jQuery('#qrcode').qrcode({width: 200,height: 200,correctLevel:0,render: "table",text: "https://www.gagahi.com/k/"+full.stmeUrlname}); 
+                	}
+                }
+            },{
+                "targets": 5,
+                "render": function(data, type, full, meta) {
+                	if(full.stmeUrlname==''){
+                		return '';
+                	}else{
+                		return "https://www.gagahi.com/y/"+full.stmeUrlname;
+                	}
+                }
+            },
+            {
+                "targets": 6,
+                "data": "stmeTime",
+                "render": function(data, type, full, meta) {
+                	var date = new Date(data);
+    	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                }
+            },{
+                "targets": 7,
+                "data": "stmeId",
+                "render": function(data, type, full, meta) {
+                return ' <a href="javascript:void(0)" onclick="openEdit(\''+ data +'\')">编辑</a>';
+                }
+            }
+            
+            ],
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+            }
+        });
+        //序号相关
+        var table = $('#memberbound').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+    });
+});
+
+//绑定账号
+function boundmember(type){
+	if(type==1){
+		$("#ModalLabel").text("绑定账号");
+		var content = '<span>绑定账号：</span><input type="text" id="memberno" value="" placeholder="会员gaga号"><br><br>'+
+		   '<span>账号密码：</span><input type="password" id="memberpwd"><br><br>'+'<span>链接名称：</span><input type="text" id="stmeUrlname" value="" placeholder="只能是数字,字母">';
+		   $("#bodycontent").html(content);
+		   $("#modalbutton").html('<button type="button" onclick="boundmember(2)" class="btn btn-primary">保存  </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		   $('#Modal').modal({
+			      keyboard: true
+		   });
+	}
+	if(type==2){
+		var memberno = $("#memberno").val();
+		var memberpwd = $("#memberpwd").val();
+		var stmeUrlname = $.trim($("#stmeUrlname").val());
+		if(memberpwd==''||memberno==''||stmeUrlname==''){
+			$("#errorbodycontent").html("账号,密码,链接名称不能为空");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+	        return;
+		}else if($.trim(stmeUrlname).length>20){		
+			$("#errorbodycontent").html("链接名称不能超过20位");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+	        return;
+		}
+		else{
+			$.ajax({
+		        type: "post",
+		        url: ctx + "/extensionUser/boundmember",
+		        dataType: "json",
+		        data: {
+		            "membno": memberno,
+		            "membpwd":memberpwd,
+		            "stmeUrlname":stmeUrlname
+		        },
+		        success: function(data) {
+		            if (data.success) {
+		            	//fn.Draw  重绘方法   true 代表表格第一页
+		                $("#memberbound").dataTable().fnDraw(true);
+		                $("#Modal").modal('hide');
+		            } else {
+		            	$("#errorbodycontent").html(data.msg);
+		     		   $('#errorModal').modal({
+		     				keyboard : true
+		     			});
+		            }
+		        }
+		    });
+		}
+	}
+}
+//查询
+function search() {
+    $("#memberbound").dataTable().fnDraw(true);
+}
+
+//下载
+/* function downloadIamge(selector, name) {
+	// 通过选择器获取canvas元素
+    var canvas = document.querySelector(selector)
+    // 使用toDataURL方法将图像转换被base64编码的URL字符串
+    var url = canvas.toDataURL()
+    // 生成一个a元素
+    var a = document.createElement('a')
+    // 创建一个单击事件
+    var event = new MouseEvent('click')
+    
+    // 将a的download属性设置为我们想要下载的图片名称，若name不存在则使用‘下载图片名称’作为默认名称
+    a.download = name || '下载图片名称'
+    // 将生成的URL设置为a.href属性
+    a.href = url
+    
+    // 触发a的单击事件
+    a.dispatchEvent(event)
+} */
+
+function downloadIamge(selector, name) {
+    // 通过选择器获取img元素
+     var img = document.getElementById(selector);
+    // 将图片的src属性作为URL地址
+    var url = img.src
+    var a = document.createElement('a')
+    var event = new MouseEvent('click')
+    
+    a.download = name || '下载图片名称'
+    a.href = url
+    
+    a.dispatchEvent(event)
+}
+
+/**
+ * 打开编辑窗口
+ */
+function openEdit(stmeIdstr){
+	var count = "";	//用于绘制表格
+	var stmeId = "";	//用于接收参数
+	
+	$.ajax({
+        type: "post",
+        url: ctx + "/extensionUser/openEdit",
+        dataType: "json",
+        async: false,
+        data: {"stmeId": stmeIdstr},
+        success: function(data) {
+        	 if (data.success) {
+        		 staffMember= data.obj.staffMember;
+        		
+        	 }
+        }
+    });
+	
+	count += "<table><tr><td>ID:"+ staffMember.stmeId +"</td><input type='hidden' id='stmeId' value='"+ staffMember.stmeId +"'></tr></table>";
+	count += "<table>";
+	count +="<tr><td>链接名称:</td><td><input id='stmeUrlname' type='text' value='"+$.trim(staffMember.stmeUrlname) +"'  /></td><td></td></tr>";
+	count += "</table>";
+	
+	$("#ModalLabel").text("编辑链接名称");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="edit()" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+
+	$('#Modal').modal({
+	    keyboard: true
+	});
+}
+
+/**
+ * 编辑保存方法
+ */
+function edit() {
+	var _id = $('#stmeId').val();
+	var _key = $('#stmeUrlname').val();
+	if (!_key) {
+		layer.msg('数据错误');
+		return;
+	}
+	$.ajax({
+        type: "post",
+        url: ctx + "/extensionUser/add",
+        dataType: "json",
+        data: {
+            "stmeId": _id,
+            "stmeUrlname": _key
+        },
+        success: function(data) {
+            if (data.success) {
+            	$('#Modal .close').click();
+                $("#memberbound").dataTable().fnDraw(true);	//重绘
+            } else {  
+            	$("#errorbodycontent").html(data.msg);
+	     		   $('#errorModal').modal({
+	     				keyboard : true
+	     			});
+     		 /*  layer.msg('链接名称重复或长度超过20位'); */
+            }
+        }
+    });
+}
+
+//删除
+function deldata(){
+	var objs = $("#memberbound div");
+	var gagaid="";
+	for (var i = 0; i < objs.length; i++) {
+	    var obj = objs[i];
+	    var flag = $(obj).attr("aria-checked");
+	    if (flag == "true") {
+	        if (gagaid.trim() != "") {
+	            gagaid += ","
+	        }
+	        gagaid += $(obj).children("input").attr("value");
+	    }
+	}
+	if (gagaid.trim() == "") {
+    	$("#errorbodycontent").html("请选择需要删除的数据");
+		   $('#errorModal').modal({
+				keyboard : true
+			});
+        return;
+    }
+	$.ajax({
+        type: "post",
+        url: ctx + "/extensionUser/delboundmember",
+        dataType: "json",
+        data: {
+            "stamids": gagaid
+        },
+        success: function(data) {
+            if (data.success) {
+                $("#memberbound").dataTable().fnDraw(true);
+            } else {
+            	$("#errorbodycontent").html("删除失败");
+     		   $('#errorModal').modal({
+     				keyboard : true
+     			});
+            }
+        }
+    });
+}
+
+function drawAndShareImage(imgBase64) {
+    var wid1 = 750 * 0.29;//大 右
+    var hei1 = 1334 * 0.37;//大 下
+    var canvas = document.createElement("canvas");
+    var context = canvas.getContext("2d"); 
+    var ratio = getPixelRatio(context);  // 关键代码
+    canvas.width = 750*ratio;
+    canvas.height = 1334*ratio;
+    context.rect(0, 0, canvas.width*ratio, canvas.height*ratio);
+    context.fillStyle = "#fff";
+    context.fill(); 
+    //底图
+     var myImage = new Image();
+     myImage.src = src="https://sources.gagahi.com/FlPnHTh2FZxbNpGuMffgEBLNXtuo";    
+     //背景图片  你自己本地的图片或者在线图片
+     myImage.crossOrigin = 'Anonymous';
+     myImage.onload = function () {
+        context.drawImage(myImage, 0, 0, 750*ratio, 1334*ratio);
+        //如果是已经生成的Img标签可以直接使用，如果是自定义的则用下面的方法手动设置src
+        var myImage2 = new Image();
+        myImage2.src = imgBase64;
+        myImage2.onload = function () {
+           context.drawImage(myImage2, wid1*ratio, hei1*ratio, 330*ratio, 330*ratio);
+           var base64 = canvas.toDataURL();  //"image/png" 这里注意一下,参数里面不要带"image/png" 之前网上代码还有这个参数一直报错
+           var img = document.getElementById('avatar');
+           img.setAttribute('src', base64);
+
+        }
+    }
+    $("#avatar").css("width","100%")
+}
+
+function openQrcode(dat){
+	$('#erweima').modal('show');
+//    $('#tup').html('');
+//	$('#tup').qrcode({
+//        render:"canvas",
+//        width: 200,
+//        height: 200,
+//        text: "https://www.gagahi.com/k/"+dat,
+//        src:"https://sources.gagahi.com/Flhta02JjmsCMnA-o7QcqZBTFs_m",
+//	});
+//    var database=$('#tup canvas')[0];
+//    var dataURL = database.toDataURL();
+//    drawAndShareImage(dataURL);
+
+    $.ajax({
+        type:"post",
+        dataType: 'json',
+        url:ctx + "/extensionUser/getQC",
+        data:{
+            url:"https://www.gagahi.com/k/"+dat
+        },
+        success:function(res){
+            drawAndShareImage("data:image/png;base64,"+res.obj);
+        }
+
+    })
+    $("#tup").empty();
+}
+/* 像素密度  如果没这段代码生成的图片可能会模糊,这一块也耽误了很久*/ 
+function getPixelRatio(context) {
+    var backingStore = context.backingStorePixelRatio ||
+        context.webkitBackingStorePixelRatio ||
+        context.mozBackingStorePixelRatio ||
+        context.msBackingStorePixelRatio ||
+        context.oBackingStorePixelRatio ||
+        context.backingStorePixelRatio || 1;
+    return (window.devicePixelRatio || 1) / backingStore;
+};
+
+</script>
+

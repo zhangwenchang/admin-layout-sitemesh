@@ -1,0 +1,996 @@
+
+<div ng-controller="AppController" class="user-participation">
+    <div class="right-top">
+        <ul class="ul-li ul-li-revenue">
+            <li ng-class="bluebgStatus == 1 ? 'blue-bg' : '' " ng-click="revenueChange(1)">营收与业绩</li>
+            <li class="border-none" ng-click="revenueChange(2)" ng-class="bluebgStatus == 2 ? 'blue-bg' : '' ">营收单产与人均业绩占比</li>
+            <li ng-click="revenueChange(3)" ng-class="bluebgStatus == 3 ? 'blue-bg' : '' ">营收单产与人均业绩</li>
+        </ul>
+    </div>
+    <div class="right-model">
+        <div class="right-model-content right-model-content1" style="display: block">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        代理商团队营收与业绩
+                    </div>
+                    <div class="title-content-right">
+                        <select name="" id="revenueSel1" class="select-value" style="width: 300px;" ng-click="revenueSel1()">
+                            <option value="{{item.syde_id}}" ng-repeat="item in allAgent">{{item.syde_name}}</option>
+                            <!--<option value="">洛阳畅游</option>-->
+                            <!--<option value="">商丘点创</option>-->
+                        </select>
+                        <span>
+							<input type="text" id="revenueStarttime1" class="startTime" readonly ng-model="revenueStarttime1" ng-change="revenueChangeVal1()">至
+                            <input type="text" id="revenueEndtime1" class="startTime" readonly ng-model="revenueEndtime1" ng-change="revenueChangeVal1()">
+						</span>
+                        <ul class="ul-li" id="deviceUl1">
+                            <li ng-class="bluebgflag1 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange1(1)">全部</li>
+                            <li class="border-none" ng-click="bluebgflagChange1(2)" ng-class="bluebgflag1 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange1(3)" ng-class="bluebgflag1 == 3 ? 'blue-bg' : '' ">APP</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="revenueChart" style="height:400px"></div>
+            </div>
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        代理商团队营收与业绩
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('revenueTable','代理商团队营收与业绩')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="revenueTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>{{revenueSelName1}}</th>
+                        <th>营收</th>
+                        <th>总营收</th>
+                        <th>营收占比</th>
+                        <th>业绩</th>
+                        <th>总业绩</th>
+                        <th>业绩占比</th>
+                    </tr>
+                    <tr ng-repeat="x in dataObj1">
+
+                        <td>{{x.datet}}</td>
+                        <td>{{x.reve}}</td>
+                        <td>{{x.reveT}}</td>
+                        <td>{{x.reveT_p}}</td>
+                        <td>{{x.achievement}}</td>
+                        <td>{{x.commis}}</td>
+                        <td>{{x.achievement_p}}</td>
+
+                    </tr>
+                    </thead>
+
+                </table>
+            </div>
+        </div>
+
+
+
+        <div class="right-model-content right-model-content2" style="display:none">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        营收单产与人均业绩占比
+                    </div>
+                    <div class="title-content-right">
+                        <select name="" id="revenueSel2" class="select-value" style="width: 280px;" ng-click="revenueSel2()">
+                            <option value="{{item.syde_id}}" ng-repeat="item in allAgent">{{item.syde_name}}</option>
+                            <!--<option value="">洛阳畅游</option>-->
+                            <!--<option value="">商丘点创</option>-->
+                        </select>
+                        <span>
+							<input type="text" id="singleStarttime1" class="startTime" readonly ng-model="singleStarttime1" ng-change="revenueChangeVal2()">至
+                            <input type="text" id="singleEndtime1" class="startTime" readonly ng-model="singleEndtime1" ng-change="revenueChangeVal2()">
+						</span>
+
+                        <ul class="ul-li" id="deviceUl2">
+                            <li ng-class="bluebgflag2 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange2(1)">全部</li>
+                            <li class="border-none" ng-click="bluebgflagChange2(2)" ng-class="bluebgflag2 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange2(3)" ng-class="bluebgflag2 == 3 ? 'blue-bg' : '' ">APP</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="singleChart" style="height:400px"></div>
+            </div>
+
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        营收单产与人均业绩占比明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('singleTable','营收单产与人均业绩占比明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="singleTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>营收单产</th>
+                        <th>人均业绩</th>
+                        <th>人均业绩占比</th>
+
+                    </tr>
+
+                    <tr ng-repeat="x in dataObj2">
+                        <td>{{x.datet}}</td>
+                        <td>{{x.reves}}</td>
+                        <td>{{x.commis_p}}</td>
+                        <td>{{x.avg_commis_p}}</td>
+                    </tr>
+
+                    </thead>
+
+                </table>
+            </div>
+        </div>
+
+
+        <div class="right-model-content right-model-content3" style="display:none">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        营收单产与人均业绩
+                    </div>
+                    <div class="title-content-right">
+                        <select name="" id="revenueSel3" class="select-value" style="width: 300px;" ng-click="revenueSel3()">
+                            <option value="{{item.syde_id}}" ng-repeat="item in allAgent">{{item.syde_name}}</option>
+                            <!--<option value="">洛阳畅游</option>-->
+                            <!--<option value="">商丘点创</option>-->
+                        </select>
+                        <span>
+							<input type="text" id="groupStarttime1" class="startTime" readonly ng-model="groupStarttime1" ng-change="revenueChangeVal3()">至
+                            <input type="text" id="groupEndtime1" class="startTime" readonly ng-model="groupEndtime1" ng-change="revenueChangeVal3()">
+						</span>
+                        <ul class="ul-li" id="deviceUl3">
+                            <li ng-class="bluebgflag3 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange3(1)">全部</li>
+                            <li class="border-none" ng-click="bluebgflagChange3(2)" ng-class="bluebgflag3 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange3(3)" ng-class="bluebgflag3 == 3 ? 'blue-bg' : '' ">APP</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="groupChart" style="height:400px"></div>
+            </div>
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        营收单产与人均业绩明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('groupTable','营收单产与人均业绩明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="groupTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>{{revenueSelNameReves}}</th>
+                        <th>{{revenueSelNameCommis}}</th>
+
+                    </tr>
+                    <tr ng-repeat="x in dataObj3">
+                        <td>{{x.datet}}</td>
+                        <td>{{x.reves_p}}</td>
+                        <td>{{x.commis_p}}</td>
+                    </tr>
+
+                    </thead>
+
+                </table>
+            </div>
+
+
+        </div>
+
+
+
+
+
+    </div>
+
+</div>
+<script>
+
+    app.controller('AppController',function($scope,$http){
+        $scope.bluebgStatus = 1;
+
+        $scope.bluebgflag1 = 1;
+        $scope.revenuebgflag1 = '';
+
+        $scope.bluebgflag2 = 1;
+        $scope.revenuebgflag2 = '';
+
+        $scope.bluebgflag3 = 1;
+        $scope.revenuebgflag3 = '';
+
+        //第二个页面
+        $scope.revenueSelName1 = '';
+
+        $scope.revenueSelNameReves = '';
+        $scope.revenueSelNameCommis = '';
+        var revenueSelId1 = '';
+        var revenueSelName1 = '';
+
+        var revenueSelId2 = '';
+        var revenueSelName2 = '';
+
+        var revenueSelId3 = '';
+        var revenueSelName3 = '';
+
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.revenueStarttime1 = firstDay;
+        $scope.revenueEndtime1 = nowdate;
+
+        $scope.singleStarttime1 = firstDay;
+        $scope.singleEndtime1 = nowdate;
+        $scope.groupStarttime1 = firstDay;
+        $scope.groupEndtime1 = nowdate;
+
+        $('#revenueStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#revenueEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        $('#singleStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#singleEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        $('#groupStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#groupEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+        initPage($scope,$http);
+        $scope.getAllAgent();
+
+
+
+
+
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http) {
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+
+        $scope.getAllAgent = function(){
+            $http.post(ctx + "/useBase/getAllAgent")
+                .then(function(data){
+                    if(data.data.success == false){
+
+                    }else if(data.data.obj == []){
+                        return;
+                    }else{
+                        //debugger;
+                        $scope.allAgent = data.data.obj;
+                        revenueSelId1 = data.data.obj[0].syde_id;
+                        revenueSelName1 = data.data.obj[0].syde_name;
+
+                        revenueSelId2 = data.data.obj[0].syde_id;
+                        revenueSelName2 = data.data.obj[0].syde_name;
+
+                        revenueSelId3 = data.data.obj[0].syde_id;
+                        revenueSelName3 = data.data.obj[0].syde_name;
+
+                        if($scope.bluebgStatus == 1){
+                            $scope.revenue();
+                        }else if($scope.bluebgStatus == 2){
+                            $scope.revenueSingle();
+                        }if($scope.bluebgStatus == 3){
+                            $scope.revenueGroup();
+                        }
+
+                    }
+
+                },function(data){
+
+                })
+
+
+        };
+
+
+        $scope.revenueChange = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgStatus = 1;
+                    $(".right-model-content1").css("display","block").siblings().css("display","none");
+                    $scope.revenue();
+                    break;
+                case 2:
+                    $scope.bluebgStatus = 2;
+                    $(".right-model-content2").css("display","block").siblings().css("display","none");
+                    $scope.revenueSingle();
+                    break;
+                case 3:
+                    $scope.bluebgStatus = 3;
+                    $(".right-model-content3").css("display","block").siblings().css("display","none");
+                    $scope.revenueGroup();
+                    break;
+
+            }
+
+        };
+
+        $scope.bluebgflagChange1 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag1 = 1;
+                    $scope.revenuebgflag1 = '';
+
+                    $scope.revenue();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag1 = 2;
+                    $scope.revenuebgflag1 = 'pc';
+                    $scope.revenue();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag1 = 3;
+                    $scope.revenuebgflag1 = 'app';
+                    $scope.revenue();
+
+                    break;
+
+            }
+
+        };
+
+        $scope.bluebgflagChange2 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag2 = 1;
+                    $scope.revenuebgflag2 = '';
+
+                    $scope.revenueSingle();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag2 = 2;
+                    $scope.revenuebgflag2 = 'pc';
+                    $scope.revenueSingle();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag2 = 3;
+                    $scope.revenuebgflag2 = 'app';
+                    $scope.revenueSingle();
+
+                    break;
+
+            }
+
+        };
+
+
+        $scope.bluebgflagChange3 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag3 = 1;
+                    $scope.revenuebgflag3 = '';
+
+                    $scope.revenueGroup();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag3 = 2;
+                    $scope.revenuebgflag3 = 'pc';
+                    $scope.revenueGroup();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag3 = 3;
+                    $scope.revenuebgflag3 = 'app';
+                    $scope.revenueGroup();
+
+                    break;
+
+            }
+
+        };
+
+
+
+
+        $scope.revenueSel1 = function(e){
+            revenueSelId1 = $('#revenueSel1 option:selected').val();
+            revenueSelName1 = $('#revenueSel1 option:selected').text();
+            $scope.revenue();
+
+        };
+
+        $scope.revenueSel2 = function(e){
+            revenueSelId2 = $('#revenueSel2 option:selected').val();
+            revenueSelName2 = $('#revenueSel2 option:selected').text();
+            $scope.revenueSingle();
+
+        };
+
+        $scope.revenueSel3 = function(e){
+            revenueSelId3 = $('#revenueSel3 option:selected').val();
+            revenueSelName3 = $('#revenueSel3 option:selected').text();
+            $scope.revenueGroup();
+
+        };
+
+
+        $scope.revenueChangeVal1 =function(){
+            if($scope.revenueStarttime1 == ''){
+                $scope.revenueStarttime1 = firstDay;
+            }
+            if($scope.revenueEndtime1 == ''){
+                $scope.revenueEndtime1 = nowdate;
+            }
+            if($scope.revenueStarttime1 > $scope.revenueEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.revenueStarttime1 = firstDay;
+                $scope.revenueEndtime1 = nowdate;
+
+            }
+            $scope.revenue();
+
+
+        }
+
+        $scope.revenueChangeVal2 =function(){
+            if($scope.singleStarttime1 == ''){
+                $scope.singleStarttime1 = firstDay;
+            }
+            if($scope.singleEndtime1 == ''){
+                $scope.singleEndtime1 = nowdate;
+            }
+            if($scope.singleStarttime1 > $scope.singleEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.singleStarttime1 = firstDay;
+                $scope.singleEndtime1 = nowdate;
+
+            }
+            $scope.revenueSingle();
+
+
+        }
+
+        $scope.revenueChangeVal3 = function(){
+            if($scope.groupStarttime1 == ''){
+                $scope.groupStarttime1 = firstDay;
+            }
+            if($scope.groupEndtime1 == ''){
+                $scope.groupEndtime1 = nowdate;
+            }
+
+            if($scope.groupStarttime1 > $scope.groupEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.groupStarttime1 = firstDay;
+                $scope.groupEndtime1 = nowdate;
+
+            }
+            $scope.revenueGroup();
+
+
+        }
+
+
+        $scope.revenue = function(){
+
+            var dateData = {
+                startTime:$scope.revenueStarttime1,
+                endTime:$scope.revenueEndtime1,
+                syus_depart:revenueSelId1,
+                flag:$scope.revenuebgflag1
+
+            };
+
+            layer.load(1,{shade: 0.3});
+            $http.post(ctx + "/useBase/getRevenueAchievement",dateData)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj1 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+                        var y2LineData = [];
+                        for(var i = 0;i<dataObj1.length; i++){
+                            xLineData.push(dataObj1[i].datet);
+                            y1LineData.push(dataObj1[i].reve);
+                            y2LineData.push(dataObj1[i].achievement_p*100);
+                        }
+
+                        $scope.lineChart1(xLineData,y1LineData,y2LineData);
+
+                        $scope.dataObj1 = dataObj1;
+
+                        $scope.revenueSelName1 = revenueSelName1;
+
+                    }
+
+
+                    layer.closeAll();
+                },function(data){
+
+                    layer.closeAll();
+                })
+
+        }
+
+
+        $scope.revenueSingle = function(){
+
+
+            var dateData = {
+                startTime:$scope.singleStarttime1,
+                endTime:$scope.singleEndtime1,
+                syus_depart:revenueSelId2,
+                flag:$scope.revenuebgflag2
+
+            };
+            layer.load(1,{shade: 0.3});
+            $http.post(ctx + "/useBase/getAVGRevenueAchievement",dateData)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj2 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+                        var y2LineData = [];
+                        for(var i = 0;i<dataObj2.length; i++){
+                            xLineData.push(dataObj2[i].datet);
+                            y1LineData.push(dataObj2[i].reves);
+                            y2LineData.push(dataObj2[i].avg_commis_p);
+                        }
+
+                        $scope.lineChart2(xLineData,y1LineData,y2LineData);
+
+                        $scope.dataObj2 = dataObj2;
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                    layer.closeAll();
+                })
+
+
+
+
+
+
+        }
+
+
+
+        $scope.revenueGroup = function(){
+
+            var dateData = {
+                startTime:$scope.groupStarttime1,
+                endTime:$scope.groupEndtime1,
+                syus_depart:revenueSelId3,
+                flag:$scope.revenuebgflag3
+
+            };
+            layer.load(1,{shade: 0.3});
+            $http.post(ctx + "/useBase/getAVGRevenueAchievement",dateData)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj3 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+                        var y2LineData = [];
+                        for(var i = 0;i<dataObj3.length; i++){
+                            xLineData.push(dataObj3[i].datet);
+                            y1LineData.push(dataObj3[i].reves_p);
+                            y2LineData.push(dataObj3[i].commis_p);
+                        }
+
+                        $scope.lineChart3(xLineData,y1LineData,y2LineData);
+
+                        $scope.dataObj3 = dataObj3;
+
+                        $scope.revenueSelNameReves = revenueSelName3 + '人均营收';
+                        $scope.revenueSelNameCommis = revenueSelName3 + '人均业绩';
+
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                    layer.closeAll();
+                })
+
+
+        }
+
+
+
+
+
+
+
+        $scope.lineChart1 = function(xLineData,y1LineData,y2LineData){
+            //debugger;
+
+            var myChart1 = echarts.init(document.getElementById('revenueChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    },
+                    formatter: '{a0}: {c0}<br />{a1}: {c1}%'
+                },
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                legend: {
+                    data:['营收','业绩占比'],
+                    bottom:0
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+                        // name: '营收',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value} %'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    }
+                ],
+                series: [
+                    {
+                        name:'营收',
+                        type:'bar',
+                        data:y1LineData
+                    },
+                    {
+                        name:'业绩占比',
+                        type:'line',
+                        data:y2LineData,
+                        yAxisIndex:1
+                    }
+                ]
+            };
+
+
+
+
+            myChart1.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart1.resize();
+
+            };
+
+
+        }
+
+
+        $scope.lineChart2 = function(xLineData,y1LineData,y2LineData){
+            //debugger;
+
+            var myChart2 = echarts.init(document.getElementById('singleChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    },
+                    formatter: '{a0}: {c0}<br />{a1}: {c1}%'
+                },
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                legend: {
+                    data:['营收单产','人均业绩占比'],
+                    bottom:0
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+                        // name: '营收',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value} %'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    }
+                ],
+                series: [
+                    {
+                        name:'营收单产',
+                        type:'bar',
+                        data:y1LineData
+                    },
+                    {
+                        name:'人均业绩占比',
+                        type:'line',
+                        data:y2LineData,
+                        yAxisIndex:1
+                    }
+                ]
+            };
+
+
+
+
+            myChart2.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart2.resize();
+
+            };
+
+
+        }
+
+
+        $scope.lineChart3 = function(xLineData,y1LineData,y2LineData){
+            //debugger;
+
+            var myChart3 = echarts.init(document.getElementById('groupChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    },
+                    formatter: '{a0}: {c0}<br />{a1}: {c1}'
+                },
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                legend: {
+                    data:['人均营收','人均业绩'],
+                    bottom:0
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+                        // name: '营收',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    },
+                    {
+                        type: 'value',
+                        // name: '业绩占比',
+
+                        axisLabel: {
+                            formatter: '{value}'
+                        },
+                        axisLine: {
+                            show: false
+
+                        }
+
+                    }
+                ],
+                series: [
+                    {
+                        name:'人均营收',
+                        type:'bar',
+                        data:y1LineData
+                    },
+                    {
+                        name:'人均业绩',
+                        type:'line',
+                        data:y2LineData,
+                        yAxisIndex:1
+                    }
+                ]
+            };
+
+
+
+
+            myChart3.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart3.resize();
+
+            };
+
+
+        }
+
+
+
+
+    }
+    // lineChart();
+
+
+
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+
+</script>
+
+

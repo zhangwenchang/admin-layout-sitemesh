@@ -1,0 +1,364 @@
+<section class="content-header">
+	<h1>
+		提成设置<small></small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>推广管理</li>
+		<li class="active">提成设置</li>
+	</ol>
+</section>
+<section class="content-main">
+<input type="hidden" id="isAlone"/>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box-footer">
+				<h4>APP提成</h4>
+			</div>
+			<div class="box">
+				<!-- /.box-header -->
+				<div class="box-body mailbox-messages">
+					<table id="appTable" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th style="width: 40%">提成项</th>
+								<th>提成比例</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tr>
+							<td>APP字符包翻译提成</td>
+							<td><span id="syde_app_char_translate" />%</td>
+							<td><a href="javascript:edit('syde_app_char_translate');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>APP金币翻译提成</td>
+							<td><span id="syde_app_money_translate" />%</td>
+							<td><a href="javascript:edit('syde_app_money_translate');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>APP充值提成</td>
+							<td><span id="syde_app_recharge" />%</td>
+							<td><a href="javascript:edit('syde_app_recharge');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>APP VIP升级提成</td>
+							<td><span id="syde_app_upgrade" />%</td>
+							<td><a href="javascript:edit('syde_app_upgrade');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>APP高级会员升级提成</td>
+							<td><span id="syde_app_seniorupgrade" />%</td>
+							<td><a href="javascript:edit('syde_app_upgrade');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>APP mini会员升级提成</td>
+							<td><span id="syde_app_mimiupgrade" />%</td>
+							<td><a href="javascript:edit('syde_app_upgrade');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>APP短视频提成</td>
+							<td><span id="syde_app_vedio" />%</td>
+							<td><a href="javascript:edit('syde_app_vedio');">编辑</a></td>
+						</tr>
+					</table>
+				</div>
+				<!-- /.box-body -->
+			</div>
+			<!-- /.box -->
+			<div class="box-footer">
+				<h4>PC提成</h4>
+			</div>
+			<div class="box">
+				<!-- /.box-header -->
+				<div class="box-body mailbox-messages">
+					<table id="pcTable" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th style="width: 40%">提成项</th>
+								<th>提成比例</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tr>
+							<td>PC充值提成</td>
+							<td><span id="syde_rechargecommission" />%</td>
+							<td><a href="javascript:edit('syde_rechargecommission');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>PC翻译提成</td>
+							<td><span id="syde_translatecommission" />%</td>
+							<td><a href="javascript:edit('syde_translatecommission');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>PC VIP升级提成</td>
+							<td><span id="syde_upgradecommission" />%</td>
+							<td><a href="javascript:edit('syde_upgradecommission');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>PC高级会员升级提成</td>
+							<td><span id="syde_senior_upgradecommission" />%</td>
+							<td><a href="javascript:edit('syde_upgradecommission');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>PC mini会员升级提成</td>
+							<td><span id="syde_mini_upgradecommission" />%</td>
+							<td><a href="javascript:edit('syde_upgradecommission');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>PC&APP模糊图提成</td>
+							<td><span id="syde_imgcommission" />%</td>
+							<td><a href="javascript:edit('syde_imgcommission');">编辑</a></td>
+						</tr>
+						<tr>
+							<td>PC&APP虚拟礼物提成</td>
+							<td><span id="syde_giftcommission" />%</td>
+							<td><a href="javascript:edit('syde_giftcommission');">编辑</a></td>
+						</tr>
+
+					</table>
+				</div>
+				<!-- /.box-body -->
+			</div>
+			<!-- /.box -->
+
+		</div>
+		<!-- /.col -->
+	</div>
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+
+<script type="text/javascript">
+$(function() {
+	initTable();
+});
+function initTable(){
+	$.ajax({
+        "dataType": 'json',
+        "type": "POST",
+        "url": ctx + "/Promotion/commissionList",
+        "success": function(result){
+        	if(result){
+        		if(result.data){
+        			var dadd=result.data;
+        			$('#syde_rechargecommission').text((dadd.syde_rechargecommission*1000)/10)
+        			$('#syde_translatecommission').text((dadd.syde_translatecommission*1000)/10)
+        			$('#syde_upgradecommission').text((dadd.syde_upgradecommission*1000)/10)
+        			$('#syde_senior_upgradecommission').text((dadd.syde_upgradecommission*1000)/10)
+        			$('#syde_mini_upgradecommission').text((dadd.syde_upgradecommission*1000)/10)
+        			$('#syde_app_recharge').text((dadd.syde_app_recharge*1000)/10)
+        			$('#syde_app_money_translate').text((dadd.syde_app_money_translate*1000)/10)
+        			$('#syde_app_upgrade').text((dadd.syde_app_upgrade*1000)/10)
+        			$('#syde_app_seniorupgrade').text((dadd.syde_app_upgrade*1000)/10)
+        			$('#syde_app_mimiupgrade').text((dadd.syde_app_upgrade*1000)/10)
+        			$('#syde_app_char_translate').text((dadd.syde_app_char_translate*1000)/10)
+        			$('#syde_app_vedio').text((dadd.syde_app_vedio*1000)/10)
+        			$('#syde_imgcommission').text((dadd.syde_imgcommission*1000)/10)
+        			$('#syde_giftcommission').text((dadd.syde_giftcommission*1000)/10)
+        			var dept = result.obj;
+        			if(dept){
+        				$('#isAlone').val(dept.sydeIsalonecommisssion);
+        			}
+        		}return;
+        	}
+        	
+        }
+    });
+}
+
+	function edit(name) {
+		var rat = $('#' + name + '').text();
+		$("#ModalLabel").text("编辑提成");
+		$("#mailcontent").val('');
+		var content = '<span>提成比例：</span><input type="text" id="caname" value="'+rat+'" >%<br><br>';
+		$("#bodycontent").html(content);
+		$("#modalbutton").html('<button type="button" onclick="update(\''+ name+ '\')" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		$('#Modal').modal({
+			keyboard : true
+		});
+	}
+
+	function update(id) {
+		var name = $("#caname").val();
+		if (name==null||name == ''||parseFloat(name).toString() == "NaN"||parseFloat(name)<0) {
+			
+			$("#errorbodycontent").html("请输入正确的提成比例（数字）");
+			$('#errorModal').modal({
+				keyboard : true
+			});
+		} else {
+			var dadd = tranformStr1(id);
+
+			var datt = {};
+			datt[dadd] = (parseFloat(name)) / 100;
+			datt["name"] = dadd;
+			
+			if (!checkValue(id, name)) {
+				layer.msg('提成比例超过标准！');
+				return;
+			}
+			$.ajax({
+				type : "post",
+				url : ctx + "/Promotion/updateCommiss",
+				dataType : "json",
+				data : datt,
+				success : function(data) {
+					initTable();
+					if (data.success) {
+						$("#category").dataTable().fnDraw(false)
+						$("#Modal").modal('hide');
+					} else {
+						$("#errorbodycontent").html(data.msg);
+						$('#errorModal').modal({
+							keyboard : true
+						});
+					}
+				}
+			})
+		}
+	}
+	function checkValue(dadd, name) {
+		switch (dadd) {
+		case 'syde_rechargecommission':
+			if (parseFloat(name) > 20)
+				return false;
+			break;
+		case 'syde_translatecommission':
+			if (parseFloat(name) > 15)
+				return false;
+			break;
+		case 'syde_upgradecommission':
+			if (parseFloat(name) > 10)
+				return false;
+			break;
+		case 'syde_app_recharge':
+			if (parseFloat(name) > 20)
+				return false;
+			break;
+		case 'syde_app_money_translate':
+			if (parseFloat(name) > 15)
+				return false;
+			break;
+		case 'syde_app_upgrade':
+			if (parseFloat(name) > 10)
+				return false;
+			break;
+		case 'syde_app_char_translate':
+			if (parseFloat(name) > 15)
+				return false;
+			break;
+		case 'syde_app_vedio':
+			if (parseFloat(name) > 20)
+				return false;
+			break;
+		case 'syde_imgcommission':
+			if (parseFloat(name) > 10)
+				return false;
+			break;
+		case 'syde_giftcommission':
+			if (parseFloat(name) > 10)
+				return false;
+			break;
+		default:
+			return false;
+			break;
+		}
+		return true;
+	}
+
+	function search() {
+		$("#category").dataTable().fnDraw(false);
+	}
+	function getText(code) {
+		var tex = '';
+		switch (code) {
+		case 'syde_rechargecommission':
+			tex = 'PC充值提成';
+			break;
+		case 'syde_translatecommission':
+			tex = 'PC翻译提成';
+			break;
+		case 'syde_upgradecommission':
+			tex = 'PC升级提成';
+			break;
+		case 'syde_app_recharge':
+			tex = 'APP充值提成	';
+			break;
+		case 'syde_app_money_translate':
+			tex = 'APP金币翻译提成';
+			break;
+		case 'syde_app_upgrade':
+			tex = 'APP升级提成';
+			break;
+		case 'syde_app_char_translate':
+			tex = 'APP字符包翻译提成';
+			break;
+		case 'syde_app_vedio':
+			tex = 'APP段视频提成';
+			break;
+		case 'syde_imgcommission':
+			tex = 'PC&APP模糊图提成';
+			break;
+		case 'syde_giftcommission':
+			tex = 'PC&APP虚拟礼物提成';
+			break;
+		default:
+
+		}
+		return tex;
+	}
+	function tranformStr1(str) {
+		var strArr = str.split('_');
+		for (var i = 1; i < strArr.length; i++) {
+			strArr[i] = strArr[i].charAt(0).toUpperCase()
+					+ strArr[i].substring(1);
+		}
+		return strArr.join('');
+	}
+</script>
+

@@ -1,0 +1,360 @@
+<section class="content-header">
+    <h1>官方账号管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>官方消息管理</li>
+        <li class="active">官方账号管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+              <div class="box-header">
+              <button type="button" onclick="add()" class="btn btn-primary">添加</button>
+              <button type="button" onclick="batchDel()" class="btn btn-primary">删除</button>
+              </div>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>                  
+                  <th>官方账号</th>
+                  <th>官方账号昵称</th>
+                  <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+var departIdTmp='',symeIdTmp='',roleNameTmp='';
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 ], function() {
+        console.log(1);
+
+        var t=$("#tableData").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 100,
+
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var gagaidorname = $("#gagaidorname").val();
+                aoData.push({
+                        "name": "noorname",
+                        "value": gagaidorname
+                    })
+                    //aoData=gagaidorname; 
+                    layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/OffiAccount/list",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "syme_id",
+                "bSortable": false
+            }, {
+                "data": "syme_id",
+                "bSortable": false
+            }, {
+                "data": "syme_gagano",
+                "bSortable": false
+            }, {
+                "data": "memb_nickname",
+                "bSortable": false
+            }, {
+                "data": "syme_id",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 1,
+                "render": function(data, type, full, meta) {                	
+                    return '<input type="checkbox" value="' + data + '" title="' + data + '" name="symeId" />';
+                }
+            },{
+                "targets": 4,
+                "data": "syroId",
+                "render": function(data, type, full, meta) {
+                	var lnks='';
+                	lnks+='<a href="javascript:void(0);" class="edit-btn" data-id="' + data + '" data-gagano="' + full.syme_gagano + '">编辑</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:del('+data+');">删除</a>';
+                    return lnks;
+                }
+            } ],
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+
+                $('.edit-btn').click(function() {
+                  var id = $(this).attr('data-id');
+                  var gagano = $(this).attr('data-gagano');
+                  $('#updModal').modal({keyboard: true});
+                  $('#updModal').attr({
+                    'data-id': id,
+                    'data-gagano': gagano
+                  });                 
+                });
+                $('[field="updTj"]').click(function() {
+                  console.log(2);
+                  var id = $('#updModal').attr('data-id');
+                  var gagano = $('#updModal').attr('data-gagano');
+                  var newGagano = $('#roleNameUpd').val();
+                  if (gagano === newGagano) {
+                    layer.msg('新gagano和原有gagano相同', {time: 500});
+                    return false;
+                  }
+                  if (id && newGagano) {
+                    doPost("OffiAccount/upd", {"symeId":id, "symeGagano": newGagano},editHd,errorHd);
+                  }
+                });
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+
+    });
+});
+
+function add(){
+	$('#addModal').modal({keyboard: true});
+}
+
+function errorHd(xreq){	 
+	  $.msg(xreq.statusText+"["+xreq.status+"]");
+}
+
+//添加提交
+$('#addModal').find('[field="addTj"]').click(function(){	
+	var symeGagano=$.trim($("#symeGagano").val());
+	if(symeGagano==''){
+		$.msg("请正确填写账号信息");
+		return;
+	}
+	//信息保存
+	
+	doPost("OffiAccount/add", {"symeGagano":symeGagano},addHd,errorHd);	
+});
+
+function addHd(data){
+	if(data.success){
+		$('#addModal').find('[field="closeModal"]').click();
+		$("#symeGagano").val("");
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+
+function editHd(data){
+  if(data.success){
+    $('#updModal').find('[field="closeModal"]').click();
+    $("#roleNameUpd").val("");
+    refreshdata();
+  }else{
+    $.msg(data.msg);
+  }
+}
+
+//删除
+function del(id){
+	var t=confirm("确定要删除官方账号吗？");
+	if(t){
+		doPost("OffiAccount/del", {"symeIds[]":[id]},delHd,errorHd);
+	}
+} 
+function delHd(data){
+	if(data.success){
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}	
+}
+
+//批量删除
+function batchDel(){
+	var chk_value =[]; 
+	$('input[name="symeId"]:checked').each(function(){ 
+	chk_value.push($(this).val()); 
+	}); 
+	if(chk_value.length==0){
+		$.msg("请选择要删除的官方账号吗？");
+	}else{
+		var t=confirm("确定要删除选定的官方账号吗？");
+		if(t){
+			doPost("OffiAccount/del", {"symeIds[]":chk_value},delHd,errorHd);
+		}		
+	}
+}
+
+//编辑
+function upd(id, name){
+	$.msg("编辑" + id + ' ', name);
+}
+function updHd(data){
+	 if(data.success){		
+	  }else{
+		$.msg(data.msg);
+	  }	  
+}
+
+/*编辑官方账号提交*/
+$('#updModal').find('[field="updTj"]').click(function(){	
+
+});
+
+function updSaveHd(data){
+	if(data.success){
+		$('#updModal').find('[field="closeModal"]').click();
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+/* end编辑角色提交*/
+
+
+//刷新表格
+function refreshdata() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+</script>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" 
+   aria-labelledby="addModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="addModalLabel">
+               添加账号
+            </h4>
+         </div>
+         <div class="modal-body" id="addModalCon">
+           <!-- 模态内容 -->
+           <form role="form">
+	<div class="box-body">
+		<div class="form-group">
+			<label for="symeGagano">GAGA号</label> <input type="text" class="form-control" id="symeGagano" placeholder="GAGA号">
+		</div>
+	</div>
+	<!-- /.box-body -->
+</form>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" field="closeModal">关闭
+            </button>
+            <!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+            <button type="button" class="btn btn-primary" field="addTj">提交</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->
+
+<!-- 编辑 -->
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="updModal" tabindex="-1" role="dialog" 
+   aria-labelledby="updModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="updModalLabel">
+               编辑账号
+            </h4>
+         </div>
+         <div class="modal-body" id="updModalCon">
+           <!-- 模态内容 -->
+           <form role="form">
+	<div class="box-body">
+		<div class="form-group">
+			<label for="roleName">GAGA号</label> <input type="text"
+				class="form-control" id="roleNameUpd" placeholder="请输入新GAGA号">
+		</div>
+		<div class="form-group" field="depart">
+		</div>
+	</div>
+	<!-- /.box-body -->
+
+	<div class="box-footer">		
+	</div>
+</form>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" field="closeModal">关闭
+            </button>
+            <!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+            <button type="button" class="btn btn-primary" field="updTj">提交</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->

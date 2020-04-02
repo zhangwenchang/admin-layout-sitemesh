@@ -1,0 +1,338 @@
+<style>
+.zi{width: 10%;float: left;text-align: center;line-height: 34px;}
+.startTime{width: 45%;float: left;}
+</style>
+<section class="content-header">
+    <h1>我的会员<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>用户管理</li>
+        <li class="active">我的会员</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          <form class="form-horizontal">
+              <div class="box-body">
+             <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">注册日期：</label>
+                  <div class="col-sm-4">
+                    <input type="text" id="starttime">至<input type="text" id="endtime">
+                  </div>
+               
+                  <label for="sendDate" class="col-sm-2 control-label">账号：</label>
+                  <div class="col-sm-4">
+                    <input type="text" class="form-control" id="gagano">
+                  </div>             
+                </div>
+                
+                <div class="form-group">   
+                  <label for="content" class="col-sm-2 control-label">性别：</label>
+                  <div class="col-sm-4">
+                     <select name="example1_length" aria-controls="example1" id="sex" class="form-control">
+	          		<option value="">不限</option>
+	          		<option value="1">男</option>
+	          		<option value="2">女</option>
+	          	</select>
+                  </div>             
+
+                  <label for="content" class="col-sm-2 control-label">终端：</label>
+                  <div class="col-sm-4">
+                     <select class="form-control" id="pcAppFlag">
+	                    <option value="">全部</option>
+	                    <option value="pc">pc</option>
+	                    <option value="app">app</option>
+	                  </select>
+                  </div>             
+                </div>
+                <div class="form-group">
+					<label for="content" class="col-sm-2 control-label">用户状态：</label>
+					<div class="col-sm-4">
+						<select class="form-control" name="isOnLine" aria-controls="example1" id="isOnLine" >
+							<option value="">全部</option>
+							<option value="1">在线</option>
+							<option value="0">离线</option>
+							<option value="4">隐身</option>
+						</select>
+					</div>
+		
+					<label for="content" class="col-sm-2 control-label">会员等级：</label>
+					<div class="col-sm-4">
+						<select class="form-control" name="level" aria-controls="example1" id="level" >
+							<option value="">全部</option>
+							<option value="0">普通会员</option>
+							<option value="10">迷你会员</option>
+							<option value="20">高级会员</option>
+							<option value="30">VIP会员</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+						<label for="membNo" class="col-sm-2 control-label">会员到期时间：</label>
+						<div class="row">
+							<div class="col-sm-4">
+								<input type="text" class="form-control startTime" id="levelStart" name="levelStart">
+								<span class="zi" style="">至</span>
+								<input type="text" class="form-control startTime" id="levelEnd" name="levelEnd">
+							</div>
+						</div>	
+					</div>
+				<div class="form-group">
+					<label for="membNo" class="col-sm-2 control-label">最后登录时间：</label>
+					<div class="row">
+						<div class="col-sm-4">
+							<input type="text" class="form-control startTime" id="loginStart" name="loginStart">
+							<span class="zi" style="">至</span>
+							<input type="text" class="form-control startTime" id="loginEnd" name="loginEnd">
+						</div>	
+					</div>
+				</div>                   
+                
+              </div>
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>
+              </div>
+              </form>
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="mymember" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>昵称</th>
+                    <th>GAGA号</th>
+                    <th>性别</th>
+                    <th>会员等级</th>
+                    <th>是否再次登录</th>
+                    <th>用户状态</th>
+                    <th>最后一次登录时间</th>
+                    <th>注册终端</th>
+                    <th>注册时间</th>
+                    <th>会员到期时间</th>
+                    <th>是否绑定邮箱</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+$(function() {
+  //  var firstDay = firstDate("yyyy-MM-dd");
+   // $('#starttime').val(firstDay);
+	 $('#starttime').datepicker({format: 'yyyy-mm-dd',language: 'zh-CN'});
+	 $('#endtime').datepicker({format: 'yyyy-mm-dd',language: 'zh-CN'});
+	
+	 $('#levelStart').datepicker({format: 'yyyy-mm-dd',language: 'zh-CN'});
+	 $('#levelEnd').datepicker({format: 'yyyy-mm-dd',language: 'zh-CN'});
+	 $('#loginStart').datepicker({format: 'yyyy-mm-dd',defaultDate : new Date(),language: 'zh-CN' });
+	 $('#loginEnd').datepicker({format: 'yyyy-mm-dd',defaultDate : new Date(),language: 'zh-CN'});
+	 
+	 
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+
+        var tabs=$("#mymember").dataTable({
+        	"bStateSave": true,
+            "paging": true,
+            //"processing": true,
+             "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "info": true,
+            "autoWidth": false,
+            "ordering": true,
+            "pageLength": 30,
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var gagano = $("#gagano").val();
+                var sex = $("#sex").val();
+                var starttime = $("#starttime").val();
+                var endtime = $("#endtime").val();
+                 aoData.push(
+                		 {"name": "gagano","value": gagano},
+                		 {"name": "sex","value": sex},
+                		 {"name": "starttime","value": starttime},
+                		 {"name": "endtime","value": endtime},
+                		 
+                		 {"name": "isOnLine","value": $("#isOnLine").val()},
+                		 {"name": "level","value": $("#level").val()},
+                		 {"name": "levelStart","value": $("#levelStart").val()},
+                		 {"name": "levelEnd","value": $("#levelEnd").val()},
+                		 {"name": "loginStart","value": $("#loginStart").val()},
+                		 {"name": "loginEnd","value": $("#loginEnd").val()},
+                		 
+                     	 {"name": "flag", "value": $("#pcAppFlag").val()}
+                		 ) 
+                    //aoData=gagaidorname; 
+                layer.load(1, {shade: 0.3});
+                var url=(tabs)?(ctx + "/extensionUser/mymember"):"#";
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": url,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "membNickname",
+                "bSortable": false
+            }, {
+                "data": "membGagano",
+                "bSortable": false
+            }, {
+                "data": "membSex",
+                "bSortable": false
+            }, {
+                "data": "memberfinance.mefiLevel",
+                "bSortable": false
+            }, {
+                "data": "isagainlogin",
+                "bSortable": false
+            }, {
+                "data": "online",
+                "bSortable": false
+            }, {
+                "data": "melotime",
+                "bSortable": false
+            },  {
+                "data": "flag",
+                "bSortable": false
+            },{
+                "data": "membRegistertime",
+                "bSortable": false
+            },{
+                "data": "memberfinance.mefiLevelendtime",
+                "bSortable": false
+            },{
+                "data": "membEmail",
+                "bSortable": false
+            }],
+            "columnDefs": [{
+                "targets": 2,
+                "data": "membSex",
+                "render": function(data, type, full, meta) {
+                    if(data==1){
+                    	return "男";
+                    }else if(data==2){
+                    	return "女";
+                    }else if(data==0){
+                    	return "无";
+                    }
+                }
+            }, {
+                "targets": 3,
+                "data": "memberfinance.mefiLevel",
+                "render": function(data, type, full, meta) {
+                    if (data == 0) {
+                        return "普通会员";
+                    } else if(data==10){
+                        return "迷你会员";
+                    } else if(data==20){
+                        return "高级会员";
+                    }else if(data==30){
+                    	return "VIP会员";
+                    }
+                }
+            }, {
+                "targets": 4,
+                "data": "isagainlogin",
+                "render": function(data, type, full, meta) {
+                    if(full.melotime!=full.membRegistertime){
+                    	return "是";
+                    }else{
+                    	return "否";
+                    }
+                }
+            }, {
+                "targets": 5,
+                "data": "online",
+                "render": function(data, type, full, meta) {
+                    if(data==1||data==2||data==3){
+                    	return "在线";
+                    }if(data==4){
+                    	return "隐身";
+                    }else{
+                    	return "离线";
+                    }
+                }
+            }, {	
+                "targets": 6,
+                "data": "melotime",
+                "render": function(data, type, full, meta) {
+                	if(data==''||data==null){
+                		return "";
+                	}
+                /* 	var reDate=full.membRegistertime;
+                	reDate = new Date(reDate); */
+                	var date = new Date(data);
+                	/* if(reDate.getTime()>date.getTime()){
+                		date = reDate; 
+                	} */
+    	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                }
+            },{
+                "targets": 8,
+                "data": "membRegistertime",
+                "render": function(data, type, full, meta) {
+                	if(data==''||data==null){
+                		return "";
+                	}
+                	var date = new Date(data);
+                	//date = new Date(date.valueOf() - 8*60* 60 * 1000);// 当前时间减掉8小时
+    	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                }
+            },{
+                "targets": 9,
+                "data": "memberfinance.mefiLevelendtime",
+                "render": function(data, type, full, meta) {
+                	if(data==''||data==null){
+                		return "";
+                	}
+                	if(full.memberfinance.mefiLevel==1){return "";}
+                	var date = new Date(data);
+    	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                }
+            },{
+                "targets": 10,
+                "render": function(data, type, full, meta) {
+                	if(data==''||data==null){
+                		return "否";
+                	}
+                	return "是";               	
+                }
+            }
+            
+            ],
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                layer.closeAll();
+            }
+        });
+
+        //序号相关   刷新后可返回第一页
+        var table = $('#mymember').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	/* var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } ); */
+         } ).draw();
+    });
+});
+
+function search() {
+    $("#mymember").dataTable().fnDraw(true);
+}
+</script>
+

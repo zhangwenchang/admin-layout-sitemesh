@@ -1,0 +1,384 @@
+<section class="content-header">
+    <h1>代理商管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>推广管理</li>
+        <li class="active">代理商管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+             <form class="form-horizontal">
+              <div class="box-body">
+              
+               <div class="form-group">
+                  <label for="starttime" class="col-sm-2 control-label">时间:</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="starttime">至<input type="text" id="endtime">(备注：开始日期为包含即“>=”，结束日期为不包含即“<”。)
+                  </div>
+                </div>                           
+                
+                <div class="form-group">
+                  <label for="content" class="col-sm-2 control-label">代理商名称：</label>
+                  <div class="col-sm-10">
+                     <input type="text" class="form-control" id="userName" placeholder="代理商名称模糊查询" >
+                  </div>             
+                </div>
+               
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+                <button type="button" class="btn btn-default" onclick="search()">查询</button>
+				<button type="button" onclick="userAdd()" class="btn btn-primary">新增</button>
+				<button type="button" onclick="refreshdata()" class="btn btn-primary">刷新</button>
+				本月新增会员总数：<span id="monthBandCountSum"></span>&nbsp;&nbsp;&nbsp;&nbsp;当月提成总额：<span id="commissionTotalSum"></span>
+				&nbsp;&nbsp;&nbsp;&nbsp;当月消费总额：<span id="consumTotalSum"></span>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+                  <th>代理名称</th>
+                  <th>推广员数</th>
+                  <th>本月新增推广员</th>
+                  <th>已绑定会员总数</th>
+                  <th>本月新增会员</th>
+                  <th>提成总额</th>                  
+                  <th>消费总额</th>
+                  <th>状态</th> 
+                  <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+var departIdTmp='',userIdTmp='',userNameTmp='';
+$(function() {
+	
+	var firstDay = firstDate("yyyy-MM-dd");
+	var now = new Date();
+	var nowdate = now.format("yyyy-MM-dd")
+	$('#starttime').val(firstDay);
+	$('#endtime').val(nowdate);
+	$('#starttime').datepicker({format: 'yyyy-mm-dd'});
+	$('#endtime').datepicker({format: 'yyyy-mm-dd'});
+	
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 
+                 , '/plugins/daterangepicker/daterangepicker.js'
+                 ,'/plugins/datepicker/bootstrap-datepicker.js'
+                 ], function() {
+
+        var t=$("#tableData").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 20,
+
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var userName = $("#userName").val();
+                aoData.push({"name": "userName", "value": userName});
+            	
+            	var starttime = $("#starttime").val();
+	        	var endtime = $("#endtime").val();
+	        	aoData.push(
+	        			{"name":"beginDate","value":starttime},
+	        			{"name":"endDate","value":endtime}
+	        			)
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/Promotion/agentList",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "sydeid",
+                "bSortable": false
+            }, {
+                "data": "sydeid",
+                "bSortable": false
+            }, {
+                "data": "agentName",
+                "bSortable": false
+            }, {
+                "data": "usercount",
+                "bSortable": false
+            },  {
+                "data": "monthusercount",
+                "bSortable": false
+            }, {
+                "data": "bandcount",
+                "bSortable": false
+            }, {
+                "data": "monthbandcount",
+                "bSortable": false
+            }, {
+                "data": "commissionTotal",
+                "bSortable": false
+            }, {
+                "data": "consumTotal",
+                "bSortable": false
+            },{
+                "data": "sydeid",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 1,                
+                "render": function(data, type, full, meta) {                	
+                    return '<input type="checkbox" value="' + data + '" title="' + data + '" name="userId" />';
+                }
+            },{
+                "targets": 2,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		/* if (data.indexOf("社交事业部 -> GAGAHI运营部 ->")>-1) {
+        					dstr=data.substr(21);
+        				} */
+        				dstr=data;
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 7,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr.toFixed(2);
+                }
+            },{
+                "targets": 8,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr.toFixed(2);
+                }
+            },{
+                "targets": 9,
+                "data": "sydeid",
+                "render": function(data, type, full, meta) {
+                	var lnks='';
+                	if(full.sydeState==1){
+                		lnks="激活";
+                	}else{
+                		lnks="禁用";
+                	}
+                    return lnks;
+                }
+            },{
+                "targets": 10,
+                "data": "sydeid",
+                "render": function(data, type, full, meta) {
+                	var lnks='';
+                	if(full.sydeState==1){
+                		lnks='<a href="javascript:zt('+full.sydeid+',2);">禁用</a>'; 
+                	}else{
+                		lnks='<a href="javascript:zt('+full.sydeid+',1);">激活</a>'; 
+                	}
+                	if(full.alonecommisssion==0){
+                		lnks=lnks+'</br><a href="javascript:agentAloneCommisssion('+full.sydeid+',1);">独立消费提成</a>'; 
+                	}else{
+                		lnks=lnks+'</br><a href="javascript:agentAloneCommisssion('+full.sydeid+',0);">取消独立消费提成</a>'; 
+                	}
+                    return lnks;
+                }
+            } ],
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+            	//debugger
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+            	
+                layer.closeAll();                
+                //设置回调数据
+            	$('#monthBandCountSum').html(oSettings.jqXHR.responseJSON.obj.monthBandCountSum);
+            	$('#commissionTotalSum').html(oSettings.jqXHR.responseJSON.obj.commissionTotalSum.toFixed(2));
+            	$('#consumTotalSum').html(oSettings.jqXHR.responseJSON.obj.consumTotalSum.toFixed(2));
+            	
+            }
+        });
+     
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+    });
+});
+
+<!-- 添加用户中的角色列表 -->
+function userAdd(){
+	$('#userAddModal').modal({keyboard: true});
+	
+}
+<!-- end 添加用户中的角色列表 -->
+function errorHd(xreq){	 
+	  $.msg(xreq.statusText+"["+xreq.status+"]");
+}
+<!-- 添加用户提交  -->
+$('#userAddModal').find('[field="userAddTj"]').click(function(){	
+	var userName=$.trim($("#userNameAdd").val());
+	if(userName==''){
+		$.msg("请正确填写代理商名称");
+		return;
+	}
+	//用户保存
+	doPost("Promotion/agentAdd", {"agentName":userName},userAddHd,errorHd);	
+});
+
+function userAddHd(data){
+	if(data.success){
+		$('#userAddModal').find('[field="closeModal"]').click();
+		$("#userName").val("");
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+<!-- end 添加用户提交  -->
+
+
+
+/*状态更新*/
+function zt(id, zt){
+	var t;
+	if(zt==1){
+		t=confirm("确定要激活该代理商账号吗？");
+	}else{
+		t=confirm("确定要禁用该代理商账号吗？");
+	}
+	if(t){
+	doPost("Promotion/agentZtUpd", {"sydeId":id, "sydeState":zt},ztHd,errorHd);
+	}
+}
+
+/*独立消费提成*/
+function agentAloneCommisssion(id, zt){
+	var t;
+	if(zt==1){
+		t=confirm("确定要独立消费提成？");
+	}else{
+		t=confirm("确定要取消独立消费提成？");
+	}
+	if(t){
+	doPost("Promotion/agentAloneCommisssion", {"sydeId":id, "alonecommisssion":zt},ztHd,errorHd);
+	}
+}
+
+function ztHd(data){
+	if(data.success){		
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+
+//刷新表格
+function refreshdata() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+
+function search() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+</script>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="userAddModal" tabindex="-1" user="dialog" 
+   aria-labelledby="userAddModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="userAddModalLabel">
+               添加代理商
+            </h4>
+         </div>
+         <div class="modal-body" id="userAddModalCon">
+           <!-- 模态内容 -->
+           <form user="form">
+	<div class="box-body">
+		<div class="form-group">
+			<label for="userName">请输入代理商名称：</label> <input type="text"
+				class="form-control" id="userNameAdd" placeholder="代理商名称">
+		</div>
+	</div>
+	<!-- /.box-body -->
+
+	<div class="box-footer">		
+	</div>
+</form>
+           <!-- /模态内容 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" 
+               data-dismiss="modal" field="closeModal">关闭
+            </button>
+            <!-- <button type="button" class="btn btn-primary">
+               提交更改
+            </button> -->
+            <button type="button" class="btn btn-primary" field="userAddTj">提交</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div>
+</div><!-- /.modal -->
+
+<!-- /.modal -->

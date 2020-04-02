@@ -1,0 +1,342 @@
+<style type="text/css">
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+</style>
+<section class="content-header">
+    <h1>金币销售明细<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>财务统计</li>
+        <li class="active">金币销售明细</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          
+           <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">统计区间:</label>(备注：查询条件中的日期使用说明，开始日期为包含即'>='，结束日期为不包含即"<"。)
+                  <div class="col-sm-10">
+                    <input type="text" id="starttime">至<input type="text" id="endtime">
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">充值类型:</label>
+                  <div class="col-sm-10">
+                  <select id="rechargetype" style="width: 140px;height:30px;">
+                  <option>全部</option>
+                  <option>paypal</option>
+                  <option>alipay</option>
+                  <option>appstore</option>
+                  <option>paypalcredit</option>
+                  <option>wechatpay</option>
+                  </select>
+                  <!--  <input type="text" id="paytype"> -->
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">订单状态:</label>
+                  <div class="col-sm-10">
+                   <select id="orderstatus" style="width: 140px;height:30px;">
+                  		<option>全部</option>
+                  		<option value="0">未支付</option>
+                  		<option value="1">成功</option>
+                  		<option value="2">失败</option>
+                  </select>
+                  <!--  <input type="text" id="orderstatus"> -->
+                  </div>
+                </div>
+                
+               <div class="form-group">
+                  <label for="membD" class="col-sm-2 control-label">部门：</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" id="departmentId">
+                    <option value="">-- 请选择 --</option>
+                  </select>
+                  </div>
+                </div>
+                
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>
+               <button type="button" onclick="exportTable('goldSaleDetail','金币销售明细')" class="btn btn-primary">导出</button>
+              </div>
+			<!-- /.box-footer -->
+            </form>
+             <span style="color: red;margin-left: 20px;">总金额:</span>
+          	 <span style="color: red;" id="totalmoney">100</span>
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="goldSaleDetail" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>部门</th>
+                    <th>推广员姓名</th>
+                    <th>订单时间</th>
+                    <th>充值类型</th>
+                    <th>第三方订单</th>
+                    <th>订单状态</th>
+                    <th>用户GAGA号</th>
+                    <th>金额</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="Modalpage" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog" style="width:60%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabelpage">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontentpage">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbuttonpage">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+$(function() {
+	var now = new Date();
+	var nowdate = now.format("yyyy-MM-dd")
+	
+	
+	var firstDay = firstDate("yyyy-MM-dd");
+    $('#starttime').val(firstDay);
+    var lastDay = lastDate("yyyy-MM-dd");
+    $('#endtime').val(nowdate);
+    $('#enddate').text(firstDay);
+    $('#startdate2').text(firstDay);
+    $('#enddate2').text(nowdate);
+	$('#starttime').datepicker({format: 'yyyy-mm-dd'});
+	$('#endtime').datepicker({format: 'yyyy-mm-dd'});
+	
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        $("#goldSaleDetail").dataTable({
+        	 "dom": 'T<"clear">lfrtip',
+             "tableTools": {
+                 "sSwfPath": "/gaga_sns_admin/plugins/datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
+             }, 
+             "bLengthChange": true,
+         	"bStateSave": true, 
+         	"paging": true,
+             //"processing": true,
+             "serverSide": true,
+             "lengthChange": false,
+             "searching": false,
+             "ordering": true,
+             "info": true,
+             "autoWidth": false,
+             "pageLength":50,
+
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	var starttime = $("#starttime").val();
+	        	var endtime = $("#endtime").val();
+	        	aoData.push(
+	        			{"name":"startTime","value":starttime},
+	        			{"name":"endTime","value":endtime},
+	        			{"name":"sysdept","value":$("#departmentId").val()}
+	        			)
+	        	if($("#rechargetype").val()!="全部"){
+	        		aoData.push({"name":"rechargetype","value":$("#rechargetype").val()})
+	        	}
+	        	if($("#orderstatus").val()!="全部"){
+	        		aoData.push({"name":"orderstatus","value":$("#orderstatus").val()})
+	        	}
+	        	//aoData=gagaidorname; 
+            layer.load(1, {shade: 0.3});
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/finance/getGoldSaleDetail",
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "syde_name","bSortable": false },
+				{"data": "syus_realname","bSortable": false},
+				{"data": "create_date","bSortable": false },
+				{"data": "rech_type","bSortable": false},
+				{"data": "rech_platorerid","bSortable": false },
+				{"data": "rech_state","bSortable": false },
+				{"data": "memb_gagano","bSortable": false },
+				{"data": "rech_goldreal","bSortable": false }
+	        ], 
+	         "columnDefs": [	
+
+				{"targets": 4,
+					"render": function ( data, type, full, meta ) {
+						if(data==-1){
+							return "-"
+						}
+						return data;
+				}},
+				{"targets": 2,
+					"render": function ( data, type, full, meta ) {
+						var dstr='';
+	                	if(data!=null){
+	                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+	                	}
+	                    return dstr;
+				}}],
+	            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                layer.closeAll();
+            	 
+	            }
+	    });
+        
+        $.post(ctx+"/useBase/getAllAgent", function (data){
+    		if (data.success) {
+    			//每次选择后清空
+    			$('#departmentId').html('<option value="">-- 请选择 --</option>');
+    			$.each(data.obj, function(index,e) {
+    				$('#departmentId').append('<option value="'+e.syde_id+'">'+e.syde_name+'</option>');
+    			});
+    		} else {
+    			layer.msg('获取部门失败');
+    		}
+    	}); 
+        
+    });
+    
+    getTotalMoney();
+    
+});
+
+function getTotalMoney(){
+    var params = {
+    		"startTime":$("#starttime").val(),
+    		"endTime":$("#endtime").val(),
+    		"sysdept":$("#departmentId").val(),
+    		};
+	if($("#rechargetype").val()!="全部"){
+		params["rechargetype"] = $("#rechargetype").val();
+	}
+	if($("#orderstatus").val()!="全部"){
+		params["orderstatus"] = $("#orderstatus").val();
+	}
+    $.post(ctx+"/finance/getGoldSaleDetailTotalMoney",params, function (data){
+		if (data!=null) {
+			$("#totalmoney").text(data);
+		} else {
+			/* layer.msg('获取部门失败'); */
+		}
+	}); 
+}
+
+
+//查询
+function search(){
+	var starttime = $('#starttime').val();
+    var endtime = $('#endtime').val();
+    $('#enddate').text(starttime);
+    $('#startdate2').text(starttime);
+    $('#enddate2').text(endtime);
+	$("#goldSaleDetail").dataTable().fnDraw(true);
+	getTotalMoney();
+}
+
+function exportTable(tableid, tableName) {
+
+	if (!!window.ActiveXObject || "ActiveXObject" in window) {
+		window.document.write(document.getElementById(tableid).outerHTML);
+		window.document.execCommand("SaveAs", false, tableName + ".xls");
+		history.go(-1);
+	} else {
+		var tb = document.getElementById(tableid); //获取table对像
+		var rows = tb.rows;
+		var str = "";
+		for (var i = 0; i < rows.length; i++) { //---循环--行---
+			var cells = rows[i].cells;
+			for (var j = 0; j < cells.length; j++) { //---循环--列---
+				str = str + cells[j].innerText + ",";
+			}
+			str = str + "\n";
+		}
+		str = encodeURIComponent(str);
+		var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+		var downloadLink = document.createElement("a");
+		downloadLink.href = uri;
+		downloadLink.download = tableName + ".csv";
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+		document.body.removeChild(downloadLink);
+	}
+}
+</script>
+
+
+

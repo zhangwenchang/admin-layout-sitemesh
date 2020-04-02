@@ -1,0 +1,217 @@
+<section class="content-header">
+    <h1>薪水变更<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>我的推广</li>
+        <li class="active">薪水变更</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+             <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">
+                  <label for="createDate" class="col-sm-2 control-label">变更时间(UTC)：</label>
+                  <div class="col-sm-10">
+                    <input type="text"  class="form-control pull-right" id="createDate">
+                  </div>
+                </div>
+                <!--
+                <div class="form-group">
+                  <label for="content" class="col-sm-2 control-label">推广员：</label>
+                  <div class="col-sm-10">
+                     <input type="text" class="form-control" id="userName" placeholder="推广员账号" >
+                  </div>             
+                </div>-->
+                
+                
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+              阶段变更金额($)：<span id="jdtc"></span><span style=" display:inline-block;width:100px"></span>
+                <button type="button" class="btn btn-default" onclick="search()">查询</button>
+				<button type="button" onclick="refreshdata()" class="btn btn-primary">刷新</button>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+
+              <div class="box-body mailbox-messages">
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th>变更金额($)</th>
+                  <th>操作员</th>
+                  <th>终端</th>
+                  <th>变更描述</th>
+                  <th>变更时间</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+                <font color="#aaaaaa">备注：查询条件中的日期使用说明，开始日期为包含即'>='，结束日期为不包含即'<'。</font>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+var departIdTmp='',userIdTmp='',userNameTmp='';
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 
+                 , '/plugins/daterangepicker/daterangepicker.js'
+                 ,'/plugins/datepicker/bootstrap-datepicker.js'
+                 ], function() {
+        console.log(1);
+        var defaultDateObj = new Date();
+        var currentYear = defaultDateObj.getFullYear();
+        var currentMonth = defaultDateObj.getMonth() + 1;
+        var defaultStartDate = currentYear + '-' + currentMonth + '-01 01:00:00';
+        var isOverYear = (currentMonth + 1) > 12;
+        var defaultEndDate = (isOverYear ? (currentYear + 1) : currentYear) + '-' + (isOverYear ? '01' : currentMonth + 1) + '-01 01:00:00';
+        $('#createDate').daterangepicker({
+          timePicker: true,
+          timePicker12Hour: false,
+          timePickerSeconds: true,
+          timePickerIncrement: 1,
+          opens: "right",
+          format: 'YYYY-MM-DD HH:mm:ss',
+          startDate: defaultStartDate,
+          endDate: defaultEndDate
+        });
+        $('#createDate').data('daterangepicker').setStartDate(defaultStartDate);
+        var t=$("#tableData").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 30,
+
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                //var userName = $("#userName").val();
+                var createDate=$("#createDate").val();
+                
+                //aoData.push({"name": "userName", "value": userName});                
+                
+                if(createDate!=''){                	
+                	var tmp=createDate.split(' - ');
+                	if(tmp.length==2){
+                		aoData.push({"name": "beginDate",  "value": tmp[0]});
+                        aoData.push({"name": "endDate",  "value": tmp[1]});
+                	}
+                }
+                layer.load(1, {shade: 0.3});  
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/Commission/myChange",
+                    "data": aoData,
+                    "success":  function (json) {  
+	                    	fnCallback( json);
+	                    	//自定义数据处理
+	                    	//console.log(json);
+	                    	$("#jdtc").html(json.obj);
+                        }
+                });
+            },
+            "columns": [{
+                "data": "cost_id",
+                "bSortable": false
+            }, {
+                "data": "cost_goldcommis",
+                "bSortable": false
+            }, {
+                "data": "nc_czr",
+                "bSortable": false
+            }, {
+                "data": "flag",
+                "bSortable": false
+            },  {
+                "data": "cost_description",
+                "bSortable": false
+            }, {
+                "data": "cost_addtime",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+                "targets": 0,                
+                "render": function(data, type, full, meta) {                	
+                    return '';
+                }
+            },{
+                "targets": 2,
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null||data!=undefined){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 4,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 5,
+                "data": "cost_typeid",
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            }],
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+    });
+});
+
+//刷新表格
+function refreshdata() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+
+function search() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+</script>

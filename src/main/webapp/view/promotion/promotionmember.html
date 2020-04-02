@@ -1,0 +1,737 @@
+<section class="content-header">
+    <h1>已绑定会员管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>推广管理</li>
+        <li class="active">已绑定会员管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          <form class="form-horizontal">
+              <div class="box-body">
+             <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">注册时间：</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="regstarttime">至<input type="text" id="regendtime">
+                  </div>
+                </div>
+             <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">最后登录时间：</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="startMelotime">至<input type="text" id="endMelotime">
+                  </div>
+                </div>   
+                <div class="form-group">   
+                  <label for="sendDate" class="col-sm-2 control-label">嘎嘎号：</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="gagano">
+                  </div>             
+                </div>
+                
+                <div class="form-group">   
+                  <label for="content" class="col-sm-2 control-label">性别：</label>
+                  <div class="col-sm-10">
+                     <select name="example1_length" aria-controls="example1" id="sex" class="form-control input-sm">
+	          		<option value="">不限</option>
+	          		<option value="1">男</option>
+	          		<option value="2">女</option>
+	          	</select>
+                  </div>             
+                </div>
+                <div class="form-group">   
+                  <label for="sendDate" class="col-sm-2 control-label">推广员：</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="username">
+                  </div>             
+                </div>
+                <div class="form-group">   
+                  <label for="sendDate" class="col-sm-2 control-label">注册IP：</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="regip">
+                  </div>             
+                </div>
+                <div class="form-group">   
+                  <label for="sendDate" class="col-sm-2 control-label">重复ip过滤：</label>
+                  <div class="col-sm-10">
+                     <span class="relative-top6"><input type="checkbox" id="filteip"></span>
+                  </div>            
+                </div>
+                <div class="form-group">   
+                  <label for="sendDate" class="col-sm-2 control-label">首次充值：</label>
+                  <div class="col-sm-10">
+                  <input type="text" readonly class="form-control pull-right" id="firstreg">
+                    <!--  <input type="text" id="firstregstart">至<input type="text" id="firstregend"> -->
+                  </div>           
+                </div>
+
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">部门：</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" id="departmentId">
+                    <option value="">-- 请选择 --</option>
+                  </select>
+                  </div>
+                </div>
+                 <div class="form-group">
+                  <label for="content" class="col-sm-2 control-label">来源：</label>
+                  <div class="col-sm-10">
+                     <select class="form-control" id="pcAppFlag">
+	                    <option value="">全部</option>
+	                    <option value="pc">pc</option>
+	                    <option value="app">app</option>
+	                  </select>
+                  </div>             
+                </div>
+
+              </div>
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>
+              </div>
+              </form>
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="promotionmember" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>昵称</th>
+                    <th>GAGA号</th>
+                    <th>性别</th>
+                    <th>语言</th>
+                    <th>等级</th>
+                    <th>注册时间</th>
+                    <th>注册来源</th>
+                    <th>最后登录时间</th>
+                    <th>推广员</th>
+                    <th>注册IP</th>
+                    <th>绑定时间</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="Modalpage" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog" style="width:60%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabelpage">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontentpage">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbuttonpage">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+$(function() {
+	 $('#regstarttime').datepicker({format: 'yyyy-mm-dd'});
+	 $('#regendtime').datepicker({format: 'yyyy-mm-dd'});
+	 $('#startMelotime').datepicker({format: 'yyyy-mm-dd'});
+	 $('#endMelotime').datepicker({format: 'yyyy-mm-dd'});
+	 $('#firstreg').daterangepicker({
+	    timePicker: true,
+	    timePickerIncrement: 1,
+	    format: 'YYYY-MM-DD HH:mm:ss', 
+	    opens: 'right'
+	   });
+	 
+	 
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+
+       var tabs= $("#promotionmember").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var gagano = $("#gagano").val();
+                var sex = $("#sex").val();
+                var starttime = $("#regstarttime").val();
+                var endtime = $("#regendtime").val();
+                var startMelotime = $("#startMelotime").val();
+                var endMelotime = $("#endMelotime").val();
+                var regip = $("#regip").val();
+                var username = $("#username").val();
+                var departmentId=$("#departmentId").val();
+                
+                
+                var firstregstart = $("#firstregstart").val();
+                var firstregend = $("#firstregend").val();
+                
+                var ip = "";
+                var filteip = $("#filteip").is(':checked');
+            	if(filteip){
+            		ip="1";
+            	}          	 
+                 aoData.push(
+                		 {"name": "gagano","value": gagano},
+                		 {"name": "sex","value": sex},
+                		 {"name": "startMelotime","value": startMelotime},
+                		 {"name": "endMelotime","value": endMelotime},
+                		 {"name": "regip","value": regip},
+                		 {"name": "username","value": username},
+                		 {"name": "regstarttime","value": starttime},
+                		 {"name": "regendtime","value": endtime},
+                		 {"name": "filteip","value": ip},
+                     	 {"name": "departmentId", "value": departmentId},
+                     	 {"name": "flag", "value": $("#pcAppFlag").val()}       
+                		 ) ;
+                		 
+                var firstreg = $("#firstreg").val();
+             	if(firstreg!=''){                	
+                 	var tmp=firstreg.split(' - ');
+                 	if(tmp.length==2){
+                 		aoData.push({"name": "firstregstart",  "value": tmp[0]});
+                         aoData.push({"name": "firstregend",  "value": tmp[1]});
+                 	}
+                 }
+                    //aoData=gagaidorname; 
+                 layer.load(1, {shade: 0.3});  
+
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/promotionMember/promotionMemberList",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "membNickname",
+                "bSortable": false
+            }, {
+                "data": "membGagano",
+                "bSortable": false
+            }, {
+                "data": "membSex",
+                "bSortable": false
+            }, {
+                "data": "membLanguage",
+                "bSortable": false
+            }, {
+                "data": "memberfinance.mefiLevel",
+                "bSortable": false
+            }, {
+                "data": "membRegistertime",
+                "bSortable": false
+            }, {
+                "data": "flag",
+                "bSortable": false
+            },{
+                "data": "melotime",
+                "bSortable": false
+            },{
+                "data": "sysUser.syusUsername",
+                "bSortable": false
+            },{
+                "data": "membIp",
+                "bSortable": false
+            },{
+                "data": "membShowtoptime",
+                "bSortable": false
+            },{
+                "data": "membGagaid",
+                "bSortable": false
+            }],
+            "columnDefs": [{
+                "targets": 2,
+                "data": "membSex",
+                "render": function(data, type, full, meta) {
+                    if(data==1){
+                    	return "男";
+                    }else if(data==2){
+                    	return "女";
+                    }
+                    return "无";
+                }
+            },{
+                "targets": 3,
+                "data": "membLanguage",
+                "render": function(data, type, full, meta) {
+                    if(data==null||data==''){
+                    	return "";
+                    }else{
+                    	return data;
+                    }
+                }
+            },{
+                "targets": 4,
+                "data": "memberfinance.mefiLevel",
+                "render": function(data, type, full, meta) {
+                    if(data==30){
+                    	return "VIP会员";
+                    }
+                    else if(data==20){
+                    	return "高级会员";
+                    } else if(data==10){
+                    	return "迷你会员";
+                    }else{
+                    	return "普通会员";
+                    }
+                }
+            } 
+             ,{
+                "targets": 5,
+                "data": "membRegistertime",
+                "render": function(data, type, full, meta) {
+                	if(data){
+                		//var date = new Date(data-(8*60*60*1000));
+                		var date = new Date(data);
+        	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                	}
+                	//var date = new Date(data).format('yyyy-MM-dd hh:mm:ss', true);
+    	    	      //date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                 // return date;
+                }
+            } 
+            , {
+                "targets": 7,
+                "data": "memberlog.meloTime",
+                "render": function(data, type, full, meta) {
+                    if(data==null||data==''){
+                    	return "";
+                    }else{
+                    	var date = new Date(data);
+        	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                    }
+                }
+            }, {
+                "targets": 9,
+                "data": "membIp",
+                "render": function(data, type, full, meta) {
+                	return data;
+                }
+            },{
+                "targets": 10,
+                "render": function(data, type, full, meta) {
+                    if(data){
+                    	var date = new Date(data);
+        	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                    }
+                }
+            }, {
+                "targets": 11,
+                "data": "membGagaid",
+                "render": function(data, type, full, meta) {
+                	var html='<a href="javascript:void(0)" onclick="recharge('+data+',1)">查看充值</a> <a href="javascript:void(0)" onclick="upgrade('+data+',1)">升级</a><br>'+
+                	'<a href="javascript:void(0)" onclick="comsume('+data+',1)">查看消费</a>'
+                	return html;
+                }
+            }],            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数               
+                layer.closeAll();
+            }
+        });
+        
+
+        //动态获取下拉框内容       放在fnDrawCallback外面可不清缓存,保留选择值
+        $.post(ctx+"/Promotion/departList", function (data){
+          if (data.success) {
+            //每次选择后清空
+            $('#departmentId').html('<option value="">-- 请选择 --</option>');
+            $.each(data.obj, function(index,e) {
+              $('#departmentId').append('<option value="'+e.sydeId+'">'+e.sydeName+'</option>');
+            });
+          } else {
+            layer.msg('获取部门失败');
+          }
+        }); 
+
+    });
+});
+
+//升级
+function upgrade(id,type){
+	if(type==1){
+		   $("#ModalLabel").text("会员升级");
+		   var content = '<ul><li><span>昵称：</span><span id="membname"></span></li><br>'+
+		   '<li><span>会员等级：<select id="uplevel"><option value="0">普通会员</option><option value="10">迷你会员</option><option value="20">高级会员</option><option value="30">VIP会员</option></select></li><br>'+
+		   '<li><span>会员过期日期：</span><input type="text" readonly id="enddate"></li>';
+		   $("#bodycontent").html(content);
+		   $("#modalbutton").html('<button type="button" onclick="upgrade('+id+',2)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		   $('#Modal').modal({
+			      keyboard: true
+		   });
+		   $('#enddate').datepicker({format: 'yyyy-mm-dd'});
+		   $.ajax({
+				type : "post",
+				url : ctx+"/adminmember/getmember",
+				dataType : "json",
+				data : {
+					"gagaid":id,
+				},
+				success : function(data) {
+					if(data.success){
+						var endtime = data.obj.memberfinance.mefiLevelendtime;
+						 var showtime="";
+						 if(endtime!=null&&endtime!=''){
+							 var date = new Date(endtime);
+							 endtime = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+						 }
+						$("#membname").text(data.obj.membNickname);
+						$("#uplevel").val(data.obj.memberfinance.mefiLevel);
+						//$("#uppwd").val(data.obj.membPassword);
+						$("#enddate").val(endtime);
+					}
+				}
+		   });
+	   }
+	   if (type == 2) {
+		   var level = $("#uplevel").val();
+		   var endtime = $("#enddate").val();
+		   if(level!=1&&endtime==''){
+			   $("#errorbodycontent").html("请选择结束日期");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+			   return;
+		   }
+		   $.ajax({
+				type : "post",
+				url : ctx+"/promotionMember/upgrademember",
+				dataType : "json",
+				data : {
+					"gagaid":id,
+					"level":level,
+					"endtime":endtime
+				},
+				success : function(data) {
+					if(data.success){
+						$("#promotionmember").dataTable().fnDraw(false);
+						$('#Modal').modal('hide');
+					}else{
+						$("#errorbodycontent").html("升级失败");
+						   $('#errorModal').modal({
+								keyboard : true
+							});
+					}
+				}
+		   });
+		}
+}
+
+//充值
+function recharge(id,type){
+	   if(type==1){
+		   $("#ModalLabelpage").text("充值记录");
+		   var tablehtml ='<div class="box">';
+			   tablehtml+='<div class="box-body mailbox-messages">';
+			   tablehtml+='<table id="recharges" class="table table-bordered table-hover">';
+			   tablehtml+='<thead>';
+			  
+			   tablehtml+='<tr><th>序号</th><th>该充值会员昵称</th><th>GAGA号</th><th>订单时间</th><th>充值成功时间</th><th>充值金币数</th><th>折扣后美元</th><th>支付方式</th><th>状态</th><th>来源</th><th>失败原因</th><th>交易单号</th></tr></thead></table></div></div>';
+			   $("#bodycontentpage").html(tablehtml);
+			   $("#modalbuttonpage").html(
+						'<button type="button" onclick="recharge(' + id
+								+ ',2)" class="btn btn-primary">确定  </button>');
+			   rechargelist(id);
+				$('#Modalpage').modal({
+					keyboard : true
+				});
+	   }
+	   if (type == 2) {
+			$('#Modalpage').modal('hide');
+		}
+}
+
+function rechargelist(id){
+	   $("#recharges").dataTable({
+	    	"bStateSave": true, 
+	    	"paging": true,
+	        //"processing": true,
+	        "serverSide": true,
+	        "lengthChange": false,
+	        "searching": false,
+	        "ordering": true,
+	        "info": true,
+	        "autoWidth": false,
+	        "pageLength":10,
+	        //"ajax" : ctx+"/adminmember/notauditedimgList",
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	aoData.push({"name":"gagaid","value":id})
+	        	//aoData=gagaidorname; 
+            layer.load(1, {shade: 0.3});
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/adminmember/rechargelist",
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "rechId","bSortable": false },
+				{"data": "member.membNickname","bSortable": false },
+				{"data": "member.membGagano","bSortable": false},
+				{"data": "rechOrdertime","bSortable": false},
+				{"data": "rechSucesstime","bSortable": false},
+				{"data": "rechGold","bSortable": false},
+				{"data": "rechGoldreal","bSortable": false},
+				{"data": "rechType","bSortable": false},
+				{"data": "rechState","bSortable": false},
+				{"data": "flag","bSortable": false},
+				{"data": "rechReason","bSortable": false},
+				{"data": "rechId","bSortable": false}
+	        ], 
+	         "columnDefs": [
+				{"targets": 3,
+					"data": "rechOrdertime",
+					"render": function ( data, type, full, meta ) {
+						if(data==''||data==null){
+				    		return "";
+				    	}
+						var data = data+"000"
+						/* var date = new Date(parseInt(data)-(8*60*60*1000)); */
+						 var date = new Date(parseInt(data));
+				    	return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+				}},
+				{"targets": 4,
+					"data": "rechSucesstime",
+					"render": function ( data, type, full, meta ) {
+					if(data==null||data==''){
+						return "";
+					}else{
+						if(data==''||data==null){
+				    		return "";
+				    	}
+						var data = data+"000"
+						/* var date = new Date(parseInt(data)-(8*60*60*1000)); */
+						var date = new Date(parseInt(data));
+				    	return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+					}
+				}},
+				{"targets": 8,
+					"data": "rechState",
+					"render": function ( data, type, full, meta ) {
+					if(data==0){
+						return "已下单，未支付";
+					}else if(data==1){
+						return "支付成功";
+					}else if(data==2){
+						return "支付失败";
+					}else if(data==3){
+						return "删除";
+					}else if(data==4){
+						return "交易处理中";
+					}else if(data==5){
+						return "退款";
+					}else{
+						return data;
+					}
+				}},{"targets": 10,
+					"data": "rechReason",
+					"render": function ( data, type, full, meta ) {
+						if(data==''||data==null){
+							return "";
+						}else{
+							if(full.rechType=='paypal'&&full.rechState == 2){
+								data='paypal提示该用户存在风险交易，未能成功支付。';
+							}
+							return data;
+						}
+				}}],            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数               
+                layer.closeAll();
+            }  
+	    });
+	 //序号相关
+       var table = $('#recharges').DataTable();
+       table.on( 'order.dt search.dt', function () {
+       	//获取页信息
+       	//debugger
+       	var page=table.page.info();
+        	table.column(0, {}).nodes().each( function (cell, i) {
+                cell.innerHTML =page.page*page.length+ i+1;
+            } );
+        } ).draw();
+}
+
+//消费
+function comsume(id,type){
+	   if(type==1){
+		   $("#ModalLabelpage").text("消费记录");
+		   var tablehtml ='<div class="box">';
+			   tablehtml+='<div class="box-body mailbox-messages">';
+			   tablehtml+='<table id="consums" class="table table-bordered table-hover">';
+			   tablehtml+='<thead>';
+			   tablehtml+='<tr><th>序号</th><th>被充值会员昵称</th><th>GAGA号</th><th>时间</th><th>消费金币数</th><th>消费类型</th><th>升级会员[月/天]数</th><th>会员开始时间</th><th>会员结束时间</th><th>来源</th></tr></thead></table></div></div>';
+			   $("#bodycontentpage").html(tablehtml);
+			   $("#modalbuttonpage").html(
+						'<button type="button" onclick="comsume(' + id
+								+ ',2)" class="btn btn-primary">确定  </button>');
+			   
+			   consumlist(id);
+				$('#Modalpage').modal({
+					keyboard : true
+				});
+	   }
+	   if (type == 2) {
+			$('#Modalpage').modal('hide');
+		}
+}
+function consumlist(id){
+	   $("#consums").dataTable({
+	    	"bStateSave": true, 
+	    	"paging": true,
+	        //"processing": true,
+	        "serverSide": true,
+	        "lengthChange": false,
+	        "searching": false,
+	        "ordering": true,
+	        "info": true,
+	        "autoWidth": false,
+	        "pageLength":10,
+	        //"ajax" : ctx+"/adminmember/notauditedimgList",
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	aoData.push({"name":"gagaid","value":id})
+	        	//aoData=gagaidorname; 
+            layer.load(1, {shade: 0.3});
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/adminmember/consumnlist",
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "cons_id","bSortable": false },
+				{"data": "memb_nickname","bSortable": false,"defaultContent":'' },
+				{"data": "memb_gagano","bSortable": false,"defaultContent":''},
+				{"data": "cons_time","bSortable": false},
+				{"data": "cons_goldreal","bSortable": false},
+				{"data": "cons_typechilddesc","bSortable": false},
+				{"data": "cons_upgrademonth","bSortable": false},
+				{"data": "cons_upgradestime","bSortable": false},
+				{"data": "cons_upgradeetime","bSortable": false},
+				{"data": "flag","bSortable": false}
+	        ], 
+	         "columnDefs": [
+				{"targets": 3,
+					"data": "meloIp",
+					"render": function ( data, type, full, meta ) {
+						var date = new Date(data);
+				    	return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+				}},
+				{"targets": 6,
+					"data": "meloIp",
+					"render": function ( data, type, full, meta ) {
+						if(data==''||data==null){
+							return "";
+						}else{
+							return data;
+						}
+				}},{"targets": 7,
+					"data": "meloIp",
+					"render": function ( data, type, full, meta ) {
+						if(data==''||data==null){
+							return "";
+						}else{
+							var date = new Date(data);
+					    	return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+						}
+				}},{"targets": 8,
+					"data": "meloIp",
+					"render": function ( data, type, full, meta ) {
+						if(data==''||data==null){
+							return "";
+						}else{
+							var date = new Date(data);
+					    	return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+						}
+				}}],            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数               
+                layer.closeAll();
+            }  
+	    });
+	 //序号相关
+       var table = $('#consums').DataTable();
+       table.on( 'order.dt search.dt', function () {
+       	//获取页信息
+       	//debugger
+       	var page=table.page.info();
+        	table.column(0, {}).nodes().each( function (cell, i) {
+                cell.innerHTML =page.page*page.length+ i+1;
+            } );
+        } ).draw();
+}
+
+function search() {
+    $("#promotionmember").dataTable().fnDraw(true);
+}
+</script>
+

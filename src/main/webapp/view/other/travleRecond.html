@@ -1,0 +1,257 @@
+<style>
+.service {  text-align: right; }
+</style>
+<section class="content-header">
+	<h1>
+		旅游客服记录<small></small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>其他管理</li>
+		<li class="active">旅游客服记录</li>
+	</ol>
+</section>
+<div class="layui-fluid">
+	<div class="layui-row">
+		<form class="layui-form" action="">
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">嘎嘎号</label>
+				<div class="layui-input-block">
+					<input id="gagano" type="text" name="" placeholder="请输入" autocomplete="off"
+						class="layui-input">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">时间</label>
+				<div class="layui-input-block">
+					<input id="createtime" type="text" name="" placeholder="请输入" autocomplete="off"
+						class="layui-input">
+				</div>
+			</div>
+			
+		</form>
+		<button class="layui-btn" id="searchEx">搜索</button>
+<!-- 		<button class="layui-btn" id="addExplore">新增</button> -->
+	</div>
+	<div class="layui-fluid">
+		<table class="layui-hide" id="travleMessage" lay-filter="travleMessage"></table>
+	</div>
+</div>
+
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width: 750px">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-body">
+				<div id="chat_box">
+					<div class="layui-row" style="height: 540px; border: 1px solid #000; overflow: auto; margin: 5px">
+						<div id="talk_content"></div>
+					</div>
+					<div class="layui-row" style="margin: 1px">
+						<form class="layui-form layui-form-pane">
+							<input type="hidden" id="toUserId" />
+							<div class="layui-form-item">
+								<label class="layui-form-label">图片</label>
+								<div class="layui-input-block">
+									<input type="file" name="ima" class="layui-input" /> <input type="hidden" id="image_send" />
+								</div>
+							</div>
+							<div class="layui-form-item layui-form-text">
+								<label class="layui-form-label">文字</label>
+								<div class="layui-input-block">
+									<textarea id="txt_send" style="min-height: 30px" placeholder="请输入内容" class="layui-textarea"></textarea>
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<div class="layui-input-block">
+									<button class="btn btn-primary" onclick="sendmsg()" id="sendMsg">发送</button>
+									<button class="btn btn-primary" onclick="getData()" id="refresh">刷新</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal -->
+</div>
+
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">聊天记录</a>
+</script>
+<script>
+	layui.use([ 'form', 'upload', 'table', 'element','laydate' ], function() {
+		//获取form模块
+		var form = layui.form, table = layui.table, element = layui.element, upload = layui.upload;
+		var laydate = layui.laydate;
+		//执行一个laydate实例
+		  laydate.render({
+		    elem: '#createtime' //指定元素
+		    ,range:true
+		  });
+
+		table.render({
+			elem : '#travleMessage',
+			url : ctx + '/travleService/travleMsgList',
+			where : {
+				gagano : $("#gagano").val(),
+				createtime : $("#createtime").val()
+			},
+			//	method: 'post' //	默认 get
+			//	contentType: 'application/json'
+			toolbar : true,
+			defaultToolbar: ['filter'],
+			even : true, //	开启隔行背景
+			title : '旅游客服记录',
+			limits : [10,30,50,100,500,1000],
+			limit : 30,
+			cols : [ [ {
+				field : 'id',
+				title : '序号',
+				type : 'numbers'
+			}, {
+				field : 'memb_gagano',
+				title : '嘎嘎号'
+			}, {
+				field : 'memb_nickname',
+				title : '昵称'
+			}, {
+				field : 'message',
+				title : '内容'
+				,templet : function(res) {
+					if(res.message_type=='img'){
+						return '<img class="min" onclick="imageclick(this)" src="'+res.filepath+'" />'
+					}else{
+						return res.message;
+					}
+				}
+			}, {
+				field : 'message_type',
+				title : '消息类型'
+			}, {
+				field : 'createdate',
+				title : '发布时间',
+				templet : function(res) {
+					if (res != null) {
+						var date = new Date(res.createdate);
+						return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+					}
+				}
+			}, {
+				field : 'isread',
+				title : '状态'
+				,templet : function(res) {
+					var dd = res.isread
+					if(dd==1){return '未读'}else if(dd==2){return '已读'}
+				}
+			}
+			] ],
+			page : true
+		});
+
+		//	监听行工具事件
+		table.on('tool(travleMessage)', function(obj) {
+			var data = obj.data;
+			var contentCode = data.cont_code;
+			console.log(data)
+			console.log(obj.event)
+			if (obj.event === 'edit') {
+				$('#myModal').modal('show')
+				$("#toUserId").val(data.form_user_id);
+				getData();
+			} 
+		});
+
+		function getData() {
+			var form_user_id=$("#toUserId").val();
+			$.ajax({
+				url : ctx + "/travleService/getTravleChatList",
+				type : "POST",
+				async:false,
+				data : {
+					"form_user_id" : form_user_id
+				},
+				dataType : "json",
+				success : function(data) {
+					console.log(data);
+					if (data.success) {
+						var list=data.obj;
+						var str='';
+						for (var i = 0; i < list.length; i++) {
+							var ob=list[i];
+							var date = new Date(ob.createdate);
+							var tim = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+							if(ob.form_user_id == '4b44242422744d8ba3a365f9012f159f'){
+			                    str += '<div class="chat service">'+tim+'<span>' + ob.message +'</span></div>';
+			                }
+			                else{
+			                    str += '<div class="chat">'+tim+'<span>' + ob.message  +'</span></div>' ;  
+			                }
+						}
+						console.log(str);
+						$('.chat').remove();
+						$('#talk_content').html(str);
+						console.log($('#talk_content').html());
+					} else {
+						layer.msg('数据为空');
+					}
+				},
+				error : function(e) {
+					layer.msg('请求失败');
+				},
+			});
+		}
+
+		//		搜索 按钮
+		$('#searchEx').click(function() {
+			 table.reload('travleMessage', {
+			        page: {
+			          curr: 1 //重新从第 1 页开始
+			        }
+			        ,where: {
+			        	gagano : $("#gagano").val(),
+						createtime : $("#createtime").val()
+			        }
+			      });
+		});
+	});
+	
+	function sendmsg(){
+		var dat={
+				"message":$('#txt_send').val(),
+				"filepath":$('#image_send').val(),
+				"toUserId":$('#toUserId').val()
+		}
+		$.ajax({
+			url : ctx + "/travleService/sendTravleChat",
+			type : "POST",
+			data : dat,
+			dataType : "json",
+			success : function(data) {
+				if(data.success){
+					layer.msg('操作成功');
+					table.reload('travleMessage');
+				}else{
+					layer.msg(data.msg);
+				}
+			},
+			error : function(e) {
+
+			},
+		});
+	}
+	function imageclick(obj){
+		//console.log(obj.src)
+        layer.photos({
+	        photos: { "data": [{"src": obj.src}] }
+	    });
+	}
+	
+</script>

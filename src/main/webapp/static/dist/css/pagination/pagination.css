@@ -1,0 +1,119 @@
+/*分页样式*/
+#pagination {
+    background: #e3e3e3;
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+#pagination .active {
+    color: #c41929;
+    border: 1px solid transparent;
+    background: #e3e3e3;
+    font-size: 14px;
+    padding: 3px 4px;
+    margin-right: 10px;
+}
+
+#pagination a, #pagination span {
+    border: 1px solid #cdcdcd;
+    background: #fff;
+    font-size: 14px;
+    padding: 3px 4px;
+    color: #000;
+    margin-right: 10px;
+}
+
+#pagination a.jump-btn {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+#pagination input {
+    height: 18px;
+    line-height: 18px;
+    width: 30px;
+}
+
+/*分页样式*/
+#tablePage, #pagination_01{
+    background: #e3e3e3;
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+#tablePage .active,
+#pagination_01 .active {
+    color: #c41929;
+    border: 1px solid transparent;
+    background: #e3e3e3;
+    font-size: 14px;
+    padding: 3px 4px;
+    margin-right: 10px;
+}
+
+#tablePage a, #tablePage span,
+#pagination_01 a, #pagination_01 span{
+    border: 1px solid #cdcdcd;
+    background: #fff;
+    font-size: 14px;
+    padding: 3px 4px;
+    color: #000;
+    margin-right: 10px;
+}
+
+#tablePage a.jump-btn,
+#pagination_01 a.jump-btn{
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+#tablePage input,
+#pagination_01 input{
+    height: 18px;
+    line-height: 18px;
+    width: 30px;
+}
+/*统计渠道分页*/
+#pagination_02 {
+    background: #e3e3e3;
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    text-align: right;
+    margin-bottom: 20px;
+}
+#pagination_02 .active {
+    color: #c41929;
+    border: 1px solid transparent;
+    background: #e3e3e3;
+    font-size: 14px;
+    padding: 3px 4px;
+    margin-right: 10px;
+}
+#pagination_02 a, #consumPage span {
+    border: 1px solid #cdcdcd;
+    background: #fff;
+    font-size: 14px;
+    padding: 3px 4px;
+    color: #000;
+    margin-right: 10px;
+}
+#pagination_02 a.jump-btn {
+    margin-right: 20px;
+    margin-left: 20px;
+}
+#pagination_02 input {
+    height: 18px;
+    line-height: 18px;
+    width: 30px;
+}
+/*全局表合格与分页距离*/
+.right-model .table{
+    margin-bottom: 0;
+}

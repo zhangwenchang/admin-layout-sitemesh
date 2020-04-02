@@ -1,0 +1,502 @@
+<style type="text/css">
+.heji { float: right;position: relative;top: -80px; margin-right: 12px; }
+
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+</style>
+<section class="content-header">
+    <h1>女性营销员提现管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>财务统计</li>
+        <li class="active">女性营销员提现管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+             <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">   
+                  <label for="createDate" class="col-sm-2 control-label">开始日期：</label>
+                  <div class="col-sm-10">
+                    <input type="text"  class="form-control pull-right" id="beginDate">
+                  </div>             
+                </div>
+                
+                 <div class="form-group">   
+                  <label for="createDate" class="col-sm-2 control-label">结束日期：</label>
+                  <div class="col-sm-10">
+                    <input type="text"  class="form-control pull-right" id="endDate">
+                  </div>             
+                </div>
+                
+                <div class="form-group">
+                  <label for="content" class="col-sm-2 control-label">用户信息：</label>
+                  <div class="col-sm-10">
+                     <input type="text" class="form-control" id="gagaNo" placeholder="请输入嘎嘎号/收款人姓名" >
+                  </div>             
+                </div>
+
+                <div class="form-group">
+                  <label for="content" class="col-sm-2 control-label">用户状态：</label>
+                  <div class="col-sm-10">
+                    <select class="form-control" id="userStatus">
+                      <option value="">全部</option>
+                      <option value="0">申请</option>
+                      <option value="1">未汇款</option>
+                      <option value="3">已汇款</option>
+                      <option value="2">未通过</option>
+                    </select>
+                  </div>             
+                </div>
+                
+                
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+                <button type="button" class="btn btn-default" onclick="search()">查询</button>
+                <button type="button" onclick="pass()" class="btn btn-primary">批量通过</button>
+                <button type="button" onclick="notPass()" class="btn btn-primary">不通过</button>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+
+              <div class="box-body mailbox-messages">                
+                <table id="tableData" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th>序号</th>
+                  <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>         
+                  <th>申请日期</th>                 
+                  <th>昵称</th>
+                  <th>嘎嘎号</th>
+                  <th>收款人姓名</th>
+                  <th>支付宝姓名</th>
+                  <th>支付宝账号</th>
+                  <th>申请额($)</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                  </tr>
+                  </thead>                  
+                </table>
+                <span class="heji">合计($)：<span id="amount"></span></span>
+                <font color="#aaaaaa">备注：查询条件中的日期使用说明，开始日期为包含即'>='，结束日期为不包含即'<'。</font>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+<script type="text/javascript">
+var departIdTmp='',userIdTmp='',userNameTmp='', withState=[]; ;
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js','/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js'
+                 , '/plugins/datatables/dataTables.bootstrap.min.js'
+                 , '/plugins/iCheck/icheck.min.js'
+                 
+                 , '/plugins/daterangepicker/daterangepicker.js'
+                 ,'/plugins/datepicker/bootstrap-datepicker.js'
+                 ], function() {
+       		//console.log(1);    
+          //debugger    .min
+        //$('#createDate').daterangepicker({timePicker: false, timePickerIncrement: 30, format: 'YYYY-MM-DD'}); defaultViewDate: 
+		//$('#beginDate').datepicker({format: 'yyyy-mm-dd',autoclose: true});
+    //$('#endDate').datepicker({format: 'yyyy-mm-dd',autoclose: true, defaultViewDate: new Date().format('yyyy-MM-dd')});    
+    var defaultDate = new Date();
+    var lastMonthDate = defaultDate.getFullYear() + '-' + defaultDate.getMonth() + '-' + defaultDate.getDate() + ' 00:00:00';
+    $('#beginDate').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true,
+        startDate: lastMonthDate
+    });
+    $('#endDate').daterangepicker({
+        timePicker: true,
+        timePicker12Hour: false,
+        timePickerSeconds: true,
+        timePickerIncrement: 1,
+        opens: "right",
+        format: 'YYYY-MM-DD HH:mm:ss',
+        singleDatePicker: true
+    });
+    $('#beginDate').data('daterangepicker').setStartDate(lastMonthDate);
+    $('#endDate').data('daterangepicker').setEndDate(new Date().format('yyyy-MM-dd') + ' 00:00:00');
+
+   /*  $('#tableData').dataTable( {
+        "dom": 'T<"clear">lfrtip',
+        "tableTools": {
+            "sSwfPath": "/plugins/datatables/TableTools/swf/copy_csv_xls_pdf.swf"
+        }
+    } ); */
+    
+        var t=$("#tableData").dataTable({
+        	 "dom": 'T<"clear">lfrtip',
+             "tableTools": {
+                 "sSwfPath": "/gaga_sns_admin/plugins/datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
+             },
+            "bStateSave": true,
+            "paging": true,
+            "bLengthChange": true,
+            "processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+             var gagaNo = $("#gagaNo").val();
+             var beginDate=getDateFromStr($("#beginDate").val());
+             var endDate=getDateFromStr($("#endDate").val());
+             var _status = $('#userStatus').val();
+                
+             if(gagaNo!='')aoData.push({"name": "gagaNo", "value": gagaNo});
+             if(beginDate!=null)aoData.push({"name": "beginDate",  "value": $("#beginDate").val()});
+             if(endDate!=null)aoData.push({"name": "endDate",  "value": $("#endDate").val()});
+             if(_status!='')aoData.push({"name": "withState", "value": _status});
+             layer.load(1, {shade: 0.3});
+              oSettings.jqXHR = $.ajax({
+                  "dataType": 'json',
+                  "type": "POST",
+                  "url": ctx + "/FinanceFamale/withdrawList",
+                  "data": aoData,
+                  "success":  function (json) {  
+                  	fnCallback( json);
+                	//自定义数据处理
+                	//console.log(json);
+                	$("#amount").html(json.obj);
+                }
+              });
+            },
+            "columns": [{
+                "data": "xh",
+                "bSortable": false
+            }, {
+                "data": "with_id",
+                "bSortable": false
+            }, {
+                "data": "with_applytime",
+                "bSortable": false
+            }, {
+                "data": "memb_nickname",
+                "bSortable": false
+            }, {
+                "data": "memb_gagano",
+                "bSortable": false
+            }, {
+                "data": "with_name",
+                "bSortable": false
+            }, {
+                "data": "with_namealipay",
+                "bSortable": false
+            }, {
+                "data": "with_alipayno",
+                "bSortable": false
+            }, {
+                "data": "with_gold",
+                "bSortable": false
+            }, {
+                "data": "with_state",
+                "bSortable": false
+            }, {
+                "data": "with_id",
+                "bSortable": false
+            }],
+           
+           "columnDefs": [{
+               "targets": 1, 
+               "render": function(data, type, full, meta) {
+                   return '<input type="checkbox" value="' + data + '" title="' + data + '" name="withId" />';
+               }
+           }, {
+                "targets": 2,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            }, {
+                "targets": 5,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            }, {
+                "targets": 6,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            }, {
+                "targets": 7,                
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=data;
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 9,
+                "data": "with_state",
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	withState.push({"withId":full.with_id, "st":data, "name":full.with_name});//记录下状态
+                	if(data!=null&&data!=undefined){
+                		switch(data){
+                		case 1:
+                			dstr='未汇款';
+                			break;
+                		case 2:
+                			dstr='未通过';
+                			break;
+                		case 3:
+                			dstr='已汇款';
+                			break;
+                		default:
+                				dstr='申请';
+                		}
+                	}else{
+                		dstr='申请';
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 10,
+                "data": "syusId",
+                "render": function(data, type, full, meta) {
+                	var links='';
+                	if(full.with_state==1){
+                		lnks='<a href="javascript:auto('+data+');">汇款</a>';
+                	}else{
+                		lnks='<font color="#aaaaaa" title="状态为未汇款时才可以操作">汇款</font>';
+                	}                	
+                    return lnks;
+                }
+            } ],
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                layer.closeAll();
+                $("#tableData .fa").removeClass('fa-check-square-o').addClass('fa-square-o');
+            }
+        });
+        
+        //序号相关
+        var table = $('#tableData').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+        
+    });
+});
+
+function errorHd(xreq){	 
+	  $.msg(xreq.statusText+"["+xreq.status+"]");
+}
+
+/**汇款操作*/
+function auto(data){
+	var chk_value =[]; 
+	chk_value.push(data); 
+	
+	var obj=autoChk(chk_value);
+	if(chk_value.length==0){
+		$.msg("请选择状态为未汇款的提现记录！");
+		return;
+	}
+	if(obj.str!=''){
+		$.msg(obj.str);
+		return;
+	}
+	//alert(obj.ids.length);
+	var t=confirm("确定要将此项设置为已汇款吗？");
+	if(t){
+		doPost("FinanceFamale/marketWithdraw", {"withIds[]":obj.ids, "withState":3},modalHd,errorHd);
+	}
+}
+
+function autoChk(chkArr){
+	var tmpArr=[],  tmp='', str='' ,re={};
+	for(var i=0;i<chkArr.length;i++){
+		//检查选择id中是否存在1未汇款、3已汇款
+		var obj=getObj(chkArr[i]);
+		if(obj.st==0||obj.st==2||obj.st==3){
+			tmp="收款人为 "+obj.name+" 的记录项当前状态["+getSt(obj.st)+"]无法设置已汇款！<br/>";
+			str+=tmp;
+		}else{
+			tmpArr.push(chkArr[i]);
+		}
+	}
+	//获取正常ID	
+	re.ids=tmpArr;
+	re.str=str;
+	return re;
+}
+
+/*批量通过*/
+function pass(){
+	var chk_value =[]; 
+	$('input[name="withId"]:checked').each(function(){	
+		chk_value.push($(this).val()); 
+	});	
+	var obj=chk(chk_value);
+	if(chk_value.length==0){
+		$.msg("请选择申请提现记录！");
+		return;
+	}
+	if(obj.str!=''){
+		$.msg(obj.str);
+		return;
+	}
+	//alert(obj.ids.length);
+	var t=confirm("确定要将这些申请提现记录设置通过吗？");
+	if(t){
+		doPost("FinanceFamale/marketWithdraw", {"withIds[]":obj.ids, "withState":1},modalHd,errorHd);
+	}
+}
+
+function chk(chkArr){
+	var tmpArr=[],  tmp='', str='' ,re={};
+	for(var i=0;i<chkArr.length;i++){
+		//检查选择id中是否存在1未汇款、3已汇款
+		var obj=getObj(chkArr[i]);
+		if(obj.st==1||obj.st==2||obj.st==3){
+			tmp="收款人为 "+obj.name+" 的记录项当前状态["+getSt(obj.st)+"]无法设置通过！<br/>";
+			str+=tmp;
+		}else{
+			tmpArr.push(chkArr[i]);
+		}
+	}
+	//获取正常ID	
+	re.ids=tmpArr;
+	re.str=str;
+	return re;
+}
+
+/*批量不通过*/
+function notPass(){
+	var chk_value =[]; 
+	$('input[name="withId"]:checked').each(function(){	
+		chk_value.push($(this).val()); 
+	});	
+	var obj=notChk(chk_value);
+	if(chk_value.length==0){
+		$.msg("请选择申请提现记录！");
+		return;
+	}
+	if(obj.str!=''){
+		$.msg(obj.str);
+		return;
+	}
+	//alert(obj.ids.length);
+	var t=confirm("确定要将这些申请提现记录设置为不通过吗？");
+	if(t){
+		doPost("FinanceFamale/marketWithdraw", {"withIds[]":obj.ids, "withState":2},modalHd,errorHd);
+	}
+}
+
+function notChk(chkArr){
+	var tmpArr=[],  tmp='', str='' ,re={};
+	for(var i=0;i<chkArr.length;i++){
+		//检查选择id中是否存在1未汇款、3已汇款
+		var obj=getObj(chkArr[i]);
+		if(obj.st==1||obj.st==2||obj.st==3){
+			tmp="收款人为 "+obj.name+" 的记录项当前状态["+getSt(obj.st)+"]无法设置未通过！<br/>";
+			str+=tmp;
+		}else{
+			tmpArr.push(chkArr[i]);
+		}
+	}
+	//获取正常ID	
+	re.ids=tmpArr;
+	re.str=str;
+	return re;
+}
+
+/*根据ID获取对象*/
+function getObj(withId){
+	var f=null;
+	for(var k=0;k<withState.length;k++){
+		if(withId==withState[k].withId){
+			f=withState[k];
+		}
+	}
+	return f;
+}
+/*获取状态*/
+function getSt(st){
+	var f='';
+	if(st==0)f='申请';
+	if(st==1)f='未汇款';
+	if(st==2)f='未通过';
+	if(st==3)f='已汇款';
+	return f;
+}
+/*通过*/
+
+/*回调*/
+function modalHd(data){
+	if(data.success){
+		$.msg(data.msg);
+		refreshdata();
+	}else{
+		$.msg(data.msg);
+	}
+}
+<!-- end 添加提成提交  -->
+
+//刷新表格
+function refreshdata() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+
+function search() {
+    $("#tableData").dataTable().fnDraw(false);
+}
+</script>

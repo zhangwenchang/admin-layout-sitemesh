@@ -1,0 +1,376 @@
+<style type="text/css">
+.add-gift-t td { padding: 5px; }
+.add-gift-t td .labels { display: inline-block; width: 70px; }
+.datepicker { z-index: 1051 !important; }
+</style>
+<section class="content-header">
+	<h1>
+		敏感词管理<small></small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>其他管理</li>
+		<li class="active">敏感词管理</li>
+	</ol>
+</section>
+
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<!-- 头部操作菜单 -->
+				<form class="form-horizontal">
+					<div class="box-footer">
+						<button type="button" class="btn btn-primary" onclick="openAdd()">添加</button>
+						<button type="button" class="btn btn-primary" onclick="batchdel(false)">删除</button>
+						<button type="button" class="btn btn-primary" onclick="addBatch()">批量添加</button>
+						<!--<a href="download/syssensitiveWords.xlsx" target="_blank">模版下载</a> -->
+						<input type="text" id="key" >
+						<button type="button" class="btn btn-primary" onclick="search()">搜索</button>
+					</div>
+				</form>
+
+				<!-- 列头 -->
+				<div class="box-body mailbox-messages">
+					<table id="privatemodellist" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>
+									<button class="btn btn-default btn-sm checkbox-toggle">
+										<i class="fa fa-square-o"></i>
+									</button>序号
+								</th>
+								<th>敏感词</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- 编辑弹窗 -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton"></div>
+		</div>
+	</div>
+</div>
+
+<!-- 提示弹窗 -->
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel1"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent1">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton1"></div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+/**
+ * 查询
+ */
+function search(){
+	$("#privatemodellist").dataTable().fnDraw(true);
+}
+
+$(function() {
+	$.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        $("#privatemodellist").dataTable({
+        	"bStateSave": true,
+        	"paging": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "info": true,
+            "autoWidth": false,
+            "ordering": true,
+            "pageLength":30,//分页长度
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	            var key = $("#key").val();
+	        	aoData.push(
+	       			{"name":"key","value":key}
+       			);
+	        	layer.load(1, {shade: 0.3});
+	        	oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/SyssensitiveWords/list",
+	              "data": aoData,
+	              "success": fnCallback
+	        	});
+	        },
+	        "columns": [//排序、赋值
+                {"data": "sswoId","bSortable": false },
+   				{"data": "sswoSensitive","bSortable": false},
+   				{"data": "sswoId","bSortable": false}
+	        ],
+	        "columnDefs": [{//特殊数据
+	        		"targets": 0,//复选框
+					"render": function ( data, type, full, meta ) {
+						 return '<input type="checkbox" value="' + data + '" title="' + data + '" name="checkbox" class="checkbox" />';    
+				}},
+	        	{
+	        		"targets": 2,//操作
+					"render": function ( data, type, full, meta ) {
+						 return ' <a href="javascript:void(0)" onclick="openEdit(\''+ data +'\')">编辑</a>';
+				}}
+			],
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+            	$(".mailbox-messages input[type='checkbox']").iCheck({
+	            	checkboxClass: 'icheckbox_flat-blue',
+	                radioClass: 'iradio_flat-blue'
+	            });
+	            layer.closeAll();
+            }
+	    });
+		$(".checkbox-toggle").click(function() {//复选框全选/反选
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+			    $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+			    $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+        //序号相关
+        var table = $('#privatemodellist').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML += page.page*page.length+ i+1;
+            });
+        }).draw();
+   });
+});
+
+/**
+ *	批量删除
+ *	sign	标志true 不再提示是否删除
+ */
+function batchdel(sign) {
+	var diphid = "";
+	
+	var objs = $("#privatemodellist div");
+    for (var i = 0; i < objs.length; i++) {
+        var obj = objs[i];
+        var flag = $(obj).attr("aria-checked");
+        if (flag == "true") {
+            if (diphid.trim() != "" && $.trim(diphid).length > 0) {
+            	diphid += ","
+            }
+            diphid += $(obj).children("input").attr("value");
+        }
+    }
+ 	if(null == diphid || diphid.length <= 0){
+		$("#ModalLabel").text("提示");
+		$("#bodycontent").html('<span>请先选中要删除的数据！</span>');
+		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal').modal({
+		    keyboard: true
+		});
+		return;
+ 	}
+    
+    if(!sign){
+		$("#ModalLabel").text("删除模板");
+		$("#bodycontent").html('<span>确定要删除所选项吗？</span>');
+		$("#modalbutton").html('<button type="button" onclick="batchdel(true)" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal').modal({
+		    keyboard: true
+		});
+		return;
+    }
+    
+    $.ajax({
+        type: "post",
+        url: ctx + "/SyssensitiveWords/del",
+        dataType: "json",
+        data: {"ids": diphid},
+        success: function(data) {
+            if (data.success) {
+            	$("#privatemodellist").dataTable().fnDraw(true);
+            	$('#Modal').modal('hide');
+            }else{
+            	$("#privatemodellist").dataTable().fnDraw(true);
+            	$('#Modal').modal('hide');
+            	
+            	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>数据异常！请重试！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});
+            }
+        }
+    });
+}
+
+/**
+ * 打开新增窗口
+ */
+function openAdd(){
+	var count = "";
+	count += "<table><tr><td>敏感词:<input type='text' id='sswoSensitive'></td></tr></table>";
+	
+	$("#ModalLabel").text("添加添加敏感词");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(false)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+}
+
+/**
+ * 新增
+ * sign 标志（是否校验数据完整性）
+ */
+function add(sign){
+	var sswoSensitive = $("#sswoSensitive").val();
+	var swid = $("#swid").val();//编辑时该值为敏感词id
+	
+	if(null == sswoSensitive || $.trim(sswoSensitive).length <= 0){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请输入敏感词！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+			keyboard: true
+		});
+		return;
+	}
+	
+	var url = "";
+	var data = "";
+	var edit = sign?"1":"2";
+	url = ctx + "/SyssensitiveWords/add";
+	data = {"sswoSensitive": sswoSensitive,"edit":edit,"swid":swid};
+	
+	$.ajax({
+		type: "post",
+		url: url,
+		dataType: "json",
+		data: data,
+		success: function(data) {
+		    if (data.success) {
+		    	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>成功！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});
+        		$("#privatemodellist").dataTable().fnDraw(true);//刷新列表
+		    }
+		}
+	});
+}
+
+/**
+ * 打开编辑窗口
+ */
+function openEdit(swid){
+	var count = "";
+	var sw = "";
+	$.ajax({
+        type: "post",
+        url: ctx + "/SyssensitiveWords/openEdit",
+        dataType: "json",
+        data:{"id":swid},
+        async: false,
+        success: function(data) {
+        	if (data.success) {
+        		sw = data.obj;
+        	}
+        }
+    });
+	
+	count += "<table><tr>敏感词：<input type='hidden' id='swid' value='"+sw.sswoId+"'><input type='text' id='sswoSensitive' value='"+sw.sswoSensitive+"'></tr></table>";
+	
+	$("#ModalLabel").text("添加礼物分类");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(true)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#gicaStime').datepicker({format: 'yyyy-mm-dd'});
+	$('#gicaEtime').datepicker({format: 'yyyy-mm-dd'});
+	$('#Modal').modal({
+	    keyboard: true
+	});
+}
+
+/**
+ * 批量上传（）
+ */
+function addBatch(){
+	var count = "";
+	count += "<table><tr><td>敏感词:<textarea rows='3' id='sswoSensitive' cols='20'></textarea></td></tr></table>";
+	$("#ModalLabel").text("批量添加添加敏感词");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="batchsave(false)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+}
+
+/**
+ * 批量新增
+ * sign 标志（是否校验数据完整性）
+ */
+function batchsave(sign){
+	var sswoSensitive = $("#sswoSensitive").val();
+	
+	if(null == sswoSensitive || $.trim(sswoSensitive).length <= 0){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请输入敏感词！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+			keyboard: true
+		});
+		return;
+	}
+	
+	var url = "";
+	var data = "";
+	url = ctx + "/SyssensitiveWords/batchsave";
+	data = {"sswoSensitive": sswoSensitive};
+	
+	$.ajax({
+		type: "post",
+		url: url,
+		dataType: "json",
+		data: data,
+		success: function(data) {
+		    if (data.success) {
+		    	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>成功！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});
+        		$("#privatemodellist").dataTable().fnDraw(true);//刷新列表
+		    }
+		}
+	});
+}
+
+
+</script>
+

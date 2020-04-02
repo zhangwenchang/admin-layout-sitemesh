@@ -1,0 +1,374 @@
+<style>
+.fullconten { display: none; }
+.max{width:100%;height:auto;}
+.min{width:100px;height:auto;}
+.zi{width: 10%;float: left;text-align: center;line-height: 34px;}
+.startTime{width: 45%;float: left;}
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.modal .dataTables_wrapper .dataTables_length { position: relative; left: 0; top: 0; }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+</style>
+<section class="content-header">
+    <h1>推广员提成<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>提成明细</li>
+        <li class="active">提成明细</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          
+           <form class="form-horizontal">
+              <div class="box-body">
+                
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_host">推广员</label>
+						<div class="col-sm-4">
+							<input class="form-control" id="syus_username" name="syus_username" type="text"  />
+						</div>
+						<label class="col-sm-2 control-label" for="ds_name">会员嘎嘎号</label>
+						<div class="col-sm-4">
+							<input class="form-control" id="memb_gagano" name="memb_gagano" type="text"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="content" class="col-sm-2 control-label">充值方式：</label>
+						<div class="col-sm-4">
+							<select class="form-control" name="rech_type" id="rech_type" >
+								<option value="">全部</option>
+								<option value="ailipay">ailipay</option>
+								<option value="paypal">paypal</option>
+								<option value="paypalcredit">paypalcredit</option>
+								<option value="appstore">appstore</option>
+								<option value="wechatpay">wechatpay</option>
+							</select>
+						</div>
+					
+						<label for="content" class="col-sm-2 control-label">状态：</label>
+						<div class="col-sm-4">
+							<select class="form-control" name="cost_flag"  id="cost_flag" >
+								<option value="">全部</option>
+								<option value="1">绑定前</option>
+								<option value="0">绑定后</option>
+							</select>
+						</div>
+					</div> 
+					<div class="form-group">
+						<label for="membNo" class="col-sm-2 control-label">消费时间：</label>
+						<div class="row">
+							<div class="col-sm-4">
+								<input type="text" class="form-control startTime" id="addStart" name="addStart">
+								<span class="zi" style="">至</span>
+								<input type="text" class="form-control startTime" id="addEnd" name="addEnd">
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="ds_host">订单号</label>
+						<div class="col-sm-4">
+							<input class="form-control" id="cost_rechconsuid" name="cost_rechconsuid" type="text"  />
+              </div>
+					</div>
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>
+           	 <!--  <button type="button" onclick="batchdel()" class="btn btn-primary">删除</button>  -->
+              <button type="button" onclick="refreshdata()" class="btn btn-primary">刷新</button>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="adcountlist" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                   	<th>序号</th>
+                    <th>推广员</th>                 
+                    <th>会员昵称</th>                 
+                    <th>会员嘎嘎号</th>
+                    <th>消费金币</th>
+                    <th>提成金额</th>
+                    <th>消费会员嘎嘎号</th>
+                    <th>消费类型</th>
+                    <th>充值方式</th>
+                    <th>消费时间</th>
+                    <th>会员注册时间</th>
+                    <th>会员最后登录时间</th>
+                    <th>状态</th>
+                    <th>来源</th>
+   					<th>充值/消费订单号</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+
+$(function() {
+	 var dstr = new Date().format('yyyy-MM');
+	 $('#addStart').datepicker({format: 'yyyy-mm-dd',language: 'zh-CN',defaultDate : new Date()});
+	 $('#addEnd').datepicker({format: 'yyyy-mm-dd',language: 'zh-CN',defaultDate : new Date()});
+	 $('#addStart').val(dstr+'-01');
+	 
+	    $.addFields(['/plugins/datatables/jquery.dataTables.min.js'
+            , '/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js'            
+            , '/plugins/datatables/dataTables.bootstrap.min.js'
+            , '/plugins/iCheck/icheck.min.js'
+            , '/plugins/daterangepicker/daterangepicker.js'
+            ,'/plugins/datepicker/bootstrap-datepicker.js'
+            ],function() {
+
+       var tabs= $("#adcountlist").dataTable({
+    	   "dom": 'T<"clear">lfrtip',
+           "tableTools": {
+               "sSwfPath": "/gaga_sns_admin/plugins/datatables/extensions/TableTools/swf/copy_csv_xls_pdf.swf"
+           },
+           "bLengthChange": true,
+           "bStateSave": true,
+           "paging": true,
+           //"processing": true,
+           "serverSide": true,
+           "lengthChange": false,
+           "searching": false,
+           "ordering": true,
+           "info": true,
+           "autoWidth": false,
+           "pageLength": 30,
+           
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+            	var message_type = $("#message_type").val();
+            	var sendtime = $("#sendtime").val();
+            	var content = $("#content").val();
+            	var messageType=$("#message_type").val();
+            	var issysgaga =$("#issysgaga").val();
+            	aoData.push(
+            			{"name": "syus_username",  "value": $('#syus_username').val()},
+            			{"name": "beginDate",  "value": $('#addStart').val()},
+            			{"name": "endDate",  "value": $('#addEnd').val()},
+            			{"name": "memb_gagano",  "value": $('#memb_gagano').val()},
+            			{"name": "rech_type",  "value": $('#rech_type').val()},
+            			{"name": "cost_rechconsuid",  "value": $('#cost_rechconsuid').val()},
+            			{"name": "cost_flag",  "value": $('#cost_flag').val()}
+            	);
+            	
+            	var url=(tabs)?(ctx + "/FinancePromotion/commiss"):"#";
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "post",
+                    "url":url,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "cost_id",
+                "bSortable": false
+            }, {
+                "data": "syus_username",
+                "bSortable": false
+            },  {
+                "data": "bmemb_nickname",
+                "bSortable": false
+            },{
+                "data": "bmemb_gagano",
+                "bSortable": false
+            },  {
+                "data": "cost_goldreal",
+                "bSortable": false
+            }, {
+                "data": "cost_goldcommis",
+                "bSortable": false
+            }, {
+                "data": "memb_gagano",
+                "bSortable": false
+            }, {
+                "data": "cost_description",
+                "bSortable": false
+            }, {
+                "data": "rech_type",
+                "bSortable": false
+            },{
+                "data": "cost_addtime",
+                "bSortable": false
+            }, {
+                "data": "memb_registertime",
+                "bSortable": false
+            }, {
+                "data": "memb_lasteruptime",
+                "bSortable": false
+            }, {
+                "data": "cost_flag",
+                "bSortable": false
+            }, {
+                "data": "flag",
+                "bSortable": false
+            }, {
+                "data": "cost_rechconsuid",
+                "bSortable": false
+            }],
+            "columnDefs": [{
+                "targets": 9,
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 10,
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 11,
+                "render": function(data, type, full, meta) {
+                	var dstr='';
+                	if(data!=null){
+                		dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+                	}
+                    return dstr;
+                }
+            },{
+                "targets": 12,
+                "render": function(data, type, full, meta) {
+                	if(data!=null){
+                		if(data==0)return '绑定后';if(data==1)return '绑定前'
+                	}
+                    return dstr;
+                }
+            }], 
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                layer.closeAll();
+            	 $(".mailbox-messages input[type='checkbox']").iCheck({
+	            	checkboxClass: 'icheckbox_flat-blue',
+	                radioClass: 'iradio_flat-blue'
+	            }); 
+            }
+        });
+        $(".checkbox-toggle").click(function() {//复选框全选/反选
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+			    $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+			    $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+        var table = $('#adcountlist').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {         		
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+    });
+});
+
+function search() {
+    $("#adcountlist").dataTable().fnDraw(true);
+}
+
+function refreshdata() {
+	$("#sender").val("");
+	$("#receiver").val("");
+	$("#starttime").val("");
+	$("#endtime").val("");
+	$("#content").val("");
+    $("#adcountlist").dataTable().fnDraw(true);
+}
+
+$('#adcountlist').delegate('td img', 'click', function(){
+    var _thisSrc = $(this).attr('src');                    
+    $.get(_thisSrc + '?imageInfo', function(data) {
+        if (data) {
+         // console.log(data.width);
+          layer.open({
+            type: 1,
+            title: false,
+            closeBtn: 1,
+            skin: 'layui-layer-nobg', //没有背景色
+           // area: data.width + 'px',
+            maxWidth:1000, 
+            shadeClose: true,
+            content: '<img src="'+ _thisSrc + '" />'
+          });
+        }
+    });                           
+});
+$('body').delegate('.layui-layer-content img', 'click', function() {
+    $('.layui-layer').remove();
+    $('.layui-layer-shade').remove();
+});
+
+</script>
+

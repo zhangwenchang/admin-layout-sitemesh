@@ -1,0 +1,128 @@
+#regionalApp{
+    width: 100%;
+}
+
+#regionalApp .regionalTile{
+    width: 100%;
+    height: 55px;
+    border: solid 1px #cccccc;
+    line-height: 55px;
+    padding-left: 1%;
+    overflow: hidden;
+    position: relative;
+}
+#regionalApp .regionalTile span{
+    font-size: 17px;
+
+}
+#regionalApp #regionalTime{
+    width: 200px;
+    text-align: center;
+    height: 35px;
+    position: absolute;
+    right: 1%;
+    top: 19%;
+    font-size: 17px;
+}
+#regionalApp .regionalChart{
+    font-size: 17px;
+}
+#regionalApp .userType{
+    overflow: hidden;
+    width: 30%;
+    border: solid 1px #cccccc;
+    text-align: center;
+    margin-top: 20px;
+}
+#regionalApp .userType li{
+    height:40px;
+    line-height: 40px;
+
+    float: left;
+    width: 50%;
+}
+#regionalApp .userType li:first-child{
+    border-right: solid 1px #cccccc;
+}
+#regionalApp .userType .clickStyle{
+    background-color: #0e90d2;
+    color: #ffffff;
+}
+#regionalApp .userContinent{
+    background-image: url(../images/areadata.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    width: 100%;
+    height: 460px;
+    margin-top: 20px;
+    position: relative;
+    color: #ffffff;
+}
+#regionalApp .userContinent li p:first-child{
+    color: #0e0e0e;
+    font-size: 18px;
+    font-weight: 600;
+    opacity: 0.3;
+}
+#regionalApp .userContinent li:first-child{
+    position: absolute;
+    top: 32%;
+    left: 68%;
+}
+#regionalApp .userContinent li:nth-child(2){
+    position: absolute;
+    top: 30%;
+    left: 20%;
+}
+#regionalApp .userContinent li:nth-child(3){
+    display: none;
+}
+#regionalApp .userContinent li:nth-child(4){
+position: absolute;
+    top: 64%;
+    left: 31%;
+}
+#regionalApp .userContinent li:nth-child(5){
+    position: absolute;
+    top: 70%;
+    left: 76%;
+
+}
+#regionalApp .userContinent li:nth-child(6){
+    position: absolute;
+    top: 30%;
+    left: 49%;
+}
+#regionalApp .userContinent li:nth-child(7){
+    position: absolute;
+    top: 52%;
+    left: 51%;
+}
+
+#regionalApp #countryData tr td,#regionalApp #countryData tr th{
+    border:solid 1px #cccccc;
+}
+#regionalApp .tableTitle{
+    width: 100%;
+    height: 60px;
+    border: solid 1px #cccccc;
+    border-bottom:none ;
+    font-size: 18px;
+    line-height: 60px;
+    overflow: hidden;
+    padding: 0 1%;
+    position: relative;
+}
+#regionalApp .tableTitle span{
+    display: inline-block;
+
+}
+#regionalApp .tableTitle button{
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    position: absolute;
+    right: 1%;
+    top: 16px;
+}

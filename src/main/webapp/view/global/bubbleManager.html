@@ -1,0 +1,543 @@
+<style>
+    .layui-form-label{
+        width: 100px;
+    }
+    .layui-table-cell{
+        height: auto;
+    }
+</style>
+<section class="content-header">
+    <h1>
+        气泡管理
+        <small></small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>其他管理</li>
+        <li class="active">气泡管理</li>
+    </ol>
+</section>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">气泡ID</label>
+                <div class="layui-input-block">
+                    <input id="bubbleId_search" type="text" name="" placeholder="请输入" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-block">
+                    <select name="contClassCode_s" id="online_search">
+                        <option value="">全部</option>
+                        <option value="1">上线</option>
+                        <option value="0">下线</option>
+
+                    </select>
+                </div>
+            </div>
+
+        </form>
+        <button class="layui-btn layui-btn-normal" id="searchEx">搜索</button>
+        <button class="layui-btn layui-btn-normal" id="openAdd">新增</button>
+<!--        <button class="layui-btn layui-btn-danger" id="delete_fun">删除</button>-->
+        <button class="layui-btn layui-btn-normal" id="online_fun">上线</button>
+        <button class="layui-btn layui-btn-warm" id="offline_fun">下线</button>
+    </div>
+    <div class="layui-fluid">
+        <table class="layui-hide" id="bubbleDetail" lay-filter="bubbleDetail"></table>
+    </div>
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">气泡管理</h4>
+            </div>
+            <div class="modal-body">
+                <div id="chat_box">
+                    <div class="layui-row">
+                        <form class="layui-form" action="" lay-filter="formTest">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 100px;">中文名称</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="bubble_name" required lay-verify="required"
+                                           autocomplete="off" class="layui-input" >
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" style="width: 100px;">英文名称</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="bubble_name_en" required lay-verify="required"
+                                           autocomplete="off" class="layui-input" >
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">气泡价格</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="bubble_price" required lay-verify="required"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">气泡排序</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="sort" required lay-verify="required"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">气泡翻译色值</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="bubble_color" required lay-verify="required"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">字体色值(#000000黑色#ffffff白色)</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="bubble_font" required lay-verify="required"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">android_padding</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="android_padding" required lay-verify="required"
+                                           autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">ios_padding</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="ios_padding" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">气泡类型</label>
+                                <div class="layui-input-block">
+                                    <select name="bubble_type" lay-verify="required">
+                                        <option value=""></option>
+                                        <option value="0">默认气泡</option>
+                                        <option value="1">VIP气泡</option>
+                                        <option value="2">收费气泡</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">商店气泡上传</label>
+                                <div class="layui-input-block">
+                                    <input type="file" name="shop" onchange="upload(this)" autocomplete="off"
+                                           class="layui-input">
+                                    <input type="hidden" name="bubble_shop_url" id="bubble_shop_url"/>
+                                    <img src="" id="bubble_url_img_shop" class="min" >
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">android右边气泡</label>
+                                <div class="layui-input-block">
+                                    <input type="file" name="right" onchange="upload(this)" autocomplete="off"
+                                           class="layui-input">
+                                    <input type="hidden" name="bubble_url" id="bubble_url"/>
+                                    <input type="hidden" name="bubble_id" id="bubble_id"/>
+                                    <img src="" id="bubble_url_img" class="min" >
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">android左边气泡</label>
+                                <div class="layui-input-block">
+                                    <input type="file" name="left" onchange="upload(this)" autocomplete="off"
+                                           class="layui-input">
+                                    <input type="hidden" name="bubble_url_left" id="bubble_url_left"/>
+                                    <img src="" id="bubble_url_img_left" class="min">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">ios右气泡</label>
+                                <div class="layui-input-block">
+                                    <input type="file" name="right_ios" onchange="upload(this)" autocomplete="off"
+                                           class="layui-input">
+                                    <input type="hidden" name="bubble_url_ios" id="bubble_url_ios"/>
+                                    <img src="" id="bubble_url_ios_img" class="min" >
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">ios左气泡</label>
+                                <div class="layui-input-block">
+                                    <input type="file" name="left_ios" onchange="upload(this)" autocomplete="off"
+                                           class="layui-input">
+                                    <input type="hidden" name="bubble_url_left_ios" id="bubble_url_left_ios"/>
+                                    <img src="" id="bubble_url_left_ios_img" class="min">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--            <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="sendmsg()">发送</button>
+                            <button type="button" class="btn btn-primary" onclick="getData()">刷新</button>
+                        </div>-->
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+</script>
+<script>
+    layui.use(['form', 'upload', 'table', 'element', 'laydate'], function () {
+        //获取form模块
+        var form = layui.form, table = layui.table, element = layui.element, upload = layui.upload;
+        var laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#createtime' //指定元素
+            , range: true
+        });
+
+        table.render({
+            id: 'bubbleDetail',
+            elem: '#bubbleDetail',
+            url: ctx + '/global/getBubbleList',
+            where: {
+                gagano: $("#gagano").val(),
+                createtime: $("#createtime").val()
+            },
+            //	method: 'post' //	默认 get
+            //	contentType: 'application/json'
+            toolbar: true,
+            defaultToolbar: ['filter'],
+            even: true, //	开启隔行背景
+            title: '气泡管理',
+            limits: [10, 30, 50, 100, 500, 1000],
+            limit: 30,
+            cols: [[{
+                field: 'k',
+                title: '序号',
+                type: 'checkbox'
+            },  {
+                field: 'bubble_id',
+                title: '气泡ID'
+            }, {
+                field: 'bubble_name',
+                title: '中文名称'
+            },  {
+                field: 'bubble_name_en',
+                title: '英文名称'
+            }, {
+                field: 'bubble_url',
+                title: 'Android右气泡'
+                ,width:125
+                , templet: function (res) {
+                    return '<img class="min" onclick="imageclick(this)" src="' + res.bubble_url + '" />'
+                }
+            }, {
+                field: 'bubble_url_left',
+                title: 'Android左气泡'
+                ,width:125
+                , templet: function (res) {
+                    return '<img class="min" onclick="imageclick(this)" src="' + res.bubble_url_left + '" />'
+                }
+            },  {
+                field: 'bubble_shop_url',
+                title: '商店气泡'
+                ,width:125
+                , templet: function (res) {
+                    return '<img class="min" onclick="imageclick(this)" src="' + res.bubble_shop_url + '" />'
+                }
+            },{
+                field: 'bubble_color',
+                title: '翻译色值'
+            }, {
+                field: 'bubble_font',
+                title: '字体色值'
+            }, {
+                field: 'bubble_price',
+                title: '价格'
+            }, {
+                field: 'bubble_type',
+                title: '类型'
+                , templet: function (res) {
+                    var bubble_type = res.bubble_type;
+                    if (bubble_type == 0) {
+                        return '默认气泡'
+                    }
+                    if (bubble_type == 1) {
+                        return 'VIP气泡'
+                    }
+                    if (bubble_type == 2) {
+                        return '收费气泡'
+                    }
+                }
+            }, {
+                field: 'create_time',
+                title: '发布时间',
+                templet: function (res) {
+                    if (res != null) {
+                        var date = new Date(res.create_time);
+                        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+                    }
+                }
+            }, {
+                field: 'online',
+                title: '状态'
+                , templet: function (res) {
+                    var dd = res.online
+                    if (dd == 1) {
+                        return '上线'
+                    } else if (dd == 0) {
+                        return '下线'
+                    }
+                }
+            }, {
+                field: 'sort',
+                title: '排序'
+            }, {
+                fixed: 'right',
+                title: '操作',
+                width: 155,
+                toolbar: '#barDemo'
+            }]],
+            page: true
+        });
+
+        //	监听行工具事件
+        table.on('tool(bubbleDetail)', function (obj) {
+            var data = obj.data;
+          //  console.log(data)
+            if (obj.event === 'edit') {
+                $('#myModal').modal('show');
+                $.get(ctx + "/global/getBubbleOne", {bubble_id: data.bubble_id}, function (res) {
+                    var data = res.obj;
+                 //   console.log(data);
+                    $("#bubble_url_img").attr('src', data.bubble_url);
+                    $("#bubble_url_img_left").attr('src', data.bubble_url_left);
+                    $("#bubble_url_img_shop").attr('src', data.bubble_shop_url);
+                    $("#bubble_url_ios_img").attr('src', data.bubble_url_ios);
+                    $("#bubble_url_left_ios_img").attr('src', data.bubble_url_left_ios);
+                    form.val("formTest", {
+                        "bubble_name": data.bubble_name // "name": "value"
+                        , "bubble_price": data.bubble_price
+                        , "sort": data.sort
+                        , "bubble_type": String(data.bubble_type)
+                        , "bubble_url": data.bubble_url
+                        , "bubble_id": data.bubble_id
+                        , "bubble_name_en": data.bubble_name_en
+                        , "bubble_url_left": data.bubble_url_left
+                        , "bubble_color": data.bubble_color
+                        , "bubble_font": data.bubble_font
+                        , "ios_padding": data.ios_padding
+                        , "android_padding": data.android_padding
+                        , "bubble_shop_url": data.bubble_shop_url
+                        , "bubble_url_ios": data.bubble_url_ios
+                        , "bubble_url_left_ios": data.bubble_url_left_ios
+                    });
+                });
+            }
+        });
+        $('#openAdd').click(function () {
+            $('#myModal').modal('show');
+            $("#bubble_url_img_left").attr('src', '');
+            $("#bubble_url_img").attr('src', '');
+            $("#bubble_url_img_shop").attr('src', '');
+            $("#bubble_url_ios_img").attr('src', '');
+            $("#bubble_url_left_ios_img").attr('src', '');
+            form.val("formTest", {
+                "bubble_name": '' // "name": "value"
+                , "bubble_price": ''
+                , "sort": ''
+                , "bubble_type": ''
+                , "bubble_url": ''
+                , "bubble_id": ''
+                , "bubble_name_en": ''
+                , "bubble_url_left": ''
+                , "bubble_color": ''
+                , "bubble_font": ''
+                , "android_padding": ''
+                , "ios_padding": ''
+                , "bubble_shop_url": ''
+                , "bubble_url_ios": ''
+                , "bubble_url_left_ios":''
+            });
+        });
+        //		搜索 按钮
+        $('#searchEx').click(function () {
+            table.reload('bubbleDetail', {
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+                , where: {
+                    bubbleId_search: $("#bubbleId_search").val(),
+                    online_search: $("#online_search").val()
+                }
+            });
+        });
+        form.on('submit(formDemo)', function(data){
+          //  console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+          //  console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+          //  console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+            $.post(ctx + "/global/addOrUpdateBubble", data.field, function (result) {
+                if (result.success) {
+                    layer.msg("操作成功！");
+                    $('#myModal').modal('hide');
+                    table.reload('bubbleDetail');
+                } else {
+                    layer.msg("操作失败！")
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        $('#delete_fun').click(function () {
+            let checkStatus = table.checkStatus('bubbleDetail');
+            let ids=new Array();
+            let len = checkStatus.data.length;
+            let data = checkStatus.data;
+            for (var i = 0; i < len; i++) {
+                if (i != len - 1) {
+                    ids += data[i].bubble_id + ","
+                } else {
+                    ids += data[i].bubble_id
+                }
+            }
+            $.post(ctx + "/global/delBubble", {str: ids}, function (result) {
+                if (result.success) {
+                    layer.msg("操作成功！");
+                    table.reload('bubbleDetail');
+                } else {
+                    layer.msg("操作失败！")
+                }
+            });
+        });
+        $('#online_fun').click(function () {
+            let checkStatus = table.checkStatus('bubbleDetail');
+            let ids=new Array();
+            let len = checkStatus.data.length;
+            let data = checkStatus.data;
+            for (let i = 0; i < len; i++) {
+                if (i != len - 1) {
+                    ids += data[i].bubble_id + ","
+                } else {
+                    ids += data[i].bubble_id
+                }
+            }
+            $.post(ctx + "/global/onlineBubble", {str: ids, online: 1}, function (result) {
+                if (result.success) {
+                    layer.msg("操作成功！");
+                    table.reload('bubbleDetail');
+                } else {
+                    layer.msg("操作失败！")
+                }
+            });
+        });
+        $('#offline_fun').click(function () {
+            let checkStatus = table.checkStatus('bubbleDetail');
+            let ids=new Array();
+            let len = checkStatus.data.length;
+            let data = checkStatus.data;
+            for (let i = 0; i < len; i++) {
+                if (i == len - 1) {
+                    ids += data[i].bubble_id
+                } else {
+                    ids += data[i].bubble_id + ","
+                }
+            }
+            $.post(ctx + "/global/onlineBubble", {str: ids, online: 0}, function (result) {
+                if (result.success) {
+                    layer.msg("操作成功！");
+                    table.reload('bubbleDetail');
+                } else {
+                    layer.msg("操作失败！")
+                }
+            });
+        });
+
+    });
+
+
+    /**
+     * 七牛上传图片
+     */
+        //var Qiniu_UploadUrl = "http://up.qiniu.com";
+    var Qiniu_UploadUrl = "https://upload.qiniup.com";
+    var Qiniu_upload = function (f, token, key, name) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", Qiniu_UploadUrl, true);
+        var formData, startDate;
+        formData = new FormData();
+        if (key !== null && key !== undefined) formData.append("key", key);
+        formData.append("token", token);
+        formData.append("file", f);
+        xhr.onreadystatechange = function (response) {
+            if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+                var blkRet = JSON.parse(xhr.responseText);
+                if (name === 'right') {
+                    $("#bubble_url_img").attr('src', qiniu + blkRet.key);
+                    $("#bubble_url").val(qiniu + blkRet.key);
+                } else if (name == 'left') {
+                    $("#bubble_url_img_left").attr('src', qiniu + blkRet.key);
+                    $("#bubble_url_left").val(qiniu + blkRet.key);
+                }else if (name == 'shop') {
+                    $("#bubble_url_img_shop").attr('src', qiniu + blkRet.key);
+                    $("#bubble_shop_url").val(qiniu + blkRet.key);
+                }else if (name == 'right_ios') {
+                    $("#bubble_url_ios_img").attr('src', qiniu + blkRet.key);
+                    $("#bubble_url_ios").val(qiniu + blkRet.key);
+                }else if (name == 'left_ios') {
+                    $("#bubble_url_left_ios_img").attr('src', qiniu + blkRet.key);
+                    $("#bubble_url_left_ios").val(qiniu + blkRet.key);
+                }
+            } else if (xhr.status != 200 && xhr.responseText) {
+                alert("上传失败!");
+            }
+        };
+        startDate = new Date().getTime();
+        xhr.send(formData);
+    };
+
+    /**
+     * 上传预览图
+     * obj 当前对象
+     * index 对应控件id
+     */
+    function upload(obj) {
+        var that = obj;
+      //  console.log(that);
+        var key = $(that).val();
+        var imageType = key.split(".");
+        $("#imageType").val(imageType[1]);
+        var token = "";
+        $.post(ctx + "/Image/uploadInit", {type: "R", imgNum: 1}, function (result) {
+            if (result.success) {
+                token = result.obj.upToken;
+                key = result.obj.img;
+                if ($(that).length > 0 && token != "") {
+                    Qiniu_upload($(that)[0].files[0], token, key, that.name);
+                } else {
+                    console && console.log("form input error");
+                }
+            }
+        });
+    }
+
+    function imageclick(obj) {
+        layer.photos({
+            photos: {"data": [{"src": obj.src}]}
+        });
+    }
+
+
+</script>

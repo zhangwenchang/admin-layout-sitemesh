@@ -1,0 +1,943 @@
+<section class="content-header">
+    <h1>群发私信<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>官方消息管理</li>
+        <li class="active">群发私信</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          
+           <form class="form-horizontal">
+              <!-- /.box-body -->
+              <div class="box-footer">
+              <button type="button" onclick="bathdel()" class="btn btn-primary">删除</button>
+               <button type="button" onclick="massmessage()" class="btn btn-primary">群发私信</button>
+              </div>
+              <div>
+              	<span id="sentnum"></span>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+          
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="massmessage" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+                    <th>序号</th>
+                    <th>发布账号</th>
+                    <th>发布内容</th>
+                    <th>发布时间</th>
+                    <th>发布条件</th>
+                    <th>操作</th>
+                    <th>ID</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+
+<div class="modal fade" id="Modalpage" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog" style="width:50%">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabelpage">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontentpage">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbuttonpage">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js','/dist/js/jquery.qqFace.js'], function() {
+        $("#massmessage").dataTable({
+        	"bStateSave": true, 
+        	"paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength":10,
+	        //"ajax" : ctx+"/adminmember/notauditedimgList",
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	layer.load(1, {shade: 0.3});
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/massmessage/massmessagelist",
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "syleId","bSortable": false },
+				{"data": "syleId","bSortable": false },
+				{"data": "sysMember.symeGagano","bSortable": false},
+				{"data": "syleContenet","bSortable": false },
+				{"data": "syleSendtime","bSortable": false},
+				{"data": "syleType","bSortable": false },
+				{"data": "syleId","bSortable": false },
+				{"data": "syleId","bSortable": false }
+	        ], 
+	         "columnDefs": [{
+	                "targets": 0,
+	                "data": "syleId",
+	                "render": function(data, type, full, meta) {
+	                    return '<input type="checkbox" value="' + full.syleLetterid + '" title="' + data + '" name="checkbox" />';
+	                }
+	            },{
+	                "targets": 2,
+	                "data": "sysMember.symeGagano",
+	                "render": function(data, type, full, meta) {
+	                	if(data==null||data==''){
+	                		return "";
+	                	}else{
+	                		return data;
+	                	}
+	                }
+	            },{
+	                "targets": 4,
+	                "data": "syleSendtime",
+	                "render": function(data, type, full, meta) {
+	                	return data ? (new Date(data)).format('yyyy-MM-dd hh:mm:ss', true) : '';
+	                	//var date = new Date(data);
+	    	    	    //return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":00:00";
+	                }
+	            },{
+	                "targets": 5,
+	                "data": "syleType",
+	                "render": function(data, type, full, meta) {
+	                	if(data==3){
+	                		return "部分用户："+full.syleReceivers;
+	                	}else if(data==2){
+	                		var date = "";
+	                		if(full.syleRegistertime==''||full.syleRegistertime==null){
+	    			    		date = "";
+	    			    	}else{
+			    	    	    var date = new Date(full.syleRegistertime);
+			    	    	    date = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+	    			    	}
+	                		return "注册时间："+date;
+	                	}else{
+	                		return "群发所有人";
+	                	}
+	                }
+	            },
+				{"targets": 6,
+					"data": "syleId",
+					"render": function ( data, type, full, meta ) {
+						var html = "";
+						if(full.syleState==0){
+							html = "即将发表  <a href='javascript:void(0)' onclick='editmassmessage(\""+full.syleLetterid+"\")'>编辑</a>";
+						}else{
+							html = "已发表  <a href='javascript:void(0)' onclick='ckmassmessage(\""+full.syleLetterid+"\")'>查看</a>";
+						}
+						
+						return html;
+				}}],
+	            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+	            	var json=jQuery.parseJSON(oSettings.jqXHR.responseText);
+		            if(json!=null){
+		            	$("#sentnum").text(json.obj);
+		            }
+	            	 $(".mailbox-messages input[type='checkbox']").iCheck({
+	                     checkboxClass: 'icheckbox_flat-blue',
+	                     radioClass: 'iradio_flat-blue'
+	                 });
+	                 layer.closeAll();
+	            }
+	    });
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+      //序号相关
+        var table = $('#massmessage').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(1, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw();
+        
+    });
+});
+
+//群发私信
+function massmessage(){
+	$("#ModalLabelpage").text("群发私信");
+	   var html="<button type='button' onclick='addmessage()' class='btn btn-primary'>确定 </button><button type='button' class='btn btn-default' data-dismiss='modal'>取消</button>";
+	   $("#modalbuttonpage").html(html);
+	   var content = returnhtml();
+	   $("#bodycontentpage").html(content);
+	   
+	   
+	   $('#Modalpage').modal({
+		      keyboard: true
+	   });
+	   var defaultDate = new Date();
+	    var lastMonthDate = defaultDate.getFullYear() + '-' + (defaultDate.getMonth() + 1) + '-' + defaultDate.getDate() + ' '+defaultDate.getHours()+':00:00';
+	   $('#senttime').daterangepicker({
+	        timePicker: true,
+	        timePicker12Hour: false,
+	        timePickerSeconds: true,
+	        timePickerIncrement: 1,
+	        opens: "right",
+	        format: 'YYYY-MM-DD HH:mm:ss',
+	        singleDatePicker: true,
+	        startDate: lastMonthDate
+	    });
+	   //$('#senttime').datepicker({format: 'yyyy-mm-dd'});
+	   $('#regtime').datepicker({format: 'yyyy-mm-dd'});
+	   $('#endtime').datepicker({format: 'yyyy-mm-dd'});
+	   $(".qqface-btn").each(function(){
+		   var that=this;
+		    
+		   $(this).qqFace({
+		        id: 'facebox',
+		        assign:$(that).attr("ctyp")+"edit",
+
+		        path: ctx+'/images/facebag/qqFace/' //表情存放的路径
+		    });
+	   });
+	   
+	   for(var i=1;i<9;i++){
+			$("#file"+i).change(function(){
+				var that=this;
+				var imgvalobj=$(that).parent().next();
+				var imgobj=$(that).parent().next().next();
+				var key=$(this).val();
+				var path1 = key.lastIndexOf("\\");
+				var key = key.substring(path1+1);
+				var token = "";
+				$.post(ctx+"/Image/uploadInit",{type:"M",imgNum:1},function(result){
+					 if(result.success){
+						 token = result.obj.upToken;
+						 key=result.obj.img;
+							if ($(that).length > 0 && token != "") {
+								Qiniu_upload($(that)[0].files[0], token,key,imgvalobj,imgobj);
+								//$(this).prev().val(key);
+							} else {
+								console && console.log("form input error");
+							}
+					 }
+				});
+			});
+		}
+
+		$('#Modalpage textarea').select(function(event) {
+	        if ($(this)[0].selectionStart != undefined && $(this)[0].selectionEnd != undefined) {
+	          	start = $(this)[0].selectionStart;
+	          	end = $(this)[0].selectionEnd;
+	          	$(this).attr('data-select', start+','+end)
+	        }
+	    });
+}
+ 
+ //群发私信保存
+ function addmessage(){
+	var checkval = $('input[name="cxtj"]:checked ').val();
+	var regtime = $("#regtime").val();
+	var dstime = $("#senttime").val();
+	var endtime = $("#endtime").val();
+	var gaganos = $("#gaganos").val();
+	var sentno = $("#sentno").val();
+	var enedit = $("#enedit").val();
+	var twedit = $("#twedit").val();
+	var deedit = $("#deedit").val();
+	var esedit = $("#esedit").val();
+	var jpedit = $("#jpedit").val();
+	var koedit = $("#koedit").val();
+	var ruedit = $("#ruedit").val();
+	var zhedit = $("#zhedit").val();
+	var zhimgval = $("#imgval1").val();
+	var twimgval = $("#imgval2").val();
+	var enimgval = $("#imgval3").val();
+	var esimgval = $("#imgval4").val();
+	var koimgval = $("#imgval5").val();
+	var jpimgval = $("#imgval6").val();
+	var deimgval = $("#imgval7").val();
+	var ruimgval = $("#imgval8").val();
+	if(checkval=='1'){
+		if(endtime==''){
+			$("#errorbodycontent").html("群发结束时间不能为空");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+	     return;
+		}
+	}
+	if(checkval=='3'){
+		if(gaganos==''){
+			$("#errorbodycontent").html("部分用户嘎嘎号不能为空");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+	     return;
+		}
+	}
+	if(enedit==''||enedit==null||zhedit==''||zhedit==null){
+		$("#errorbodycontent").html("中文和英文内容不能为空");
+		   $('#errorModal').modal({
+				keyboard : true
+			});
+     return;
+	}
+	$.ajax({
+        type: "post",
+        url: ctx + "/massmessage/sendmessage",
+        dataType: "json",
+        data: {
+            "regtime":regtime,
+            "dstime":dstime,
+            "endtime":endtime,
+            "sendno":sentno,
+            "allmemb":checkval,
+            "membnos":gaganos,
+            "zhcontent":zhedit,
+            "encontent":enedit,
+            "twcontent":twedit,
+            "kocontent":koedit,
+            "jpcontent":jpedit,
+            "rucontent":ruedit,
+            "escontent":esedit,
+            "decontent":deedit,
+            "zhimgval":zhimgval,
+            "twimgval":twimgval,
+            "enimgval":enimgval,
+            "esimgval":esimgval,
+            "koimgval":koimgval,
+            "jpimgval":jpimgval,
+            "deimgval":deimgval,
+            "ruimgval":ruimgval
+        },
+        success: function(data) {
+        	if(data.success){
+        		$('#Modalpage').modal('hide');
+        		$("#errorbodycontent").html(data.msg);
+ 			   $('#errorModal').modal({
+ 					keyboard : true
+ 				});
+	        	$("#massmessage").dataTable().fnDraw(false);
+	        	
+        	}
+        }
+	});
+ }
+ 
+ function updatemessage(id){
+	 var checkval = $('input[name="cxtj"]:checked ').val();
+		var regtime = $("#regtime").val();
+		var dstime = $("#senttime").val();
+		var gaganos = $("#gaganos").val();
+		var sentno = $("#sentno").val();
+		var enedit = $("#enedit").val();
+		var twedit = $("#twedit").val();
+		var deedit = $("#deedit").val();
+		var esedit = $("#esedit").val();
+		var jpedit = $("#jpedit").val();
+		var koedit = $("#koedit").val();
+		var ruedit = $("#ruedit").val();
+		var zhedit = $("#zhedit").val();
+		var zhimgval = $("#imgval1").val();
+		var twimgval = $("#imgval2").val();
+		var enimgval = $("#imgval3").val();
+		var esimgval = $("#imgval4").val();
+		var koimgval = $("#imgval5").val();
+		var jpimgval = $("#imgval6").val();
+		var deimgval = $("#imgval7").val();
+		var ruimgval = $("#imgval8").val();
+		if(checkval=='3'){
+			if(gaganos==''){
+				$("#errorbodycontent").html("部分用户嘎嘎号不能为空");
+				   $('#errorModal').modal({
+						keyboard : true
+					});
+		     return;
+			}
+		}
+		if(enedit==''||enedit==null||zhedit==''||zhedit==null){
+			$("#errorbodycontent").html("中文和英文内容不能为空");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+	     return;
+		}
+		$.ajax({
+	        type: "post",
+	        url: ctx + "/massmessage/updatesendmessage",
+	        dataType: "json",
+	        data: {
+	        	"letterid":id,
+	            "regtime":regtime,
+	            "dstime":dstime,
+	            "sendno":sentno,
+	            "allmemb":checkval,
+	            "membnos":gaganos,
+	            "zhcontent":zhedit,
+	            "encontent":enedit,
+	            "twcontent":twedit,
+	            "kocontent":koedit,
+	            "jpcontent":jpedit,
+	            "rucontent":ruedit,
+	            "escontent":esedit,
+	            "decontent":deedit,
+	            "zhimgval":zhimgval,
+	            "twimgval":twimgval,
+	            "enimgval":enimgval,
+	            "esimgval":esimgval,
+	            "koimgval":koimgval,
+	            "jpimgval":jpimgval,
+	            "deimgval":deimgval,
+	            "ruimgval":ruimgval
+	        },
+	        success: function(data) {
+	        	if(data.success){
+		         	$("#massmessage").dataTable().fnDraw(false);
+		        	$('#Modalpage').modal('hide');
+	        	}
+	        }
+		});
+ }
+ 
+//编辑私信
+function editmassmessage(id){
+	$("#ModalLabelpage").text("群发私信");
+	   var html="<button type='button' onclick='updatemessage(\""+id+"\")' class='btn btn-primary'>确定 </button><button type='button' class='btn btn-default' data-dismiss='modal'>取消</button>";
+	   $("#modalbuttonpage").html(html);
+	   var content = returnhtml();
+	   $("#bodycontentpage").html(content);
+	   
+	   var defaultDate = new Date();
+	    var lastMonthDate = defaultDate.getFullYear() + '-' + defaultDate.getMonth() + '-' + defaultDate.getDate() + ' 00:00:00';
+	   $('#senttime').daterangepicker({
+	        timePicker: true,
+	        timePicker12Hour: false,
+	        timePickerSeconds: true,
+	        timePickerIncrement: 1,
+	        opens: "right",
+	        format: 'YYYY-MM-DD HH:mm:ss',
+	        singleDatePicker: true,
+	        startDate: lastMonthDate
+	    });
+	  // $('#senttime').datepicker({format: 'yyyy-mm-dd'});
+	   $('#regtime').datepicker({format: 'yyyy-mm-dd'});
+	   
+	   $('#Modalpage').modal({
+		      keyboard: true
+	   });
+	   $(".qqface-btn").each(function(){
+		   var that=this;
+		    
+		   $(this).qqFace({
+		        id: 'facebox',
+		        assign:$(that).attr("ctyp")+"edit",
+
+		        path: ctx+'/images/facebag/qqFace/' //表情存放的路径
+		    });
+	   });
+	   
+	   for(var i=1;i<9;i++){
+			$("#file"+i).change(function(){
+				var that=this;
+				var imgvalobj=$(that).parent().next();
+				var imgobj=$(that).parent().next().next();
+				var key=$(this).val();
+				var path1 = key.lastIndexOf("\\");
+				var key = key.substring(path1+1);
+				var token = "";
+				$.post(ctx+"/Image/uploadInit",{type:"M",imgNum:1},function(result){
+					 if(result.success){
+						 token = result.obj.upToken;
+						 key=result.obj.img;
+							if ($(that).length > 0 && token != "") {
+								Qiniu_upload($(that)[0].files[0], token,key,imgvalobj,imgobj);
+								//$(this).prev().val(key);
+							} else {
+								console && console.log("form input error");
+							}
+					 }
+				});
+			});
+		}
+	   
+	   $.ajax({
+	        type: "post",
+	        url: ctx + "/massmessage/getmassmessage",
+	        dataType: "json",
+	        data: {
+	            "letterid":id
+	        },
+	        success: function(data) {
+	        	var obj = data.obj;
+	            if (data.success&&obj!=null) {
+		        	var regtime = obj[0].syleRegistertime;
+		        	var senttime = new Date(obj[0].syleSendtime);
+		        	if(regtime!=''&&regtime!=null){
+		        		var date = new Date(regtime);
+		        		regtime = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+		        	}
+		        	if(senttime!=''&&senttime!=null){
+		        		var date = new Date(senttime);
+		        		senttime = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+		        	}
+		        	
+		        	var sentno = obj[0].syleSysgagaid;
+		        	var type = obj[0].syleType;
+		        	var receiver = obj[0].syleReceivers;
+		        	$("#senttime").val(senttime);
+		        	$("#gaganos").val(receiver);
+		        	$("#sentno").val(sentno);
+		        	if(type==3){
+			        	$("input[name='cxtj']").eq(1).attr("checked","checked");
+		        	}else{
+			        	$("#regtime").val(regtime);
+		        		$("input[name='cxtj']").eq(0).attr("checked","checked");
+		        	}
+	            	obj.forEach(function(item){
+	            		if(item.syleLanguage=='en-us'){
+	            			$("#enedit").val(item.syleContenet);
+	            			if(item.syleImg!=''&&item.syleImg!=null){
+		            			$("#imgval3").val(item.syleImg);
+		            			$("#img3").attr("src",item.syleImg);
+	            			}
+	            		}else if(item.syleLanguage=='zh-tw'){
+	            			$("#twedit").val(item.syleContenet);
+							if(item.syleImg!=''&&item.syleImg!=null){
+		            			$("#imgval2").val(item.syleImg);
+		            			$("#img2").attr("src",item.syleImg);
+	            			}
+	            		}else if(item.syleLanguage=='de-de'){
+	            			$("#deedit").val(item.syleContenet);
+							if(item.syleImg!=''&&item.syleImg!=null){
+		            			$("#imgval7").val(item.syleImg);
+		            			$("#img7").attr("src",item.syleImg);
+	            			}
+	            		}else if(item.syleLanguage=='es-es'){
+	            			$("#esedit").val(item.syleContenet);
+							if(item.syleImg!=''&&item.syleImg!=null){
+		            			$("#imgval4").val(item.syleImg);
+		            			$("#img4").attr("src",item.syleImg);
+	            			}
+	            		}else if(item.syleLanguage=='ja-jp'){
+	            			$("#jpedit").val(item.syleContenet);
+							if(item.syleImg!=''&&item.syleImg!=null){
+	            				$("#imgval6").val(item.syleImg);
+	            				$("#img6").attr("src",item.syleImg);
+	            			}
+	            		}else if(item.syleLanguage=='ko-kr'){
+	            			$("#koedit").val(item.syleContenet);
+							if(item.syleImg!=''&&item.syleImg!=null){
+		            			$("#imgval5").val(item.syleImg);
+		            			$("#img5").attr("src",item.syleImg);
+	            			}
+	            		}else if(item.syleLanguage=='ru-ru'){
+	            			$("#ruedit").val(item.syleContenet);
+							if(item.syleImg!=''&&item.syleImg!=null){
+		            			$("#imgval8").val(item.syleImg);
+		            			$("#img8").attr("src",item.syleImg);
+	            			}
+	            		}else{
+	            			$("#zhedit").val(item.syleContenet);
+							if(item.syleImg!=''&&item.syleImg!=null){
+		            			$("#imgval1").val(item.syleImg);
+		            			$("#img1").attr("src",item.syleImg);
+	            				
+	            			}
+	            		}
+	            	});
+	            }
+	        }
+	    });
+}
+ 
+ function returnhtml(){
+	 //<span>定时发送时间：</span><input type="text" id="senttime">(注：如果选定的时间小于当前时间，点击保存会立即发送)  
+	 //<span> 注册开始时间：</span><input type="text" id="regtime">
+	 var tj = '<span>发送账号：</span><select id="sentno"></select><br><br>'+
+	   '<span>群发条件：</span><label><br><input type="radio" name="cxtj" checked class="minimal" value="1">全部用户</label>  <span> 结束时间：</span><input type="text" id="endtime"><br>'+
+     '<label><input type="radio" name="cxtj" class="minimal" value="3">部分用户</label><input type="text" id="gaganos" placeholder="GaGa号"> 例：123,456';
+	   var content = tj+'<section class="content"><div class="row"><div class="col-md-9"><div class="nav-tabs-custom">'+
+	   '<ul class="nav nav-tabs">'+
+		   '<li class="active"><a href="#zhtimeline" data-toggle="tab">简体中文</a></li>'+
+		   '<li><a href="#twtimeline" data-toggle="tab">繁体中文</a></li>'+
+		   '<li><a href="#entimeline" data-toggle="tab">英文</a></li>'+
+		   '<li><a href="#estimeline" data-toggle="tab">西班牙文</a></li>'+
+		   '<li><a href="#kotimeline" data-toggle="tab">韩文</a></li>'+
+		   '<li><a href="#jptimeline" data-toggle="tab">日文</a></li>'+
+		   '<li><a href="#detimeline" data-toggle="tab">德文</a></li>'+
+		   '<li><a href="#rutimeline" data-toggle="tab">俄文</a></li></ul>'+
+	   '<div class="tab-content">'+
+	   '<div class="active tab-pane" id="zhtimeline"><div class="post"><textarea id="zhedit" name="editor1" rows="10" cols="90" placeholder="简体中文"></textarea></div>'+
+	   '<div class="modal-footer"><button type="button" onclick="addurl(this)" class="btn btn-default btn-sm">链接地址</button><button type="button" ty="1"  ctyp="zh"  class="btn btn-default btn-sm qqface-btn">表情</button><button onclick="triggerclick(1)" class="btn btn-default btn-sm">上传照片</button></div><div style="text-align:center;"><div style="display:none;"><input type="file" id="file1"></div><input type="hidden" id="imgval1"><img id="img1" width="100" height="100" ></div></div>'+
+	   '<div class="tab-pane" id="twtimeline"><div class="post"><textarea id="twedit" name="editor1" rows="10" cols="90" placeholder="繁体中文"></textarea></div>'+
+	   '<div class="modal-footer"><button type="button" onclick="addurl(this)" class="btn btn-default btn-sm">链接地址</button><button type="button" ty="2" ctyp="tw" class="btn btn-default btn-sm qqface-btn">表情</button><button onclick="triggerclick(2)" class="btn btn-default btn-sm">上传照片</button></div><div style="text-align:center;"><div style="display:none;"><input type="file" id="file2"></div><input type="hidden" id="imgval2"><img id="img2" width="100" height="100"></div></div>'+
+	   '<div class="tab-pane" id="entimeline"><div class="post"><textarea id="enedit" name="editor1" rows="10" cols="90" placeholder="英文"></textarea></div>'+
+	   '<div class="modal-footer"><button type="button" onclick="addurl(this)" class="btn btn-default btn-sm">链接地址</button><button type="button"  ctyp="en"  class="btn btn-default btn-sm qqface-btn">表情</button><button onclick="triggerclick(3)" class="btn btn-default btn-sm">上传照片</button></div><div style="text-align:center;"><div style="display:none;"><input type="file" id="file3"></div><input type="hidden" id="imgval3"><img id="img3" width="100" height="100" ></div></div>'+
+	   '<div class="tab-pane" id="estimeline"><div class="post"><textarea id="esedit" name="editor1" rows="10" cols="90" placeholder="西班牙文"></textarea></div>'+
+	   '<div class="modal-footer"><button type="button" onclick="addurl(this)" class="btn btn-default btn-sm">链接地址</button><button type="button"  ctyp="es"   class="btn btn-default btn-sm qqface-btn">表情</button><button onclick="triggerclick(4)" class="btn btn-default btn-sm">上传照片</button></div><div style="text-align:center;"><div style="display:none;"><input type="file" id="file4"></div><input type="hidden" id="imgval4"><img id="img4" width="100" height="100" ></div></div>'+
+	   '<div class="tab-pane" id="kotimeline"><div class="post"><textarea id="koedit" name="editor1" rows="10" cols="90" placeholder="韩文"></textarea></div>'+
+	   '<div class="modal-footer"><button type="button" onclick="addurl(this)" class="btn btn-default btn-sm">链接地址</button><button type="button"  ctyp="ko"  class="btn btn-default btn-sm qqface-btn">表情</button><button onclick="triggerclick(5)" class="btn btn-default btn-sm">上传照片</button></div><div style="text-align:center;"><div style="display:none;"><input type="file" id="file5"></div><input type="hidden" id="imgval5"><img id="img5" width="100" height="100" ></div></div>'+
+	   '<div class="tab-pane" id="jptimeline"><div class="post"><textarea id="jpedit" name="editor1" rows="10" cols="90" placeholder="日文"></textarea></div>'+
+	   '<div class="modal-footer"><button type="button" onclick="addurl(this)" class="btn btn-default btn-sm">链接地址</button><button type="button"  ctyp="jp"  class="btn btn-default btn-sm qqface-btn ">表情</button><button onclick="triggerclick(6)" class="btn btn-default btn-sm">上传照片</button></div><div style="text-align:center;"><div style="display:none;"><input type="file" id="file6"></div><input type="hidden" id="imgval6"><img id="img6" width="100" height="100" ></div></div>'+
+	   '<div class="tab-pane" id="detimeline"><div class="post"><textarea id="deedit" name="editor1" rows="10" cols="90" placeholder="德文"></textarea></div>'+
+	   '<div class="modal-footer"><button type="button" onclick="addurl(this)" class="btn btn-default btn-sm">链接地址</button><button type="button"  ctyp="de"   class="btn btn-default btn-sm qqface-btn">表情</button><button onclick="triggerclick(7)" class="btn btn-default btn-sm">上传照片</button></div><div style="text-align:center;"><div style="display:none;"><input type="file" id="file7"></div><input type="hidden" id="imgval7"><img id="img7" width="100" height="100" ></div></div>'+
+	   '<div class="tab-pane" id="rutimeline"><div class="post"><textarea id="ruedit" name="editor1" rows="10" cols="90" placeholder="俄文"></textarea></div>'+
+	   '<div class="modal-footer"><button type="button" onclick="addurl(this)" class="btn btn-default btn-sm">链接地址</button><button type="button"  ctyp="ru"  class="btn btn-default btn-sm qqface-btn">表情</button><button onclick="triggerclick(8)" class="btn btn-default btn-sm">上传照片</button></div><div style="text-align:center;"><div style="display:none;"><input type="file" id="file8"></div><input type="hidden" id="imgval8"><img id="img8" width="100" height="100" ></div></div>'+
+	   '</div></div></div></div></div></section>';
+	   $.ajax({
+	        type: "post",
+	        url: ctx + "/OffiAccount/dicList",
+	        dataType: "json",
+	        success: function(data) {
+	        	if(data.success){
+	        		var html = "";
+	        		var obj = data.obj;
+	        		obj.forEach(function(item){
+	        			html+='<option value="'+item.syme_gagaid+'">'+item.memb_nickname+'</option>';
+	        		});
+	        		$("#sentno").html(html);
+	        	}
+	        }
+	   })
+	   return content;
+ }
+ 
+ function triggerclick(id){
+	 $("#file"+id).trigger("click");
+ }
+ 
+ function languagemodel(){
+	 var content = '<section class="content"><div class="row"><div class="col-md-9"><div class="nav-tabs-custom">'+
+	   '<ul class="nav nav-tabs">'+
+		   '<li class="active"><a href="#zhtimeline" data-toggle="tab">简体中文</a></li>'+
+		   '<li><a href="#twtimeline" data-toggle="tab">繁体中文</a></li>'+
+		   '<li><a href="#entimeline" data-toggle="tab">英文</a></li>'+
+		   '<li><a href="#estimeline" data-toggle="tab">西班牙文</a></li>'+
+		   '<li><a href="#kotimeline" data-toggle="tab">韩文</a></li>'+
+		   '<li><a href="#jptimeline" data-toggle="tab">日文</a></li>'+
+		   '<li><a href="#detimeline" data-toggle="tab">德文</a></li>'+
+		   '<li><a href="#rutimeline" data-toggle="tab">俄文</a></li></ul>'+
+	   '<div class="tab-content">'+
+	   '<div class="active tab-pane" id="zhtimeline"><div class="post"><textarea id="zhedit" readonly name="editor1" rows="10" cols="90" placeholder="简体中文"></textarea></div><div style="text-align:center;"><img id="img1" width="100" height="100"></div>'+
+	   '</div>'+
+	   '<div class="tab-pane" id="twtimeline"><div class="post"><textarea id="twedit" readonly name="editor1" rows="10" cols="90" placeholder="繁体中文"></textarea></div><div style="text-align:center;"><img id="img2" width="100" height="100" ></div>'+
+	   '</div>'+
+	   '<div class="tab-pane" id="entimeline"><div class="post"><textarea id="enedit" readonly name="editor1" rows="10" cols="90" placeholder="英文"></textarea></div><div style="text-align:center;"><img id="img3" width="100" height="100" ></div>'+
+	   '</div>'+
+	   '<div class="tab-pane" id="estimeline"><div class="post"><textarea id="esedit" readonly name="editor1" rows="10" cols="90" placeholder="西班牙文"></textarea></div><div style="text-align:center;"><img id="img4" width="100" height="100" ></div>'+
+	   '</div>'+
+	   '<div class="tab-pane" id="kotimeline"><div class="post"><textarea id="koedit" readonly name="editor1" rows="10" cols="90" placeholder="韩文"></textarea></div><div style="text-align:center;"><img id="img5" width="100" height="100" ></div>'+
+	   '</div>'+
+	   '<div class="tab-pane" id="jptimeline"><div class="post"><textarea id="jpedit" readonly name="editor1" rows="10" cols="90" placeholder="日文"></textarea></div><div style="text-align:center;"><img id="img6" width="100" height="100" ></div>'+
+	   '</div>'+
+	   '<div class="tab-pane" id="detimeline"><div class="post"><textarea id="deedit" readonly name="editor1" rows="10" cols="90" placeholder="德文"></textarea></div><div style="text-align:center;"><img id="img7" width="100" height="100" ></div>'+
+	   '</div>'+
+	   '<div class="tab-pane" id="rutimeline"><div class="post"><textarea id="ruedit" readonly name="editor1" rows="10" cols="90" placeholder="俄文"></textarea></div><div style="text-align:center;"><img id="img8" width="100" height="100" ></div>'+
+	   '</div>'+
+	   '</div></div></div></div></div></section>';
+	   return content;
+ }
+ 
+ //查看私信
+ function ckmassmessage(id){
+	 $("#ModalLabelpage").text("查看");
+	   var html="<button type='button' class='btn btn-default' data-dismiss='modal'>取消</button>";
+	   $("#modalbuttonpage").html(html);
+	   var content = languagemodel();
+	   $("#bodycontentpage").html(content);
+	   
+	   $('#Modalpage').modal({
+		      keyboard: true
+	   });
+	   $.ajax({
+	        type: "post",
+	        url: ctx + "/massmessage/getmassmessage",
+	        dataType: "json",
+	        data: {
+	            "letterid":id
+	        },
+	        success: function(data) {
+	        	var obj = data.obj;
+	            if (data.success&&obj!=null) {
+	            	obj.forEach(function(item){
+	            		if(item.syleLanguage=='en-us'){
+	            			$("#enedit").val(item.syleContenet);
+	            			$("#img3").attr("src",item.syleImg);
+	            		}else if(item.syleLanguage=='zh-tw'){
+	            			$("#twedit").val(item.syleContenet);
+	            			$("#img2").attr("src",item.syleImg);
+	            		}else if(item.syleLanguage=='de-de'){
+	            			$("#deedit").val(item.syleContenet);
+	            			$("#img7").attr("src",item.syleImg);
+	            		}else if(item.syleLanguage=='es-es'){
+	            			$("#esedit").val(item.syleContenet);
+	            			$("#img4").attr("src",item.syleImg);
+	            		}else if(item.syleLanguage=='ja-jp'){
+	            			$("#jpedit").val(item.syleContenet);
+	            			$("#img6").attr("src",item.syleImg);
+	            		}else if(item.syleLanguage=='ko-kr'){
+	            			$("#koedit").val(item.syleContenet);
+	            			$("#img5").attr("src",item.syleImg);
+	            		}else if(item.syleLanguage=='ru-ru'){
+	            			$("#ruedit").val(item.syleContenet);
+	            			$("#img8").attr("src",item.syleImg);
+	            		}else{
+	            			$("#zhedit").val(item.syleContenet);
+	            			$("#img1").attr("src",item.syleImg);
+	            		}
+	            	});
+	            }
+	        }
+	    });
+ }
+ 
+ function addurl(obj){
+ 	//debugger
+ 	var _this = $(obj);
+ 	var $textarea = _this.closest('.tab-pane').find('textarea');
+ 	var selPos = $textarea.attr('data-select');
+ 	if (selPos) {
+ 		var start = Number(selPos.split(',')[0]);
+ 		var end = Number(selPos.split(',')[1]);
+ 		if (start!=undefined && end!=undefined) {
+ 			var oldTxt = $textarea.val();
+	          var startTxt, centerTxt, endTxt;
+	          startTxt = oldTxt.substring(0, start);
+	          centerTxt = oldTxt.substring(start, end);
+	          endTxt = oldTxt.substring(end);
+	          var link = prompt();
+	            if (link && $.trim(link) != '') {
+	            	if (link.indexOf('http') == -1) {
+		              link = 'http://' + link;
+		            }
+		            $textarea.val(startTxt + '<a href="' + link + '" target="_blank">' + centerTxt + '</a>' + endTxt)
+	            }	            	         
+ 		}
+ 	} else {
+ 		var link = prompt();
+	    if (link && $.trim(link) != '') {
+	        if (link.indexOf('http') == -1) {
+		        link = 'http://' + link;
+		     }
+		    $textarea.val($textarea.val() + '<a href="' + link + '" target="_blank"></a>')
+	     }	 
+ 	}
+
+ 	/*data,type
+	 var urladd = '';
+	 if(type==1){
+		 $("#ModalLabel").text("新增链接");
+		 var content = '<span>链接地址：</span><input type="text" id="url" class="form-control" placeholder="请输入完整的链接地址">';
+		   $("#bodycontent").html(content);
+		   $("#modalbutton").html('<button type="button" onclick="addurl('+data+',2)" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		   $('#Modal').modal({
+			      keyboard: true
+		   });
+	 }else{
+		 var urldata = $("#url").val();
+		 if(urldata!=''&&urldata!=null){
+			 urladd='<a href="'+urldata+'"  target="_blank">'+urldata+'</a>';
+		 }
+		 if(data==1){
+			 $("#zhedit").val($("#zhedit").val()+urladd);
+		 }else if(data==2){
+			 $("#twedit").val($("#twedit").val()+urladd);
+		 }else if(data==3){
+			 $("#enedit").val($("#enedit").val()+urladd);
+		 }else if(data==4){
+			 $("#esedit").val($("#esedit").val()+urladd);
+		 }else if(data==5){
+			 $("#koedit").val($("#koedit").val()+urladd);
+		 }else if(data==6){
+			 $("#jpedit").val($("#jpedit").val()+urladd);
+		 }else if(data==7){
+			 $("#deedit").val($("#deedit").val()+urladd);
+		 }else if(data==8){
+			 $("#ruedit").val($("#ruedit").val()+urladd);
+		 }
+		 $("#Modal").modal('hide');
+	 }*/
+ }
+ 
+function expression(type){
+	/* $("#facebox").qqFace({
+        id: 'zhedit',
+        assign: 'sendContent',
+
+        path: ctx + '/images/facebag' //表情存放的路径
+    }); */
+
+}
+
+function bathdel(){
+	var letterid = "";
+    var num = 0;
+    var objs = $("#massmessage div");
+    for (var i = 0; i < objs.length; i++) {
+        var obj = objs[i];
+        var flag = $(obj).attr("aria-checked");
+        if (flag == "true") {
+            if (letterid.trim() != "") {
+                num += 1;
+                letterid += ","
+            }
+            letterid += $(obj).children("input").attr("value");
+        }
+    }
+    if (letterid.trim() == "") {
+    	$("#errorbodycontent").html("请选择需要操作的数据");
+		   $('#errorModal').modal({
+				keyboard : true
+			});
+        return;
+    }
+    $.ajax({
+        type: "post",
+        url: ctx + "/massmessage/delmassmessage",
+        dataType: "json",
+        data: {
+            "letterids":letterid
+        },
+        success: function(data) {
+            if (data.success) {
+            	 $("#massmessage").dataTable().fnDraw(false);
+            }
+        }
+    });
+}
+
+
+
+var Qiniu_UploadUrl = "https://upload.qiniup.com";
+var Qiniu_upload = function(f, token, key,imgvalobj,imgobj) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", Qiniu_UploadUrl, true);
+	var formData, startDate;
+	formData = new FormData();
+	if (key !== null && key !== undefined) formData.append("key", key);
+	formData.append("token", token);
+	formData.append("file", f);
+	var taking;
+	xhr.upload.addEventListener("progress", function(evt) {
+		if (evt.lengthComputable) {
+			var nowDate = new Date().getTime();
+			taking = nowDate - startDate;
+			var x = (evt.loaded) / 1024;
+			var y = taking / 1000;
+			var uploadSpeed = (x / y);
+			var formatSpeed;
+			if (uploadSpeed > 1024) {
+				formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+			} else {
+				formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+			}
+		}
+	}, false);
+	xhr.onreadystatechange = function(response) {
+		if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+			var blkRet = JSON.parse(xhr.responseText);
+			$(imgobj).attr("src",qiniu+blkRet.key);
+			$(imgvalobj).val(qiniu+blkRet.key);
+		} else if (xhr.status != 200 && xhr.responseText) {
+			$("#errorbodycontent").html(xhr.responseText);
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+			//$("#dialog").html(xhr.responseText).dialog();
+		}
+	};
+	startDate = new Date().getTime();
+	xhr.send(formData);
+};
+
+</script>
+

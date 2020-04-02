@@ -1,0 +1,50 @@
+#equimentModel .equimentBar{
+    width: 100%;
+}
+#equimentModel #equimentBar{
+    width: 100%;
+    height: 500px;
+}
+#equimentModel .equimentBar header{
+    height: 29px;
+    width: 100%;
+    line-height: 44px;
+    position: relative;
+}
+#equimentModel .equimentBar .equiment-title{
+    font-size: 17px;
+
+}
+#equimentModel .main_hot{
+    margin-bottom: 20px;
+}
+#equimentModel .main_hot ul{
+    overflow: hidden;
+}
+#equimentModel .main_hot ul li{
+    width: 45%;
+    float: left;
+    position: relative;
+}
+#equimentModel .main_hot ul li:first-child{
+    margin-right: 10%;
+}
+#equimentModel .main_hot ul li p span:nth-child(2){
+    display: inline-block;
+    position: absolute;
+    right: 1%;
+}
+
+/*时间选框*/
+#equimentModel #channelTime{
+    width: 200px;
+    text-align: center;
+    height: 35px;
+    position: absolute;
+    right: 0%;
+    top: 8%;
+    font-size: 17px;
+}
+#equimentModel #pagination{
+    margin-bottom: 20px;
+}

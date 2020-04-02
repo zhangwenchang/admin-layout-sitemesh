@@ -1,0 +1,252 @@
+<section class="content-header">
+    <h1>头像管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>用户管理</li>
+        <li class="active">头像管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+              <div class="box-header">
+              <button type="button" onclick="batchaudit(1)" class="btn btn-primary">批量审核通过</button>         
+              <button type="button" onclick="batchaudit(2)" class="btn btn-primary">批量封IP</button>
+              <button type="button" onclick="batchaudit(3)" class="btn btn-primary">批量审核不通过</button>
+              <button type="button" onclick="refreshdata()" class="btn btn-primary">刷新</button>
+                <!-- <h3 class="box-title">头像管理</h3> -->
+                <div class="box-tools">
+                      <div class="input-group" style="width: 150px;">
+                        <input name="table_search" id="gagaidorname" class="form-control input-sm pull-right" placeholder="GaGa号/昵称" type="text">
+                        <div class="input-group-btn">
+                          <button class="btn btn-sm btn-default" onclick="search()"><i class="fa fa-search"></i></button>
+                        </div>
+                      </div>
+                    </div>
+              </div>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="imgdata" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+                    <th>昵称</th>
+                    <th>GAGA号</th>
+                    <th>性别</th>
+                    <th>头像</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<script type="text/javascript">
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        console.log(1);
+
+       var tabs= $("#imgdata").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 30,
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                var gagaidorname = $("#gagaidorname").val();
+                aoData.push({
+                        "name": "noorname",
+                        "value": gagaidorname
+                    })
+                    //aoData=gagaidorname; 
+                    layer.load(1, {shade: 0.3});
+                    var url=(tabs)?(ctx + "/adminmember/notauditedimgList"):"#";
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/adminmember/notauditedimgList",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "membGagaid",
+                "bSortable": false
+            }, {
+                "data": "membNickname",
+                "bSortable": false
+            }, {
+                "data": "membGagano",
+                "bSortable": false
+            }, {
+                "data": "membSex",
+                "bSortable": false
+            }, {
+                "data": "membBigimg",
+                "bSortable": false
+            }],
+            "columnDefs": [{
+                "targets": 0,
+                "data": "membGagaid",
+                "render": function(data, type, full, meta) {
+                    return '<input type="checkbox" value="' + data + '" title="' + data + '" name="checkbox" />';
+                }
+            }, {
+                "targets": 3,
+                "data": "membSex",
+                "render": function(data, type, full, meta) {
+                	if(data==1){
+                    	return "男";
+                    }else if(data==2){
+                    	return "女";
+                    }
+                    return "无";
+                }
+            }, {
+                "targets": 4,
+                "data": "membBigimg",//为了上传头像图片能直接显示，后审核，使用membBigimg做新照片的存储地址   审核通过1覆盖2  
+                                     //不通过2覆盖1(旧照片保存地址membNewimg) 前台存储直接存入1  注： 1代表membBigimg 2代表membNewimg
+                "render": function(data, type, full, meta) {
+                   // return '<img style="width:100px;" alt="" src="' + qiniu + data + '">';
+                    //处理头像是否全地址问题
+                	if (data.indexOf("http")>-1) {
+    					return '<img style="width:100px;" alt="" src="'+data+'">';
+    				}else{
+    					return '<img style="width:100px;" alt="" src="'+qiniu+data+'">';
+    				}
+                }
+            }, ],
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+                $(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                $(".checkbox-toggle .fa").removeClass("fa-check-square-o").addClass('fa-square-o');
+                layer.closeAll();
+            }
+        });
+        $(".checkbox-toggle").click(function() {
+            
+            if ($(this).children(".fa").hasClass("fa-check-square-o")) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+          
+        });
+    });
+});
+//批量操作  1 审核通过  2 封IP   3  审核不通过
+function batchaudit(type) {
+    var gagaid = "";
+    var num = 0;
+    var objs = $("#imgdata div");
+    for (var i = 0; i < objs.length; i++) {
+        var obj = objs[i];
+        var flag = $(obj).attr("aria-checked");
+        if (flag == "true") {
+            if (gagaid.trim() != "") {
+                gagaid += ","
+            }
+            gagaid += $(obj).children("input").attr("value");
+            num += 1;
+        }
+    }
+    if (gagaid.trim() == "") {
+    	$("#errorbodycontent").html("请选择需要操作的数据");
+		   $('#errorModal').modal({
+				keyboard : true
+			});
+        return;
+    }
+    if (type == "3") {
+        if (!confirm("确认提交所有选项吗？")) {
+            return;
+        }
+    }
+    $.ajax({
+        type: "post",
+        url: ctx + "/adminmember/batchaudit",
+        dataType: "json",
+        data: {
+            "memids": gagaid,
+            "type": type
+        },
+        success: function(data) {
+        	
+            if (data.success) {
+                if (type == 3) {
+                	$("#errorbodycontent").html(num + "个审核不通过成功，0个审核不通过失败");
+         		   $('#errorModal').modal({
+         				keyboard : true
+         			});
+                } else {
+                	$("#errorbodycontent").html("操作成功");
+          		   $('#errorModal').modal({
+          				keyboard : true //如果使用 keyboard 选项，当点击 escape 时则关闭模态窗口。它的类型是 boolean，默认值是 true。
+          			});
+                }
+                $("#imgdata").dataTable().fnDraw(false);
+            } else {
+            	$("#errorbodycontent").html("操作失败");
+       		   $('#errorModal').modal({
+       				keyboard : true
+       			});
+            } 
+        }
+    });
+}
+//刷新
+function refreshdata() {
+    $("#imgdata").dataTable().fnDraw(true)
+}
+
+function search() {
+    $("#imgdata").dataTable().fnDraw(true);
+}
+</script>
+

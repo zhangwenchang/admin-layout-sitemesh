@@ -1,0 +1,560 @@
+<div id="rechargListr" class="right-model">
+    <div ng-controller="AppController" class="right-model-content user-participation">
+        <section class="recharge_all">
+            <span>充值总金额：{{rechar_data.chongzhi_all}}$</span>
+            <input type="text" id="new_times" value="" readonly>
+            <ul class="type_chal">
+                <li ng-repeat="types in rechar_data.type_chanl" ng-class="{'type_active':types.isClick}"
+                    ng-click="chanl_click(types.type)">
+                    {{types.name}}
+                </li>
+            </ul>
+        </section>
+        <div id="chongzhi_id" style="width: 100%;height: 500px"></div>
+        <section class="chongzhi_table">
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        充值明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('chongzhi_body','充值明细')">导出</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <table id="chongzhi_body" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>充值总金额（$）</th>
+                </tr>
+                <tr ng-repeat="item_data in rechar_data.chongzhi_table">
+                    <td>{{item_data.dtime}}</td>
+                    <td>{{item_data.gold}}</td>
+                </tr>
+                </thead>
+
+            </table>
+        </section>
+
+
+        <!--sun-->
+
+        <div class="div-bg" style="margin-bottom: 0">
+
+        </div>
+
+        <div class="title-border">
+            <div class="title-content">
+                <div class="right-model">
+                    <div class="title-content-left" style="margin-left: -30px;">
+                        不同区间充值
+                    </div>
+                    <div class="title-content-right">
+                    <span>
+                        <input type="text" id="revenueStarttime1" class="startTime" readonly ng-model="revenueStarttime1" ng-change="revenueChangeVal1()">至
+                        <input type="text" id="revenueEndtime1" class="startTime" readonly ng-model="revenueEndtime1" ng-change="revenueChangeVal1()">
+                    </span>
+                        <ul class="ul-li" id="deviceUl1">
+                            <li ng-class="bluebgflag1 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange1(1)" class="exportBtn">全部</li>
+                            <li class="border-none exportBtn" ng-click="bluebgflagChange1(2)" ng-class="bluebgflag1 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange1(3)" ng-class="bluebgflag1 == 3 ? 'blue-bg' : '' " class="exportBtn">APP</li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="addUserMain-content">
+            <div id="revenueChart" style="height:450px;margin-top: 30px;"></div>
+        </div>
+        <div class="title-border" style="margin-top: 37px;">
+            <div class="title-content">
+                <div class="title-content-left">
+                    不同区间充值明细
+                </div>
+                <div class="title-content-right">
+
+                    <span class="blue exportBtn" onclick="exportTable('revenueTable','不同区间充值明细')">导出</span>
+                </div>
+            </div>
+        </div>
+        <div class="box-body mailbox-messages">
+            <table id="revenueTable" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>1-20</th>
+                    <th>20-50</th>
+                    <th>50-100</th>
+                    <th>100-200</th>
+                    <th>200-500</th>
+                    <th>500-1000</th>
+                    <th>1000+</th>
+
+                </tr>
+                </thead>
+
+                <tr ng-repeat="x in dataObj2">
+                    <th>{{x.date}}</th>
+                    <th>{{x['1-20']}}</th>
+                    <th>{{x['20-50']}}</th>
+                    <th>{{x['50-100']}}</th>
+                    <th>{{x['100-200']}}</th>
+                    <th>{{x['200-500']}}</th>
+                    <th>{{x['500-1000']}}</th>
+                    <th>{{x['1000+']}}</th>
+
+
+                </tr>
+
+
+            </table>
+        </div>
+
+
+    </div>
+</div>
+<script type="text/javascript">
+    app.controller('AppController', function ($scope, $http) {
+        $scope.rechar_data = {
+            type_chanl: [
+                {
+                    type: '',
+                    isClick: true,
+                    name: '全部'
+                },
+                {
+                    type: 'pc',
+                    isClick: false,
+                    name: 'PC'
+                },
+                {
+                    type: 'app',
+                    isClick: false,
+                    name: 'APP'
+                },
+            ],
+            chongzhi_all: 0,
+            chongzhi_table:[]
+        };
+        var daterangepickerBox = $("#new_times");
+        var defaultDateObj = new Date();
+        var currentYear = defaultDateObj.getFullYear();
+        var currentMonth = defaultDateObj.getMonth() + 1;
+        var defaultStartDate = currentYear + '-' + currentMonth + '-01';
+        var isOverYear = (currentMonth + 1) > 12;
+        var defaultEndDate = (isOverYear ? (currentYear + 1) : currentYear) + '-' + (isOverYear ? '01' : currentMonth + 1) + '-01';
+        var req_datas = {
+            stime: defaultStartDate,
+            etime: defaultEndDate,
+            flag: ''
+        };
+        daterangepickerBox.daterangepicker({
+            timePicker: false,
+            timePickerIncrement: 10,
+            format: 'YYYY-MM-DD',
+            opens: 'right',
+            timePicker12Hour: false,
+            timePicker: false,
+            showDropdowns: true,
+            startDate: defaultStartDate,
+            endDate: defaultEndDate
+        }, function (start, end, label) {
+            // console.log(daterangepickerBox.val())
+            // console.log(this.startDate.format(this.locale.format));
+            // console.log(this.endDate.format(this.locale.format));
+            var starInit = this.startDate.format(this.locale.format);
+            var endInit = this.endDate.format(this.locale.format);
+            var timeIndex = starInit.indexOf('T');
+            var startTimes = starInit.substr(0, timeIndex);
+            var endTimes = endInit.substr(0, timeIndex);
+            req_datas.stime = startTimes;
+            req_datas.etime = endTimes;
+            // newUserHttp()
+            chongzhi_tu();
+            qujian_diff();
+        });
+        var myChart = echarts.init(document.getElementById("chongzhi_id"));
+
+        function newUser_chongzhi(data) {
+            // console.log(data)
+            var option = {
+                legend: {
+                    show: false,
+                },
+                toolbox: {
+                    id: '',
+                    show: true,
+                    orient: 'horizontal',
+                    showTitle: true,
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'line'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                grid: {
+                    // y2: 140
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    axisLabel: {
+                        interval: 3,
+                        // rotate: -30
+                    },
+                    data: function () {
+                        var x_time = [];
+                        x_time.splice(0, x_time.length)
+                        for (var ins in data) {
+                            x_time.push(data[ins].dtime)
+                        }
+                        ;
+                        return x_time;
+                    }()
+                },
+                yAxis: {
+                    type: 'value',
+                    "axisLine": {       //y轴
+                        "show": false
+
+                    },
+                    "axisTick": {       //y轴刻度线
+                        "show": false
+                    },
+                },
+                series: [{
+                    type: 'line',
+                    smooth: true,
+                    areaStyle: {},
+                    data: function () {
+                        var y_time = [];
+                        y_time.splice(0, y_time.length)
+                        for (var ins in data) {
+                            y_time.push(data[ins].gold)
+                        }
+                        ;
+                        return y_time;
+                    }(),
+
+                }]
+            };
+            myChart.setOption(option);
+            window.onresize = function () {
+                myChart.resize();
+            };
+        };
+        chongzhi_tu();
+        qujian_diff();
+        //充值图表
+        function chongzhi_tu() {
+        	 layer.load(1, {shade: 0.3});  
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + "/useranalysis/rechargeList",
+                data: req_datas,
+                cache: false,
+            }).then(function (resData) {
+            	layer.closeAll();
+                // console.log(resData);
+                newUser_chongzhi(resData.data.obj);
+                var init_num = 0;
+                for (var ins in resData.data.obj) {
+                    init_num += Number(resData.data.obj[ins].gold)
+                }
+                $scope.rechar_data.chongzhi_all = init_num;
+                $scope.rechar_data.chongzhi_table = resData.data.obj
+                // $scope.newInviData.show_table = resData.data.data
+            }, function (errData) {
+            	layer.closeAll();
+            })
+        };
+        //不同区间请求
+        function qujian_diff() {
+        	 layer.load(1, {shade: 0.3}); 
+            $http({
+                method: 'post',
+                dataType: "json",
+                // headers: {'Content-Type': 'application/json'},
+                url: ctx + "/useranalysis/rechargeListByQuJian",
+                data: req_datas,
+                cache: false,
+            }).then(function (resData) {
+            	layer.closeAll();
+                console.log(resData);
+                // newUser_chongzhi(resData.data.obj);
+                // var init_num = 0;
+                // for (var ins in resData.data.obj) {
+                //     init_num += Number(resData.data.obj[ins].gold)
+                // }
+                // $scope.rechar_data.chongzhi_all = init_num;
+                // $scope.rechar_data.chongzhi_table = resData.data.obj
+                // $scope.newInviData.show_table = resData.data.data
+            }, function (errData) {
+            	layer.closeAll();
+            })
+        };
+
+        //设备点击
+        $scope.chanl_click = function chanl_click(type) {
+            for (var ins in $scope.rechar_data.type_chanl) {
+                if ($scope.rechar_data.type_chanl[ins].type == type) {
+                    $scope.rechar_data.type_chanl[ins].isClick = true
+                } else {
+                    $scope.rechar_data.type_chanl[ins].isClick = false
+                }
+            };
+            req_datas.flag=type;
+            chongzhi_tu();
+            qujian_diff()
+        }
+        daterangepickerBox.data('daterangepicker').setStartDate(daterangepickerBox.daterangepicker);
+
+
+        // sun
+        $scope.bluebgflag1 = 1;
+        $scope.revenuebgflag1 = '';
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.revenueStarttime1 = firstDay;
+        $scope.revenueEndtime1 = nowdate;
+
+        $('#revenueStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#revenueEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+        initPage($scope,$http);
+        $scope.revenue();
+
+    })
+    angular.bootstrap(document.getElementById('rechargListr'), ['App']);
+
+
+    function initPage($scope,$http) {
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+
+        $scope.bluebgflagChange1 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag1 = 1;
+                    $scope.revenuebgflag1 = '';
+
+                    $scope.revenue();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag1 = 2;
+                    $scope.revenuebgflag1 = 'pc';
+                    $scope.revenue();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag1 = 3;
+                    $scope.revenuebgflag1 = 'app';
+                    $scope.revenue();
+
+                    break;
+
+            }
+
+        };
+
+        $scope.revenueChangeVal1 =function(){
+            if($scope.revenueStarttime1 == ''){
+                $scope.revenueStarttime1 = firstDay;
+            }
+            if($scope.revenueEndtime1 == ''){
+                $scope.revenueEndtime1 = nowdate;
+            }
+            if($scope.revenueStarttime1 > $scope.revenueEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.revenueStarttime1 = firstDay;
+                $scope.revenueEndtime1 = nowdate;
+
+            }
+            $scope.revenue();
+
+
+        }
+
+
+        $scope.revenue = function(){
+
+            var dateData1 = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1
+
+            };
+            layer.load(1, {shade: 0.3}); 
+            $http.post(ctx + "/useranalysis/rechargeListByQuJian",dateData1)
+                .then(function(data){
+                    //debugger;
+                    	layer.closeAll();
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj1 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+
+                        for(var i = 0;i<dataObj1.length; i++){
+                            xLineData.push(dataObj1[i].qujian);
+                            y1LineData.push(dataObj1[i].con);
+
+                        }
+
+                        $scope.lineChart1(xLineData,y1LineData);
+
+                    }
+
+                },function(data){
+                	layer.closeAll();
+                })
+
+            var dateData2 = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1
+
+            };
+            layer.load(1, {shade: 0.3});  	
+            $http.post(ctx + "/useranalysis/rechargeListByQuJianList",dateData2)
+                .then(function(data){
+                	layer.closeAll();
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj2 =  data.data.obj;
+                        $scope.dataObj2 = dataObj2;
+                        console.log($scope.dataObj2);
+                    }
+
+                },function(data){
+                	layer.closeAll();
+                })
+
+        }
+
+        $scope.lineChart1 = function(xLineData,y1LineData){
+            var myChart = echarts.init(document.getElementById('revenueChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                color: colors,
+
+                tooltip: {
+                    trigger: 'none',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                // legend: {
+                //     data: ['今日', '昨日', '7天前', '30天前']
+                // },
+                grid: {
+                    top: 70,
+                    bottom: 70
+                },
+
+                xAxis: {
+                    type: 'category',
+                    show: true,
+                    // boundaryGap: false,
+                    data: xLineData
+
+                },
+
+
+                yAxis: [{
+                    type: 'value',
+                    axisLine: {
+                        show: false
+
+                    },
+                    axisTick: {
+                        show: false
+                    }
+                }],
+                series: [
+                    {
+                        type: 'bar',
+
+                        data: y1LineData
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart.resize();
+            };
+
+        }
+
+
+
+
+
+    }
+
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+
+
+
+
+
+
+</script>

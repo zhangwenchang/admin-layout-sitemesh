@@ -1,0 +1,1553 @@
+
+<div ng-controller="AppController" class="user-participation">
+    <div class="right-top">
+        <ul class="ul-li ul-li-revenue">
+            <li ng-class="bluebgStatus == 1 ? 'blue-bg' : '' " ng-click="revenueChange(1)">全部</li>
+            <li class="border-none" ng-click="revenueChange(2)" ng-class="bluebgStatus == 2 ? 'blue-bg' : '' ">累计红包满送</li>
+            <li ng-click="revenueChange(3)" ng-class="bluebgStatus == 3 ? 'blue-bg' : '' ">累计消费(除红包外)满送</li>
+        </ul>
+    </div>
+    <div class="right-model">
+        <div class="right-model-content right-model-content1" style="display: block">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        消费
+                    </div>
+                    <div class="title-content-right">
+
+                        <span>
+							<input type="text" id="revenueStarttime1" class="startTime" readonly ng-model="revenueStarttime1" ng-change="revenueChangeVal1()">至
+                            <input type="text" id="revenueEndtime1" class="startTime" readonly ng-model="revenueEndtime1" ng-change="revenueChangeVal1()">
+						</span>
+                        <ul class="ul-li" id="deviceUl1">
+                            <li ng-class="bluebgflag1 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange1(1)">全部</li>
+                            <li class="border-none" ng-click="bluebgflagChange1(2)" ng-class="bluebgflag1 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange1(3)" ng-class="bluebgflag1 == 3 ? 'blue-bg' : '' ">APP</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="revenueChart" style="height:450px;margin-top: 30px;"></div>
+            </div>
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        消费明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('revenueTable','消费明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="revenueTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>消费项</th>
+                        <th ng-repeat="item in allAgent">{{item.syde_name}}($)</th>
+                        <th>合计($)</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <td>{{tdArr1[0]}}</td>
+                        <td>{{tdArr1[1]}}</td>
+                        <td>{{tdArr1[2]}}</td>
+                        <td>{{tdArr1[3]}}</td>
+                        <td>{{tdArr1[4]}}</td>
+                        <td>{{tdArr1[5]}}</td>
+                        <td>{{tdArr1[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr2[0]}}</td>
+                        <td>{{tdArr2[1]}}</td>
+                        <td>{{tdArr2[2]}}</td>
+                        <td>{{tdArr2[3]}}</td>
+                        <td>{{tdArr2[4]}}</td>
+                        <td>{{tdArr2[5]}}</td>
+                        <td>{{tdArr2[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr3[0]}}</td>
+                        <td>{{tdArr3[1]}}</td>
+                        <td>{{tdArr3[2]}}</td>
+                        <td>{{tdArr3[3]}}</td>
+                        <td>{{tdArr3[4]}}</td>
+                        <td>{{tdArr3[5]}}</td>
+                        <td>{{tdArr3[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr4[0]}}</td>
+                        <td>{{tdArr4[1]}}</td>
+                        <td>{{tdArr4[2]}}</td>
+                        <td>{{tdArr4[3]}}</td>
+                        <td>{{tdArr4[4]}}</td>
+                        <td>{{tdArr4[5]}}</td>
+                        <td>{{tdArr4[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr5[0]}}</td>
+                        <td>{{tdArr5[1]}}</td>
+                        <td>{{tdArr5[2]}}</td>
+                        <td>{{tdArr5[3]}}</td>
+                        <td>{{tdArr5[4]}}</td>
+                        <td>{{tdArr5[5]}}</td>
+                        <td>{{tdArr5[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr6[0]}}</td>
+                        <td>{{tdArr6[1]}}</td>
+                        <td>{{tdArr6[2]}}</td>
+                        <td>{{tdArr6[3]}}</td>
+                        <td>{{tdArr6[4]}}</td>
+                        <td>{{tdArr6[5]}}</td>
+                        <td>{{tdArr6[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr7[0]}}</td>
+                        <td>{{tdArr7[1]}}</td>
+                        <td>{{tdArr7[2]}}</td>
+                        <td>{{tdArr7[3]}}</td>
+                        <td>{{tdArr7[4]}}</td>
+                        <td>{{tdArr7[5]}}</td>
+                        <td>{{tdArr7[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr8[0]}}</td>
+                        <td>{{tdArr8[1]}}</td>
+                        <td>{{tdArr8[2]}}</td>
+                        <td>{{tdArr8[3]}}</td>
+                        <td>{{tdArr8[4]}}</td>
+                        <td>{{tdArr8[5]}}</td>
+                        <td>{{tdArr8[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr9[0]}}</td>
+                        <td>{{tdArr9[1]}}</td>
+                        <td>{{tdArr9[2]}}</td>
+                        <td>{{tdArr9[3]}}</td>
+                        <td>{{tdArr9[4]}}</td>
+                        <td>{{tdArr9[5]}}</td>
+                        <td>{{tdArr9[6]}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{tdArr10[0]}}</td>
+                        <td>{{tdArr10[1]}}</td>
+                        <td>{{tdArr10[2]}}</td>
+                        <td>{{tdArr10[3]}}</td>
+                        <td>{{tdArr10[4]}}</td>
+                        <td>{{tdArr10[5]}}</td>
+                        <td>{{tdArr10[6]}}</td>
+                    </tr>
+
+
+
+
+                </table>
+            </div>
+
+
+        </div>
+
+
+
+        <div class="right-model-content right-model-content2" style="display:none">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        累计红包消费人数统计
+                    </div>
+                    <div class="title-content-right">
+
+                        <span>
+							<input type="text" id="singleStarttime1" class="startTime" readonly ng-model="singleStarttime1" ng-change="revenueChangeVal2()">至
+                            <input type="text" id="singleEndtime1" class="startTime" readonly ng-model="singleEndtime1" ng-change="revenueChangeVal2()">
+						</span>
+
+
+                        <ul class="ul-li" id="deviceUl2">
+                            <li ng-class="bluebgflag2 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange2(1)">全部</li>
+                            <li class="border-none" ng-click="bluebgflagChange2(2)" ng-class="bluebgflag2 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange2(3)" ng-class="bluebgflag2 == 3 ? 'blue-bg' : '' ">APP</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="singleChart" style="height:400px"></div>
+            </div>
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        累计红包消费人数统计明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('singleTable','累计红包消费人数统计明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="singleTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>红包累计消费</th>
+                        <th ng-repeat="item in allAgent">{{item.syde_name}}($)</th>
+                    </tr>
+                    <tr ng-repeat="x in dataObj111">
+
+                        <td>{{x.date}}</td>
+                        <td>≥$520</td>
+                        <td>{{x[4]}}</td>
+                        <td>{{x[7]}}</td>
+                        <td>{{x[10]}}</td>
+                        <td>{{x[11]}}</td>
+                        <td>{{x[25]}}</td>
+
+
+                    </tr>
+                    </thead>
+
+                </table>
+
+
+                <table id="tableData" class="table table-bordered table-hover" style="margin-top:50px">
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>红包累计消费</th>
+                        <th ng-repeat="item in allAgent">{{item.syde_name}}($)</th>
+                    </tr>
+                    <tr ng-repeat="x in dataObj1111">
+
+                        <td>{{x.date}}</td>
+                        <td>≥$1314</td>
+                        <td>{{x[4]}}</td>
+                        <td>{{x[7]}}</td>
+                        <td>{{x[10]}}</td>
+                        <td>{{x[11]}}</td>
+                        <td>{{x[25]}}</td>
+
+
+                    </tr>
+                    </thead>
+
+                </table>
+
+
+            </div>
+        </div>
+
+
+        <div class="right-model-content right-model-content3" style="display:none">
+            <div class="title-border">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        累计消费（除红包外）人数统计
+                    </div>
+                    <div class="title-content-right">
+                        <span>
+							<input type="text" id="groupStarttime1" class="startTime" readonly ng-model="groupStarttime1" ng-change="revenueChangeVal3()">至
+                            <input type="text" id="groupEndtime1" class="startTime" readonly ng-model="groupEndtime1" ng-change="revenueChangeVal3()">
+						</span>
+
+                        <ul class="ul-li" id="deviceUl3">
+                            <li ng-class="bluebgflag3 == 1 ? 'blue-bg' : '' " ng-click="bluebgflagChange3(1)">全部</li>
+                            <li class="border-none" ng-click="bluebgflagChange3(2)" ng-class="bluebgflag3 == 2 ? 'blue-bg' : '' ">PC</li>
+                            <li ng-click="bluebgflagChange3(3)" ng-class="bluebgflag3 == 3 ? 'blue-bg' : '' ">APP</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="addUserMain-content">
+                <div id="groupChart" style="height:400px"></div>
+            </div>
+            <div class="title-border" style="margin-top: 37px;">
+                <div class="title-content">
+                    <div class="title-content-left">
+                        累计消费（除红包外）人数统计明细
+                    </div>
+                    <div class="title-content-right">
+
+                        <span class="blue exportBtn" onclick="exportTable('groupTable','累计消费（除红包外）人数统计明细')">导出</span>
+                    </div>
+                </div>
+            </div>
+            <div class="box-body mailbox-messages">
+                <table id="groupTable" class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>累计消费（除红包外）</th>
+                        <th ng-repeat="item in allAgent">{{item.syde_name}}($)</th>
+                    </tr>
+                    <tr ng-repeat="x in dataObj33">
+
+                        <td>{{x.date}}</td>
+                        <td>≥$2000</td>
+                        <td>{{x[4]}}</td>
+                        <td>{{x[7]}}</td>
+                        <td>{{x[10]}}</td>
+                        <td>{{x[11]}}</td>
+                        <td>{{x[25]}}</td>
+
+
+                    </tr>
+
+                    </thead>
+
+                </table>
+            </div>
+
+
+        </div>
+
+
+
+    </div>
+
+</div>
+<script>
+    app.controller('AppController',function($scope,$http){
+        $scope.bluebgStatus = 1;
+
+        $scope.bluebgflag1 = 1;
+        $scope.revenuebgflag1 = '';
+
+        $scope.bluebgflag2 = 1;
+        $scope.revenuebgflag2 = '';
+
+        $scope.bluebgflag3 = 1;
+        $scope.revenuebgflag3 = '';
+
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+        $scope.revenueStarttime1 = firstDay;
+        $scope.revenueEndtime1 = nowdate;
+
+        $scope.singleStarttime1 = firstDay;
+        $scope.singleEndtime1 = nowdate;
+        $scope.groupStarttime1 = firstDay;
+        $scope.groupEndtime1 = nowdate;
+
+        $('#revenueStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#revenueEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        $('#singleStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#singleEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+
+        $('#groupStarttime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+        $('#groupEndtime1').datepicker({
+            format : 'yyyy-mm-dd'
+        });
+
+        initPage($scope,$http);
+        $scope.getAllAgent();
+
+
+    });
+    angular.bootstrap(document.getElementById('App'),['App']);
+
+    function initPage($scope,$http) {
+        var allAgentName = [];
+        var firstDay = firstDate("yyyy-MM-dd");
+        var now = new Date();
+        var nowdate = now.format("yyyy-MM-dd");
+
+
+        $scope.getAllAgent = function(){
+
+            $http.post(ctx + "/useBase/getAllAgent")
+                .then(function(data){
+                    if(data.data.success == false){
+
+                    }else if(data.data.obj == []){
+                        return;
+                    }else{
+
+                        $scope.allAgent = data.data.obj;
+                        for(var i = 0;i<data.data.obj.length;i++){
+                            allAgentName.push(data.data.obj[i].syde_name);
+
+                        }
+
+                        console.log(allAgentName);
+                        revenueSelId1 = data.data.obj[0].syde_id;
+                        revenueSelName1 = data.data.obj[0].syde_name;
+
+                        if($scope.bluebgStatus == 1){
+                            $scope.revenue();
+                        }else if($scope.bluebgStatus == 2){
+                            $scope.revenueSingle();
+                        }if($scope.bluebgStatus == 3){
+                            $scope.revenueGroup();
+                        }
+
+                    }
+
+                },function(data){
+
+                })
+
+
+        };
+
+
+        $scope.revenueChange = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgStatus = 1;
+                    $(".right-model-content1").css("display","block").siblings().css("display","none");
+                    $scope.revenue();
+                    break;
+                case 2:
+                    $scope.bluebgStatus = 2;
+                    $(".right-model-content2").css("display","block").siblings().css("display","none");
+                    $scope.revenueSingle();
+                    break;
+                case 3:
+                    $scope.bluebgStatus = 3;
+                    $(".right-model-content3").css("display","block").siblings().css("display","none");
+                    $scope.revenueGroup();
+                    break;
+
+            }
+
+        };
+
+        $scope.bluebgflagChange1 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag1 = 1;
+                    $scope.revenuebgflag1 = '';
+                    $scope.revenueBottom();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag1 = 2;
+                    $scope.revenuebgflag1 = 'pc';
+                    $scope.revenueBottom();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag1 = 3;
+                    $scope.revenuebgflag1 = 'app';
+                    $scope.revenueBottom();
+
+                    break;
+
+            }
+
+        };
+
+        $scope.bluebgflagChange2 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag2 = 1;
+                    $scope.revenuebgflag2 = '';
+
+                    $scope.revenueSingle();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag2 = 2;
+                    $scope.revenuebgflag2 = 'pc';
+                    $scope.revenueSingle();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag2 = 3;
+                    $scope.revenuebgflag2 = 'app';
+                    $scope.revenueSingle();
+
+                    break;
+
+            }
+
+        };
+
+
+        $scope.bluebgflagChange3 = function(e){
+            switch(e){
+                case 1:
+                    $scope.bluebgflag3 = 1;
+                    $scope.revenuebgflag3 = '';
+
+                    $scope.revenueGroup();
+
+                    break;
+                case 2:
+                    $scope.bluebgflag3 = 2;
+                    $scope.revenuebgflag3 = 'pc';
+                    $scope.revenueGroup();
+
+                    break;
+                case 3:
+                    $scope.bluebgflag3 = 3;
+                    $scope.revenuebgflag3 = 'app';
+                    $scope.revenueGroup();
+
+                    break;
+
+            }
+
+        };
+
+
+
+        $scope.revenueChangeVal1 =function(){
+            if($scope.revenueStarttime1 == ''){
+                $scope.revenueStarttime1 = firstDay;
+            }
+            if($scope.revenueEndtime1 == ''){
+                $scope.revenueEndtime1 = nowdate;
+            }
+            if($scope.revenueStarttime1 > $scope.revenueEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.revenueStarttime1 = firstDay;
+                $scope.revenueEndtime1 = nowdate;
+
+            }
+            $scope.revenue();
+
+
+        }
+
+        $scope.revenueChangeVal2 =function(){
+            if($scope.singleStarttime1 == ''){
+                $scope.singleStarttime1 = firstDay;
+            }
+            if($scope.singleEndtime1 == ''){
+                $scope.singleEndtime1 = nowdate;
+            }
+            if($scope.singleStarttime1 > $scope.singleEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.singleStarttime1 = firstDay;
+                $scope.singleEndtime1 = nowdate;
+
+            }
+            $scope.revenueSingle();
+
+
+        }
+
+        $scope.revenueChangeVal3 = function(){
+            if($scope.groupStarttime1 == ''){
+                $scope.groupStarttime1 = firstDay;
+            }
+            if($scope.groupEndtime1 == ''){
+                $scope.groupEndtime1 = nowdate;
+            }
+
+            if($scope.groupStarttime1 > $scope.groupEndtime1){
+                alert("开始时间不能大于结束时间!");
+                $scope.groupStarttime1 = firstDay;
+                $scope.groupEndtime1 = nowdate;
+
+            }
+            $scope.revenueGroup();
+
+
+        }
+
+
+        $scope.revenue = function(){
+
+            var dateData1 = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:'pc'
+            };
+            
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeTop",dateData1)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObj1 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+
+                        for (var key in dataObj1[0]){
+                            xLineData.push(key);
+                            y1LineData.push(dataObj1[0][key]);
+                        }
+
+                        var dateData11 = {
+                            stime:$scope.revenueStarttime1,
+                            etime:$scope.revenueEndtime1,
+                            flag:'app'
+                        };
+                        $http.post(ctx + "/ActivityAnalysis/ConsumTypeTop",dateData11)
+                            .then(function(data){
+                                //debugger;
+                                if(data.data.success == false){
+
+                                }else{
+                                    var dataObj11 =  data.data.obj;
+                                    var y2LineData = [];
+
+                                    for (var key in dataObj11[0]){
+                                        y2LineData.push(dataObj11[0][key]);
+                                    }
+
+
+                                    $scope.lineChart1(xLineData,y1LineData,y2LineData);
+
+                                    $scope.revenueBottom();
+                                }
+                                layer.closeAll();
+
+                            },function(data){
+                                layer.closeAll();
+                            })
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+        }
+
+
+        $scope.revenueBottom = function(){
+            var dateDatahuiyuan = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"3"
+            };
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDatahuiyuan)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dataObjhuiyuan =  data.data.obj;
+                        $scope.tdArr1 = [];
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+                        td1 = '会员';
+                        td2 = dataObjhuiyuan[4]?dataObjhuiyuan[4]:'';
+                        td3 = dataObjhuiyuan[7]?dataObjhuiyuan[7]:'';
+                        td4 = dataObjhuiyuan[10]?dataObjhuiyuan[10]:'';
+                        td5 = dataObjhuiyuan[11]?dataObjhuiyuan[11]:'';
+                        td6 = dataObjhuiyuan[25]?dataObjhuiyuan[25]:'';
+                        td7 = dataObjhuiyuan.sumGold?dataObjhuiyuan.sumGold:'';
+
+                        $scope.tdArr1 = [td1,td2,td3,td4,td5,td6,td7];
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+            var dateDatafanyi = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"5,6,7"
+            };
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDatafanyi)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjfanyi =  data.data.obj;
+                        $scope.tdArr2 = [];
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+                        td1 = '翻译';
+                        td2 = dateObjfanyi[4]?dateObjfanyi[4]:'';
+                        td3 = dateObjfanyi[7]?dateObjfanyi[7]:'';
+                        td4 = dateObjfanyi[10]?dateObjfanyi[10]:'';
+                        td5 = dateObjfanyi[11]?dateObjfanyi[11]:'';
+                        td6 = dateObjfanyi[25]?dateObjfanyi[25]:'';
+                        td7 = dateObjfanyi.sumGold?dateObjfanyi.sumGold:'';
+
+                        $scope.tdArr2 = [td1,td2,td3,td4,td5,td6,td7];
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+            var dateDataVgift = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"8"
+            };
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDataVgift)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjVgift =  data.data.obj;
+                        $scope.tdArr3 = [];
+
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+                        td1 = '虚拟礼物';
+                        td2 = dateObjVgift[4]?dateObjVgift[4]:'';
+                        td3 = dateObjVgift[7]?dateObjVgift[7]:'';
+                        td4 = dateObjVgift[10]?dateObjVgift[10]:'';
+                        td5 = dateObjVgift[11]?dateObjVgift[11]:'';
+                        td6 = dateObjVgift[25]?dateObjVgift[25]:'';
+                        td7 = dateObjVgift.sumGold?dateObjVgift.sumGold:'';
+
+                        $scope.tdArr3 = [td1,td2,td3,td4,td5,td6,td7];
+
+
+                    }
+
+                },function(data){
+
+                })
+
+            var dateDatabao = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"1"
+            };
+            
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDatabao)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjbao =  data.data.obj;
+                        $scope.tdArr4 = [];
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+
+                        td1 = '红包';
+                        td2 = dateObjbao[4]?dateObjbao[4]:'';
+                        td3 = dateObjbao[7]?dateObjbao[7]:'';
+                        td4 = dateObjbao[10]?dateObjbao[10]:'';
+                        td5 = dateObjbao[11]?dateObjbao[11]:'';
+                        td6 = dateObjbao[25]?dateObjbao[25]:'';
+                        td7 = dateObjbao.sumGold?dateObjbao.sumGold:'';
+
+                        $scope.tdArr4 = [td1,td2,td3,td4,td5,td6,td7];
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+            var dateDataegg = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"25"
+            };
+            
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDataegg)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjegg =  data.data.obj;
+                        $scope.tdArr5 = [];
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+                        td1 = '砸金蛋';
+                        td2 = dateObjegg[4]?dateObjegg[4]:'';
+                        td3 = dateObjegg[7]?dateObjegg[7]:'';
+                        td4 = dateObjegg[10]?dateObjegg[10]:'';
+                        td5 = dateObjegg[11]?dateObjegg[11]:'';
+                        td6 = dateObjegg[25]?dateObjegg[25]:'';
+                        td7 = dateObjegg.sumGold?dateObjegg.sumGold:'';
+
+                        $scope.tdArr5 = [td1,td2,td3,td4,td5,td6,td7];
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+            var dateDataimage = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"29"
+            };
+            
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDataimage)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjimage =  data.data.obj;
+                        $scope.tdArr6 = [];
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+
+                        td1 = '模糊图';
+                        td2 = dateObjimage[4]?dateObjimage[4]:'';
+                        td3 = dateObjimage[7]?dateObjimage[7]:'';
+                        td4 = dateObjimage[10]?dateObjimage[10]:'';
+                        td5 = dateObjimage[11]?dateObjimage[11]:'';
+                        td6 = dateObjimage[25]?dateObjimage[25]:'';
+                        td7 = dateObjimage.sumGold?dateObjimage.sumGold:'';
+
+                        $scope.tdArr6 = [td1,td2,td3,td4,td5,td6,td7];
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+            var dateDataVideo = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"204"
+            };
+            
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDataVideo)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjVideo =  data.data.obj;
+                        $scope.tdArr7 = [];
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+                        td1 = '小视频';
+                        td2 = dateObjVideo[4]?dateObjVideo[4]:'';
+                        td3 = dateObjVideo[7]?dateObjVideo[7]:'';
+                        td4 = dateObjVideo[10]?dateObjVideo[10]:'';
+                        td5 = dateObjVideo[11]?dateObjVideo[11]:'';
+                        td6 = dateObjVideo[25]?dateObjVideo[25]:'';
+                        td7 = dateObjVideo.sumGold?dateObjVideo.sumGold:'';
+
+                        $scope.tdArr7 = [td1,td2,td3,td4,td5,td6,td7];
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+            var dateDataSex = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"17"
+            };
+            
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDataSex)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjSex =  data.data.obj;
+                        $scope.tdArr8 = [];
+
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+                        td1 = '一键50位异性';
+                        td2 = dateObjSex[4]?dateObjSex[4]:'';
+                        td3 = dateObjSex[7]?dateObjSex[7]:'';
+                        td4 = dateObjSex[10]?dateObjSex[10]:'';
+                        td5 = dateObjSex[11]?dateObjSex[11]:'';
+                        td6 = dateObjSex[25]?dateObjSex[25]:'';
+                        td7 = dateObjSex.sumGold?dateObjSex.sumGold:'';
+
+                        $scope.tdArr8 = [td1,td2,td3,td4,td5,td6,td7];
+
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+            var dateDataRgift = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"11"
+            };
+            
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDataRgift)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjRgift =  data.data.obj;
+                        $scope.tdArr9 = [];
+
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+                        td1 = '真实礼物';
+                        td2 = dateObjRgift[4]?dateObjRgift[4]:'';
+                        td3 = dateObjRgift[7]?dateObjRgift[7]:'';
+                        td4 = dateObjRgift[10]?dateObjRgift[10]:'';
+                        td5 = dateObjRgift[11]?dateObjRgift[11]:'';
+                        td6 = dateObjRgift[25]?dateObjRgift[25]:'';
+                        td7 = dateObjRgift.sumGold?dateObjRgift.sumGold:'';
+
+                        $scope.tdArr9 = [td1,td2,td3,td4,td5,td6,td7];
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+            var dateDatatalk = {
+                stime:$scope.revenueStarttime1,
+                etime:$scope.revenueEndtime1,
+                flag:$scope.revenuebgflag1,
+                types:"28"
+            };
+            
+
+            $http.post(ctx + "/ActivityAnalysis/ConsumTypeDiBuList",dateDatatalk)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        var dateObjtalk =  data.data.obj;
+                        $scope.tdArr10 = [];
+
+                        var td1 = '';
+                        var td2 = '';
+                        var td3 = '';
+                        var td4 = '';
+                        var td5 = '';
+                        var td6 = '';
+                        var td7 = '';
+
+                        td1 = 'gagatalk';
+                        td2 = dateObjtalk[4]?dateObjtalk[4]:'';
+                        td3 = dateObjtalk[7]?dateObjtalk[7]:'';
+                        td4 = dateObjtalk[10]?dateObjtalk[10]:'';
+                        td5 = dateObjtalk[11]?dateObjtalk[11]:'';
+                        td6 = dateObjtalk[25]?dateObjtalk[25]:'';
+                        td7 = dateObjtalk.sumGold?dateObjtalk.sumGold:'';
+
+                        $scope.tdArr10 = [td1,td2,td3,td4,td5,td6,td7];
+
+                    }
+
+
+                },function(data){
+
+                })
+
+
+        }
+
+
+
+
+
+
+
+
+        $scope.revenueSingle = function(){
+
+
+            var dateData2 = {
+                stime:$scope.singleStarttime1,
+                etime:$scope.singleEndtime1,
+                flag:$scope.revenuebgflag2,
+                gold:520
+
+            };
+            
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/ActivityAnalysis/ConsumHongBao",dateData2)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj2 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+
+                        for(var i = 0;i<dataObj2.length; i++){
+                            xLineData.push(dataObj2[i].name);
+                            y1LineData.push(dataObj2[i].con);
+                        }
+
+                        var dateData22 = {
+                            stime:$scope.singleStarttime1,
+                            etime:$scope.singleEndtime1,
+                            flag:$scope.revenuebgflag2,
+                            gold:1314
+
+                        };
+                        $http.post(ctx + "/ActivityAnalysis/ConsumHongBao",dateData22)
+                            .then(function(data){
+                                //debugger;
+                                if(data.data.success == false){
+
+                                }else{
+                                    //debugger;
+
+                                    var dataObj22 =  data.data.obj;
+                                    var y2LineData = [];
+
+                                    for(var i = 0;i<dataObj22.length; i++){
+                                        y2LineData.push(dataObj22[i].con);
+                                    }
+
+
+                                    $scope.lineChart2(xLineData,y1LineData,y2LineData);
+
+                                }
+
+
+                            },function(data){
+
+                            })
+
+                    }
+                    layer.closeAll();
+
+                },function(data){
+                	layer.closeAll();
+                })
+
+
+            var dateData222 = {
+                stime:$scope.singleStarttime1,
+                etime:$scope.singleEndtime1,
+                flag:$scope.revenuebgflag2,
+                gold:520
+
+            };
+            
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/ActivityAnalysis/ConsumHongBaoList",dateData222)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj222 =  data.data.obj;
+
+                        $scope.dataObj222 = dataObj222;
+
+                        var dateData2222 = {
+                            stime:$scope.singleStarttime1,
+                            etime:$scope.singleEndtime1,
+                            flag:$scope.revenuebgflag2,
+                            gold:1314
+
+                        };
+                        $http.post(ctx + "/ActivityAnalysis/ConsumHongBaoList",dateData2222)
+                            .then(function(data){
+                                //debugger;
+                                if(data.data.success == false){
+
+                                }else{
+                                    //debugger;
+
+                                    var dataObj2222 =  data.data.obj;
+                                    $scope.dataObj2222 = dataObj2222;
+
+
+                                }
+
+
+                            },function(data){
+
+                            })
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                	layer.closeAll();
+                })
+
+
+        }
+
+
+
+        $scope.revenueGroup = function(){
+
+            var dateData3 = {
+                stime:$scope.groupStarttime1,
+                etime:$scope.groupEndtime1,
+                flag:$scope.revenuebgflag3
+
+            };
+            
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/ActivityAnalysis/ConsumNoHongBao",dateData3)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj3 =  data.data.obj;
+                        var xLineData = [];
+                        var y1LineData = [];
+
+                        for(var i = 0;i<dataObj3.length; i++){
+                            xLineData.push(dataObj3[i].name);
+                            y1LineData.push(dataObj3[i].con);
+                        }
+                        $scope.lineChart3(xLineData,y1LineData);
+
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                	layer.closeAll();
+                })
+
+
+            var dateData33 = {
+                stime:$scope.groupStarttime1,
+                etime:$scope.groupEndtime1,
+                flag:$scope.revenuebgflag3
+            };
+            
+            layer.load(1,{shade:0.3});
+            $http.post(ctx + "/ActivityAnalysis/ConsumNoHongBaoList",dateData33)
+                .then(function(data){
+                    //debugger;
+                    if(data.data.success == false){
+
+                    }else{
+                        //debugger;
+
+                        var dataObj33 =  data.data.obj;
+
+                        $scope.dataObj33 = dataObj33;
+
+
+
+                    }
+
+                    layer.closeAll();
+                },function(data){
+                	layer.closeAll();
+                })
+
+        }
+
+
+        $scope.lineChart1 = function(xLineData,y1LineData,y2LineData){
+            // debugger;
+
+            var myChart1 = echarts.init(document.getElementById('revenueChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                grid:{
+                    bottom:'20%',//距离下边距
+                },
+                legend: {
+                    data:['PC','APP'],
+                    bottom:0
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    },
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name:'PC',
+                        type:'bar',
+                        data:y1LineData
+                    },
+                    {
+                        name:"APP",
+                        type:'bar',
+                        data:y2LineData
+                    }
+                ]
+            };
+
+
+            myChart1.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart1.resize();
+
+            };
+
+
+        }
+
+
+        $scope.lineChart2 = function(xLineData,y1LineData,y2LineData){
+            // debugger;
+
+            var myChart2 = echarts.init(document.getElementById('singleChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                grid:{
+                    bottom:'20%',//距离下边距
+                },
+                legend: {
+                    data:['≥$520人数','≥$1314人数'],
+                    bottom:0
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    },
+                    {
+                        type: 'value',
+
+                        axisLine: {
+                            show: false
+
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name:'≥$520人数',
+                        type:'bar',
+                        data:y1LineData
+                    },
+                    {
+                        name:'≥$1314人数',
+                        type:'bar',
+                        data:y2LineData
+                    }
+                ]
+            };
+
+
+            myChart2.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart2.resize();
+
+            };
+
+
+        }
+
+        $scope.lineChart3 = function(xLineData,y1LineData){
+            //debugger;
+
+            var myChart3 = echarts.init(document.getElementById('groupChart'));
+
+            var colors = ['#5793f3'];
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                // toolbox: {
+                //     feature: {
+                //         dataView: {show: true, readOnly: false},
+                //         magicType: {show: true, type: ['line', 'bar']},
+                //         restore: {show: true},
+                //         saveAsImage: {show: true}
+                //     }
+                // },
+                grid:{
+                    bottom:'20%',//距离下边距
+                },
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: xLineData,
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    }
+                ],
+                yAxis: [
+
+                    {
+                        type: 'value',
+                        axisLine: {
+                            show: false
+
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name:'PC',
+                        type:'bar',
+                        data:y1LineData
+                    }
+                ]
+            };
+
+
+
+
+            myChart3.setOption(option);
+
+            window.onresize = function() {
+                $('.addUserMain-content').width('100%');
+                myChart3.resize();
+
+            };
+
+
+        }
+
+
+
+
+    }
+    // lineChart();
+
+
+
+
+    function exportTable(tableid,tableName) {
+
+        if (!!window.ActiveXObject || "ActiveXObject" in window){
+            window.document.write(document.getElementById(tableid).outerHTML);
+            window.document.execCommand("SaveAs",false,tableName + ".xls");
+            history.go(-1);
+        }
+        else {
+            var tb=document.getElementById(tableid);    //获取table对像
+            var rows=tb.rows;
+            var str="";
+            for(var i=0;i<rows.length;i++){          //---循环--行---
+                var cells=rows[i].cells;
+                for(var j=0;j<cells.length;j++){   //---循环--列---
+                    str=str+cells[j].innerText+",";
+                }str=str+"\n";
+            }
+            console.log(str);
+            str = encodeURIComponent(str);
+            var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+            var downloadLink = document.createElement("a");
+            downloadLink.href = uri;
+            downloadLink.download = tableName + ".csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    }
+
+
+</script>
+
+

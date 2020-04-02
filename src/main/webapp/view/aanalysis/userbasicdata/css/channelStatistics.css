@@ -1,0 +1,85 @@
+
+#channelApp .channelTable header{
+    width: 100%;
+    height: 55px;
+    font-size: 18px;
+    border: solid 1px #e6e6e6;
+    border-bottom: none;
+    line-height: 55px;
+    position: relative;
+    padding-left: 1%;
+}
+#channelApp #channelTime{
+    width: 200px;
+    position: absolute;
+    top: 12px;
+    right: 7%;
+    display: inline-block;
+    height: 35px;
+    text-align: center;
+}
+
+#channelApp .blue{
+    position: absolute;
+    right: 2%;
+    color: #337ab7;
+    cursor: pointer;
+}
+
+
+#channelApp li,#channelApp ul{
+    list-style: none;
+    /*display: inline-block;*/
+    margin: 0;
+    padding: 0;
+}
+#channelApp .channelEcharts .echartsTitle{
+width: 100%;
+    height: 35px;
+    border: solid 1px #cccccc;
+    padding: 20px 0 20px 20px;
+    line-height: 2px;
+}
+#channelApp .channelEcharts .typeNav{
+    width: 35%;
+    overflow: hidden;
+    text-align: center;
+}
+#channelApp .channelEcharts .typeNav li{
+    width: 32%;
+    border: solid 1px #cccccc;
+    float: left;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor:pointer;
+}
+#channelApp .channelEcharts .typeNav li:nth-child(2){
+    border-left:none;
+    border-right: none;
+}
+#channelApp .channelEcharts .typeNav .clickActive{
+    background-color: #00a2d4;
+    color: #ffffff;
+
+}
+#channelApp .table-hover .doItname{
+    color: #00a2d4;
+    font-size: 14px;
+    text-align: center;
+}
+#channelApp .table-hover .doItname:hover{
+    cursor: pointer;
+
+}
+#channelApp .table-hover .doItname span:first-child{
+    display: inline-block;
+    margin-right: 15px;
+}
+
+/*折线图样式*/
+#channelApp #channel_ebox{
+    width: 100%;
+    height: 600px;
+}

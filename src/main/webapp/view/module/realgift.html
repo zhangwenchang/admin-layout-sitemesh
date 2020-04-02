@@ -1,0 +1,380 @@
+<style type="text/css">
+
+</style>
+<section class="content-header">
+	<h1>真实礼物记录管理<small></small></h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>模块管理</li>
+		<li class="active">真实礼物记录管理</li>
+	</ol>
+</section>
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<form class="form-horizontal page-search-box">		
+				
+					<div class="box-body">
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">发件人:</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="purchasemember" placeholder="" aria-controls="example1">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">收件人:</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="receivemember" placeholder="" aria-controls="example1">
+							</div>
+						</div>
+						<div class="form-group">
+                  			<label for="membNo" class="col-sm-2 control-label">发送时间:</label>
+                  			<div class="col-sm-10">
+                    			<input type="text" id="starttime">至<input type="text" id="endtime">
+                  			</div>
+               			 </div>
+					</div>
+							
+					<div class="box-footer">
+						<button type="button" class="btn btn-primary del-btn">删除</button>&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-primary refresh-btn">刷新</button>&nbsp;&nbsp;&nbsp;						
+						<button type="button" class="btn btn-primary search-btn">查询</button>
+						&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" onclick="exportTable('datalist','真实礼物记录')" class="btn btn-primary">导出</button>
+					</div>
+				</form>
+				<div class="box-body mailbox-messages">
+					<table id="datalist" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+								<th>订单号</th>
+								<th>类型</th>
+								<th>名称</th>
+								<th>消费金币数</th>
+								<th>发送人</th>
+								<th>发送人ID</th>
+								<th>推广员</th>
+								<th>接收人</th>
+								<th>接收人ID</th>
+								<th>推广员</th>
+								<th>是否推广员</th>
+								<th>发送时间(UTC)</th>
+								<th>状态</th>
+								<th width="90">操作</th>
+							</tr>
+						</thead>
+						
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+$(function() {
+	console.log(1);
+	$.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js', '/plugins/daterangepicker/daterangepicker.js'], function() {
+		var now = new Date();
+		var nowdate = now.format("yyyy-MM-dd")
+		
+		
+		var firstDay = firstDate("yyyy-MM-dd");
+	    $('#starttime').val(firstDay);
+	    var lastDay = lastDate("yyyy-MM-dd");
+	    $('#endtime').val(nowdate);
+	   /*  $('#enddate').text(firstDay);
+	    $('#startdate2').text(firstDay);
+	    $('#enddate2').text(nowdate); */
+		$('#starttime').datepicker({format: 'yyyy-mm-dd'});
+		$('#endtime').datepicker({format: 'yyyy-mm-dd'});
+		var t = $("#datalist").dataTable({
+			"bStateSave": true,
+			"paging": true,
+			//"processing": true,
+			"serverSide": true,
+			"lengthChange": false,
+			"searching": false,
+			"ordering": true,
+			"info": true,
+			"autoWidth": false,
+			"pageLength": 10,
+			"fnServerData": function(sSource, aoData, fnCallback, oSettings) {				
+			 	var purchasemember = $("#purchasemember").val();
+			 	var receivemember = $("#receivemember").val();
+	        	aoData.push(
+	        			{"name":"startTime","value":$("#starttime").val()},
+	        			{"name":"endTime","value":$("#endtime").val()},
+	        			)
+			 	if (purchasemember) {
+			 		aoData.push({"name":"purchasemember","value":purchasemember});
+			 	}
+			 	if (receivemember) {
+			 		aoData.push({"name":"receivemember","value":receivemember});
+			 	}
+	        	layer.load(1, {shade: 0.3});
+				oSettings.jqXHR = $.ajax({
+					"dataType": 'json',
+					"type": "POST",
+					"url": ctx + "/RealgiftController/list",
+					"data": aoData,
+					"success": fnCallback
+				});
+			},
+			"columns": [{
+				"data": "grreId",
+				"bSortable": false
+				}, {
+				"data": "grreId",
+				"bSortable": false
+				}, {
+				"data": "grreOrderno",
+				"bSortable": false
+				}, {
+				"data": "giftReal.giftcategory.gicaName",
+				"bSortable": false
+				}, {
+				"data": "grreName",
+				"bSortable": false
+				}, {
+				"data": "grreGoldreal", //礼物实际消费价
+				"bSortable": false
+				}, {
+				"data": "purchasemember.membNickname",
+				"bSortable": false
+				}, {
+				"data": "purchasemember.membGagano",
+				"bSortable": false
+				}, {
+				"data": "smp.sysUser.syusUsername",
+				"bSortable": false
+				}, {
+				"data": "receivemember.membNickname",
+				"bSortable": false
+				}, {
+				"data": "receivemember.membGagano",
+				"bSortable": false
+				}, {
+				"data": "smr.sysUser.syusUsername",
+				"bSortable": false
+				}, {
+				"data": "istgy",
+				"bSortable": false
+				}, {
+				"data": "grreBuytime",
+				"bSortable": false
+				}, {
+				"data": "grreOrderstate",
+				"bSortable": false
+				}, {
+				"data": "grreId",
+				"bSortable": false
+			}],
+			"columnDefs": [
+				{
+					"targets": 1,
+					"render": function(data, type, full, meta) {
+						return '<input type="checkbox" value="' + data + '" title="' + data + '" name="withId" />';
+					}
+				},
+				{
+					"targets": 3,
+					"render": function(data, type, full, meta) {
+						if(null == full.giftReal || null == full.giftReal.giftcategory || null == full.giftReal.giftcategory.gicaName){
+							return "";
+						}else{
+							return data;
+						}
+					}
+				},
+				{
+					"targets": 8,
+					"render": function(data, type, full, meta) {
+						if(null == full.smp || null == full.smp.sysUser || null == full.smp.sysUser.syusUsername){
+							return "";
+						}else{
+							return data;
+						}
+					}
+				},
+				{
+					"targets": 11,
+					"render": function(data, type, full, meta) {
+						if(null == full.smr || null == full.smr.sysUser || null == full.smr.sysUser.syusUsername){
+							return "";
+						}else{
+							return data;
+						}
+					}
+				},
+				{
+					"targets": 12,
+					"render": function(data, type, full, meta) {
+						return data == 1 ? "是":"否";
+					}
+				},
+				{
+					"targets": 13,
+					"render": function(data, type, full, meta) {
+						var dstr='';
+						if(data!=null){
+							dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+						}
+						return dstr;
+					}
+				},
+				{
+					"targets": 14,
+					"render": function(data, type, full, meta) {
+						var orderStatus = '未知状态';
+						if (data != null || data != undefined) {
+							switch(data) {
+							case -1:
+								orderStatus = '已下单，未支付';
+								break;
+							case 0:
+								orderStatus = '付款成功，待出库';
+								break;
+							case 1:
+								orderStatus = '已出库';
+								break;
+							case 2:
+								orderStatus = '已到货，交易成功';
+								break;
+							case 3:
+								orderStatus = '申请退货';
+								break;
+							case 4:
+								orderStatus = '退货成功';
+								break;
+							default:
+								orderStatus = '未知状态'
+							};
+						}
+						return orderStatus;				
+					}
+				},
+				{
+	                "targets": 15,
+	                "data": "grre_id",
+	                "render": function(data, type, full, meta) {
+	                	var lnks='<a href="javascript:edit('+data+', 1);">发货</a>';
+	                	lnks+='&nbsp;&nbsp;<a href="javascript:edit('+data+', 2);">到货</a><br>';
+	                	lnks+='<a href="javascript:edit('+data+', 8);">取消发货</a>';
+	                	lnks+='&nbsp <a href="javascript:edit('+data+', 3);">申请退货</a>';
+	                	lnks+='&nbsp <a href="javascript:edit('+data+', 4);">退货成功</a>';
+	                    return lnks;
+	                }
+            	}
+			],
+			"fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+				$(".mailbox-messages input[type='checkbox']").iCheck({
+					checkboxClass: 'icheckbox_flat-blue',
+					radioClass: 'iradio_flat-blue'
+				});
+				layer.closeAll();
+				$("#tableData .fa").removeClass('fa-check-square-o').addClass('fa-square-o');
+			}
+		});
+
+		//序号相关 .draw()
+		var table = $('#datalist').DataTable();
+		table.on( 'order.dt search.dt', function () {
+			//获取页信息
+			//debugger
+			var page = table.page.info();
+			table.column(0, {}).nodes().each( function (cell, i) {
+				cell.innerHTML = page.page * page.length + i + 1;
+			});
+		});
+
+		$(".checkbox-toggle").click(function() {
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+				$(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+				$(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+				$(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+				$(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+
+		$('.del-btn').click(function() {
+			var chk_value =[]; 
+			$('input[name="withId"]:checked').each(function(){ 
+				chk_value.push($(this).val()); 
+			}); 
+			if(chk_value.length==0){
+				$.msg("请选择要删除的礼物");
+			}else{    
+			    var delIndex = layer.confirm('确定要删除选定的礼物吗？', function() {			    	
+			      	doPost("RealgiftController/del", {"ids[]":chk_value},userDelHd,errorHd);
+			      	layer.close(delIndex);
+			    });		
+			}
+		});
+
+		$('.refresh-btn').click(function() {
+			$('#purchasemember').val('');
+			$('#receivemember').val('');
+			$("#datalist").dataTable().fnDraw(false);
+		});
+
+		$('.search-btn').click(function() {
+			$("#datalist").dataTable().fnDraw(false);			
+		});
+
+	});
+	
+});
+function userDelHd(data){
+		if(data.success){
+			$("#datalist").dataTable().fnDraw(false);
+		}else{
+			layer.msg(data.msg, {time: 1000});
+		}	
+	}
+	function errorHd(xreq){	 
+		layer.msg(xreq.statusText+"["+xreq.status+"]", {time: 1000});
+	}
+	function edit(id, type){
+		if (id && type) {
+			var newType = (type == 8? 0 : type);
+			doPost("RealgiftController/openEdit", {"id":id, "grreOrderstate": newType}, userDelHd, errorHd);
+		}		
+	}
+	
+
+	function exportTable(tableid, tableName) {
+
+		if (!!window.ActiveXObject || "ActiveXObject" in window) {
+			window.document.write(document.getElementById(tableid).outerHTML);
+			window.document.execCommand("SaveAs", false, tableName + ".xls");
+			history.go(-1);
+		} else {
+			var tb = document.getElementById(tableid); //获取table对像
+			var rows = tb.rows;
+			var str = "";
+			for (var i = 0; i < rows.length; i++) { //---循环--行---
+				var cells = rows[i].cells;
+				for (var j = 0; j < cells.length-1; j++) { //---循环--列---
+					if(j==1){
+						continue;
+					}
+					str = str + cells[j].innerText + ",";
+				}
+				str = str + "\n";
+			}
+			str = encodeURIComponent(str);
+			var uri = 'data:text/csv;charset=utf-8,\ufeff' + str;
+			var downloadLink = document.createElement("a");
+			downloadLink.href = uri;
+			downloadLink.download = tableName + ".csv";
+			document.body.appendChild(downloadLink);
+			downloadLink.click();
+			document.body.removeChild(downloadLink);
+		}
+	}
+</script>

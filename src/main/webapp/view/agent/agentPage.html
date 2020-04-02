@@ -1,0 +1,569 @@
+<style type="text/css">
+.giftReal-t td { padding: 6px; }
+.ylt1, .ylt2, .ylt3, .ylt4, .ylt5 { max-height: 100px; }
+.edit-img-box { position: relative; display: none; }
+.edit-img-box span { width: 15px; height: 15px; position: absolute; background: #f00; right: 0; text-align: center;  line-height: 16px;  color: #FFF; cursor: pointer;  }
+.edit-img-box.have { display: inline-block; }
+.zi{width: 10%;float: left;text-align: center;line-height: 34px;}
+.startTime{width: 45%;float: left;}
+</style>
+<section class="content-header">
+	<h1>
+		大使管理<small></small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>代理商管理</li>
+		<li class="active">大使管理</li>
+	</ol>
+</section>
+
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<!-- 头部操作菜单 -->
+				<form class="form-horizontal" id="searchForm">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="content" class="col-sm-2 control-label">级别：</label>
+							<div class="col-sm-4">
+								<select class="form-control" name="level" aria-controls="example1" id="level" onchange="search()">
+									<option value="0">全部大使</option>
+									<option value="1">下级大使</option>
+									<option value="6">自己</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label" for="ds_host">大使姓名</label>
+							<div class="col-sm-4">
+								<input class="form-control" id="amName_search" name="amName_search" type="text" placeholder="大使姓名" />
+							</div>
+							<label class="col-sm-2 control-label" for="ds_name">gaga号</label>
+							<div class="col-sm-4">
+								<input class="form-control" id="amGagaid_search" name="amGagaid_search" type="text" placeholder="绑定充值卡的gaga号"
+									required="required" />
+							</div>
+						</div>
+					
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">添加时间：</label>
+							<div class="row">
+								<div class="col-sm-4">
+									<input type="text" class="form-control startTime" id="addStart" name="addStart">
+									<span class="zi" style="">至</span>
+									<input type="text" class="form-control startTime" id="addEnd" name="addEnd">
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">薪资统计时间：</label>
+							<div class="row">
+								<div class="col-sm-4">
+									<input type="text" class="form-control startTime" id="salaryStart" name="salaryStart">
+									<span class="zi" style="">至</span>
+									<input type="text" class="form-control startTime" id="salaryEnd" name="salaryEnd">
+								</div>
+								
+							</div>
+						</div>
+					</div>
+					<div class="box-footer">
+						<button type="button" class="btn btn-primary" onclick="openAddNew()">新增</button>
+						<button type="button" class="btn btn-primary" id="deleted" onclick="batchdel(false)">删除</button>
+						<button type="button" class="btn btn-primary" onclick="reload()">刷新</button>
+						
+						<button type="button" class="btn btn-primary" onclick="exportExcel()">导出</button> 
+						<button type="button" class="btn btn-primary" onclick="search()">搜索</button>
+						大使人数：<span id="totalDashi"></span>&nbsp;&nbsp;当前可用配额：<span id="peieTotal"></span>
+						业绩提成总额：<span id="tiChengTotal"></span>&nbsp;&nbsp;管理津贴总额：<span id="jinTieTotal"></span>
+					</div>
+				</form>
+
+				<!-- 列头 -->
+				<div class="box-body mailbox-messages">
+					<table id="privatemodellist" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>
+									<button class="btn btn-default btn-sm checkbox-toggle">
+										<i class="fa fa-square-o"></i>
+									</button>序号
+								</th>
+								<th>直属上级</th>
+								<th>大使姓名</th>
+								<th>gaga号(登录帐号)</th>
+								<th>性别</th>
+								<th>银行卡号</th>
+								<th>开卡行</th>
+								<th>开卡省</th>
+								<th>开卡城市</th>
+								<th>开卡行支行</th>
+								<th>大使院校</th>
+								<th>大使电话</th>
+								<th>添加时间</th>
+								<th>业绩工资</th>
+								<th>管理津贴</th>
+								<th>总工资</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- 编辑弹窗 -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width:820px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent">
+			
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭
+				</button>
+				<button type="button" id="modalbutton" class="btn btn-primary" >
+					提交更改
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 提示弹窗 -->
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel1"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent1">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton1"></div>
+		</div>
+	</div>
+</div>
+<div id ="formDiv" hidden="hidden">
+<form class="form-horizontal" role="form" id="formAdd">
+<input type="hidden" id ="amId" name="amId"/>
+<input type="hidden" id ="amSysId" name="amSysId"/>
+       <fieldset>
+           <legend>添加大使</legend>
+          <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_host">大使姓名</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amName" name="amName" type="text" placeholder="大使姓名"/>
+             </div>
+             <label class="col-sm-2 control-label" for="ds_name">gaga号(登录帐号)</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amGagaid" name="amGagaid" type="text" placeholder="绑定充值卡的gaga号" required="required"/>
+             </div>
+          </div>
+          <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_username">大使电话</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amPhone" name="amPhone" type="text" placeholder="大使电话"/>
+             </div>
+             <label class="col-sm-2 control-label" for="ds_password">性别</label>
+             <div class="col-sm-4">
+               	<select id="amSex" name="amSex" class="form-control">
+               		<option value="1">男</option>
+               		<option value="2">女</option>
+               		<option value="0">无</option>
+               	</select>
+            </div>
+          </div>
+          <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_username">银行卡号</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amCardNumber" name="amCardNumber" type="text" placeholder="银行卡号"/>
+             </div>
+             <label class="col-sm-2 control-label" for="ds_password">开卡行</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amCardBank" name="amCardBank" type="text" placeholder="开卡行"/>
+             </div>
+          </div>
+          <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_username">开卡行支行</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amCardBankBranch" name="amCardBankBranch" type="text" placeholder="开卡行支行"/>
+             </div>
+             <label class="col-sm-2 control-label" for="ds_password">开卡省</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amCardProvince" name="amCardProvince" type="text" placeholder="开卡省"/>
+             </div>
+          </div>
+           <div class="form-group">
+             <label class="col-sm-2 control-label" for="ds_username">开卡城市</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amCardCity" name="amCardCity" type="text" placeholder="开卡城市"/>
+             </div>
+             <label class="col-sm-2 control-label" for="ds_password">大使院校</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amUniversity" name="amUniversity" type="text" placeholder="大使院校"/>
+             </div>
+          </div>
+           <div class="form-group">
+            <label class="col-sm-2 control-label" for="ds_password">人员配额</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amPersonLimit" name="amPersonLimit" type="text" placeholder="人员配额"/>
+             </div>
+               <input class="form-control" id="amCommission" name="amCommission" type="hidden" value="0.35" placeholder="提成比例"/>
+          <!--   <label class="col-sm-2 control-label" for="ds_username">提成比例</label>
+             <div class="col-sm-4">
+                <input class="form-control" id="amCommission" name="amCommission" type="text" value="0.35" placeholder="提成比例"/>
+             </div>  -->
+          </div>
+       </fieldset>     
+</form>
+</div>
+
+<script src="dist/js/pages/agent.js"></script>
+<script type="text/javascript">
+$(function(){
+	$('#addStart').datepicker({format: 'yyyy-mm-dd',defaultDate : new Date(),language: 'zh-CN' });
+	 $('#addEnd').datepicker({format: 'yyyy-mm-dd',defaultDate : new Date(),language: 'zh-CN' });
+	 $('#salaryStart').datepicker({format: 'yyyy-mm-dd',defaultDate : new Date(),language: 'zh-CN'});
+	 $('#salaryEnd').datepicker({format: 'yyyy-mm-dd',defaultDate : new Date(),language: 'zh-CN'});
+});
+function exportExcel(){
+	var salaryStart = $('#salaryStart').val();
+	var salaryEnd = $('#salaryEnd').val();
+	var addStart = $('#addStart').val();
+	var addEnd = $('#salaryEnd').val();
+	var level = $('#level').val();
+	 var url= ctx+"/agent/ambassaPage?salaryStart="+salaryStart+"&salaryEnd="+
+			 salaryEnd+"&addStart="+addStart+"&addEnd="+addEnd+"&export=1"+"&level="+level
+     window.open(url);
+}
+function openAddNew(){
+	$('#bodycontent').html($('#formDiv').html());
+	$('legend').text('新增大使');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	 $('#modalbutton').unbind();
+	  $('#modalbutton').on('click', function(event) {
+	    	event.preventDefault();
+	    	if(!checkForm())return;
+	    	$('#modalbutton').attr('disabled',"true");
+	    	  $.ajax({
+					type:"post",
+					url:ctx + "/agent/addAmbassador",
+					dataType:"json",
+					data:$('#formAdd').serialize(),
+					success:function(data){
+						$('#modalbutton').removeAttr("disabled"); 
+						layer.msg(data.msg);
+						if(data.success){
+							$('#Modal').modal('hide');
+							search();
+							layer.msg(data.msg);
+						}else{
+							layer.msg(data.msg);
+						}
+					}
+				});
+	    });
+}
+function openEditNew(id){
+	$('#bodycontent').html($('#formDiv').html());
+	$('legend').text('编辑大使');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	$.ajax({
+		type:"post",
+		async:"false",
+		url:ctx + "/agent/getAmbassador",
+		dataType:"json",
+		data:{amSysId:id},
+		success:function(data){
+			if(data.success){
+				$('#amId').val(data.obj.amId);
+				$('#amName').val(data.obj.amName);
+				$('#amCardNumber').val(data.obj.amCardNumber);
+				$('#amCardBank').val(data.obj.amCardBank);
+				$('#amCardBankBranch').val(data.obj.amCardBankBranch);
+				$('#amCardProvince').val(data.obj.amCardProvince);
+				$('#amCardCity').val(data.obj.amCardCity);
+				$('#amUniversity').val(data.obj.amUniversity);
+				$('#amPhone').val(data.obj.amPhone);
+				$('#amPersonLimit').val(data.obj.amPersonLimit);
+				$('#amCommission').val(data.obj.amCommission);
+				$('#amSysId').val(data.obj.amSysId);
+				$('#amGagaid').val(data.obj.gagano);
+				$('#amSex').val(data.obj.amSex);
+				$('#amGagaid').attr("disabled","disabled"); 
+				$('#amCommission').attr("disabled","disabled"); 
+			}else{
+				layer.msg(data.msg);
+			}
+		}
+	});
+	$('#modalbutton').unbind();
+  $('#modalbutton').on('click', function(event) {
+    	event.preventDefault();
+    	if(!checkForm())return;
+    	$('#modalbutton').attr('disabled',"true");
+    	  $.ajax({
+				type:"post",
+				url:ctx + "/agent/editAmbassador",
+				dataType:"json",
+				data:$('#formAdd').serialize(),
+				success:function(data){
+					$('#modalbutton').removeAttr("disabled"); 
+					layer.msg(data.msg);
+					if(data.success){
+						$('#Modal').modal('hide');
+						search();
+					}else{
+						layer.msg(data.msg);
+					}
+				}
+			});
+    });
+}
+
+/**
+ * 查询
+ */
+function search(){
+	$("#privatemodellist").dataTable().fnDraw(true);
+}
+
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        $("#privatemodellist").dataTable({
+        	"bStateSave": true,
+        	"paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "info": true,
+            "autoWidth": false,
+            "ordering": true,
+            "pageLength":10,//分页长度
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	         	            
+	        	aoData.push(
+	        			{"name":"amName","value":$('#amName_search').val()},
+		       			{"name":"level","value": $("#level").val()},
+		       			{"name":"addStart","value":$('#addStart').val()},
+		       			{"name":"addEnd","value":$('#addEnd').val()},
+		       			{"name":"salaryStart","value":$('#salaryStart').val()},
+		       			{"name":"salaryEnd","value":$('#salaryEnd').val()},
+		       			{"name":"amGagaid","value":$('#amGagaid_search').val()}
+       			)
+	        	layer.load(1, {shade: 0.3});
+	        	oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/agent/ambassaPage",
+	              "data": aoData,
+	              "success": fnCallback
+	        	});
+	        },
+	        "columns": [//排序、赋值
+				{"data": "am_sys_id","bSortable": false },
+				{"data": "parentName","bSortable": false },
+				{"data": "am_name","bSortable": false},
+				{"data": "username","bSortable": false,"defaultContent":0},
+				{"data": "am_sex","bSortable": false},
+				{"data": "am_card_number","bSortable": false },
+				{"data": "am_card_bank","bSortable": false },
+				{"data": "am_card_province","bSortable": false },
+				{"data": "am_card_city","bSortable": false },
+				{"data": "am_card_bank_branch","bSortable": false},
+				{"data": "am_university","bSortable": false },
+				{"data": "am_phone","bSortable": false},
+				{"data": "am_create_time","bSortable": false},
+				{"data": "commission","bSortable": false,"defaultContent":0},
+				{"data": "allowance","bSortable": false,"defaultContent":0},
+				{"data": "allowance","bSortable": false,"defaultContent":0},
+				{"data": "am_sys_id","bSortable": false },
+	        ],
+	        "columnDefs": [{//特殊数据
+	        		"targets": 0,//复选框
+	        		 "data": "am_sys_id",
+					"render": function ( data, type, full, meta ) {
+						 return '<input type="checkbox" value="' + data + '" title="' + data + '" name="checkbox" class="checkbox" />'; 
+					}   
+				},{//特殊数据
+	        		"targets": 3,//嘎嘎号
+	        		 "data": "username",
+					"render": function ( data, type, full, meta ) {
+	                	if(data==null){
+	                		return full.syus_username;
+	                	}return data;
+					}   
+				},{//特殊数据
+	        		"targets": 4,//复选框
+	        		 "data": "am_sex",
+					"render": function ( data, type, full, meta ) {
+	                	if(data==2){return '女'}else if(data==1){return '男'}return '无'
+					}   
+				},{//特殊数据
+	        		"targets": 12,//复选框
+	        		 "data": "am_create_time",
+					"render": function ( data, type, full, meta ) {
+	                	if(data!=null){
+	                		var longtime=new Date(data).getTime();
+	                		date=new Date(longtime);
+	                    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();;
+	                	}
+					}   
+				},{
+	        		"targets": 15,
+	        		 "data": "commission",
+					"render": function ( data, type, full, meta ) {
+							return full.commission+data;
+					}
+				},{
+	        		"targets": 16,//操作
+	        		 "data": "am_sys_id",
+					"render": function ( data, type, full, meta ) {
+						
+						 return ' <a class="openEditNew" href="javascript:void(0)" onclick="openEditNew(\''+ data +'\')">编辑</a><br/>';
+					}
+				}
+			],
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+            	$(".mailbox-messages input[type='checkbox']").iCheck({
+	            	checkboxClass: 'icheckbox_flat-blue',
+	                radioClass: 'iradio_flat-blue'
+	            });
+	            layer.closeAll();
+            	var json=jQuery.parseJSON(oSettings.jqXHR.responseText);
+            	var obbj=json.obj;
+            	if(obbj){
+            		$('#totalDashi').text(json.recordsTotal)
+                	$('#peieTotal').text(json.obj.peieTotal)
+                	$('#tiChengTotal').text(json.obj.tiChengTotal)
+                	$('#jinTieTotal').text(json.obj.jinTieTotal)
+            	}
+            	var table=$('#privatemodellist').DataTable();
+            	var lev = $('#level').val();
+            	if(lev==6){
+            		$('#deleted').hide();
+            		table.column(16).visible( false );
+            		table.column(1).visible( false );
+            	}else{
+            		$('#deleted').show();
+            		table.column(16).visible( true );
+            		table.column(1).visible( true );
+            	}
+            }
+	    });
+		$(".checkbox-toggle").click(function() {//复选框全选/反选
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+			    $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+			    $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+			    $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+        //序号相关
+        var table = $('#privatemodellist').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	var page=table.page.info();
+         	table.column(0, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML += page.page*page.length+ i+1;
+            });
+        }).draw();
+   });
+});
+
+
+/**
+ * 刷新
+ */
+function reload(){
+	window.location.reload();//刷新当前页面.
+}
+/**
+ *	批量删除
+ *	sign	标志true 不再提示是否删除
+ */
+function batchdel(sign) {
+	var diphid = new Array();
+	
+	var objs = $("#privatemodellist div");
+//	console.log(objs)
+    for (var i = 0; i < objs.length; i++) {
+        var obj = objs[i];
+        var flag = $(obj).attr("aria-checked");
+        if (flag == "true") {
+            var val=$(obj).children("input").attr("value");
+            diphid.push(val);  
+        }
+    }
+    console.log(diphid.length);
+ 	if(null == diphid || diphid.length <= 0||diphid.length > 1){
+		$("#ModalLabel1").text("提示");
+		$("#bodycontent1").html('<span>请选中一条进行删除！</span>');
+		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+ 	}
+    
+    if(!sign){
+		$("#ModalLabel1").text("删除模板");
+		$("#bodycontent1").html('<span>确定要删除所选项吗？</span>');
+		$("#modalbutton1").html('<button type="button" onclick="batchdel(true)" class="btn btn-primary">确定</button><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+		$('#Modal1').modal({
+		    keyboard: true
+		});
+		return;
+    }
+  
+    $.ajax({
+        type: "post",
+        url: ctx + "/agent/deleteAmbassador",
+        dataType: "json",
+        data: {"amSysId": diphid.join()},
+        success: function(data) {
+            if (data.success) {
+            	$("#privatemodellist").dataTable().fnDraw(true);
+            	$('#Modal1').modal('hide');
+            	search();
+            }else{
+            	$("#privatemodellist").dataTable().fnDraw(true);
+            	$('#Modal').modal('hide');
+            	search();
+            	$("#ModalLabel1").text("提示");
+        		$("#bodycontent1").html('<span>数据异常！请重试！</span>');
+        		$("#modalbutton1").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal1').modal({
+        		    keyboard: true
+        		});
+            }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+        	$("#privatemodellist").dataTable().fnDraw(true);
+        	$('#Modal').modal('hide');
+        	search();
+        }
+    });
+}
+
+</script>
+

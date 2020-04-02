@@ -1,0 +1,306 @@
+<style>
+<!--
+.con {
+	word-wrap: break-word;
+	word-break: break-word;
+}
+-->
+</style>
+<style>
+.fullconten { display: none; }
+.max{width:100%;height:auto;}
+.min{width:100px;height:auto;}
+.zi{width: 10%;float: left;text-align: center;line-height: 34px;}
+.startTime{width: 45%;float: left;}
+</style>
+
+<section class="content-header">
+	<h1>
+		点击量详情<small></small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>模块管理</li>
+		<li class="active">推广数据点击量详情</li>
+	</ol>
+</section>
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<form class="form-horizontal">
+					<div class="box-body">
+
+						<div class="form-group">
+							<label for="content" class="col-sm-2 control-label">公司：</label>
+							<div class="col-sm-4">
+								<select class="form-control" name=message_type aria-controls="example1" id="message_type">
+									<option value="">全部</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">时间：</label>
+							<div class="row">
+								<div class="col-sm-4">
+									<input type="text" class="form-control startTime" id="addStart" name="addStart"> <span class="zi" style="">至</span> <input type="text"
+										class="form-control startTime" id="addEnd" name="addEnd">
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+					<!-- /.box-body -->
+					<div class="box-footer">
+						<button type="button" class="btn btn-default" onclick="search()">查询</button>
+						<button type="button" onclick="batchDel()" class="btn btn-primary">删除</button>
+						<button type="button" onclick="refreshdata()" class="btn btn-primary">刷新</button>
+					</div>
+					<!-- /.box-footer -->
+				</form>
+
+				<div class="box-body mailbox-messages">
+					<table id="tableData" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th>gagaid</th>
+								<th>点击时间</th>
+								<th>公司名称</th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+				<!-- /.box-body -->
+			</div>
+
+			<!-- /.box -->
+		</div>
+		<!-- /.col -->
+	</div>
+</section>
+<script type="text/javascript">
+	$(function() {
+		$.ajax({
+			type : "POST",
+			url : ctx + "/adcount/getCompanyList",
+			dataType : "json",
+			data : {
+				adType : 1
+			},
+			success : function(data) {
+				if (data.data) {
+					console.log(data.data);
+					//每次选择后清空
+					$('#message_type').html('<option value="">-- 请选择 --</option>');
+					$.each(data.data, function(index, e) {
+						$('#message_type').append('<option value="'+e.id+'">' + e.company_name + '</option>');
+					});
+				} else {
+					layer.msg('获取公司失败');
+				}
+			}
+		});
+
+		$('#addStart').datepicker({
+			format : 'yyyy-mm-dd',
+			defaultDate : new Date(),
+			language : 'zh-CN'
+		});
+		$('#addEnd').datepicker({
+			format : 'yyyy-mm-dd',
+			defaultDate : new Date(),
+			language : 'zh-CN'
+		});
+
+	})
+	$(function() {
+		$.addFields([ '/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js',
+				'/plugins/daterangepicker/daterangepicker.js', '/plugins/datepicker/bootstrap-datepicker.js' ], function() {
+			var tuiguangclick = $("#tableData").dataTable({
+				"bStateSave" : true,
+				"paging" : true,
+				//"processing": true,
+				"serverSide" : true,
+				"lengthChange" : false,
+				"searching" : false,
+				"ordering" : true,
+				"info" : true,
+				"autoWidth" : false,
+				"pageLength" : 30,
+
+				"fnServerData" : function(sSource, aoData, fnCallback, oSettings) {
+					
+					aoData.push({"name": "company",  "value": $("#message_type").val()},
+							{"name":"addStart","value":$('#addStart').val()},
+			       			{"name":"addEnd","value":$('#addEnd').val()}
+					);
+					
+					var url = (tuiguangclick) ? (ctx + "/adcount/getTuiguangClickList") : "#";
+					layer.load(1, {
+						shade : 0.3
+					});
+					oSettings.jqXHR = $.ajax({
+						"dataType" : 'json',
+						"type" : "POST",
+						"url" : url,
+						"data" : aoData,
+						"success" : fnCallback
+					});
+				},
+				"columns" : [ {
+					"data" : "id",
+					"bSortable" : false
+				}, {
+					"data" : "memb_gagaid",
+					"bSortable" : false
+				}, {
+					"data" : "click_time",
+					"bSortable" : false
+				}, {
+					"data" : "company_name",
+					"bSortable" : false
+				} ],
+
+				"columnDefs" : [ {
+					"targets" : 2,
+					"render" : function(data, type, full, meta) {
+						var dstr = '';
+						if (data != null) {
+							dstr = new Date(data).format('yyyy-MM-dd hh:mm:ss');
+						}
+						return dstr;
+					}
+				} ],
+				"fnDrawCallback" : function(oSettings) { //这个应该是重绘的回调函数
+					$(".mailbox-messages input[type='checkbox']").iCheck({
+						checkboxClass : 'icheckbox_flat-blue',
+						radioClass : 'iradio_flat-blue'
+					});
+					layer.closeAll();
+				}
+			});
+
+			//序号相关
+			var table = $('#tableData').DataTable();
+			table.on('order.dt search.dt', function() {
+				//获取页信息
+				//debugger
+				var page = table.page.info();
+				table.column(0, {}).nodes().each(function(cell, i) {
+					cell.innerHTML = page.page * page.length + i + 1;
+				});
+			}).draw();
+
+			$(".checkbox-toggle").click(function() {
+				var clicks = $(this).data('clicks');
+				if (clicks) {
+
+					$(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+					$(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+				} else {
+					$(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+					$(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+				}
+				$(this).data("clicks", !clicks);
+			});
+		});
+	});
+
+	function content(commId) {
+		//获取评论信息
+		doPost("Module/commGet", {
+			"commId" : commId
+		}, conHd, errorHd);
+
+	}
+
+	function conHd(data) {
+		if (data.success) {
+			//评论内容详情
+			var tmp = "";
+			tmp += "<div class='con'>"
+			var con = data.obj.zoco_content;
+			if (con != null && con != undefined) {
+				tmp += $.getFaceImg(con);
+			}
+			tmp += "</div><br/>";
+			$("#commTmp").html(tmp);
+			$('#commConModal').modal({
+				keyboard : true
+			});
+		} else {
+			$.msg(data.msg);
+		}
+	}
+	function errorHd(xreq) {
+		$.msg(xreq.statusText + "[" + xreq.status + "]");
+	}
+
+	//删除评论
+	function del(id) {
+		var t = confirm("确定要删除选定的评论吗？");
+		if (t) {
+			doPost("Module/commDel", {
+				"commIds[]" : [ id ]
+			}, roleDelHd, errorHd);
+		}
+	}
+	function roleDelHd(data) {
+		if (data.success) {
+			refreshdata();
+		} else {
+			$.msg(data.msg);
+		}
+	}
+
+	//批量删除
+	function batchDel() {
+		var chk_value = [];
+		$('input[name="commId"]:checked').each(function() {
+			chk_value.push($(this).val());
+		});
+		if (chk_value.length == 0) {
+			$.msg("请选择要删除的评论");
+		} else {
+			var t = confirm("确定要删除选定的评论吗？");
+			if (t) {
+				doPost("Module/commDel", {
+					"commIds[]" : chk_value
+				}, roleDelHd, errorHd);
+			}
+		}
+	}
+
+	//刷新表格
+	function refreshdata() {
+		$("#tableData").dataTable().fnDraw(false);
+	}
+
+	function search() {
+		$("#tableData").dataTable().fnDraw(false);
+	}
+</script>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="commConModal" tabindex="-1" role="dialog" aria-labelledby="commConModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="commConModalLabel">评论详情</h4>
+			</div>
+			<div class="modal-body" id="commConModalCon">
+				<!-- 模态内容 -->
+				<div id="commTmp"></div>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" field="closeModal">关闭</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- /.modal -->

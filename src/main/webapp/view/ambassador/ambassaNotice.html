@@ -1,0 +1,460 @@
+<style type="text/css">
+.giftReal-t td { padding: 6px; }
+.ylt1, .ylt2, .ylt3, .ylt4, .ylt5 { max-height: 100px; }
+.edit-img-box { position: relative; display: none; }
+.edit-img-box span { width: 15px; height: 15px; position: absolute; background: #f00; right: 0; text-align: center;  line-height: 16px;  color: #FFF; cursor: pointer;  }
+.edit-img-box.have { display: inline-block; }
+</style>
+<section class="content-header">
+	<h1>
+		<!-- 公告管理<small></small> -->
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>代理商管理</a></li>
+		<li>公告管理</li>
+		<li class="active">公告管理</li>
+	</ol>
+</section>
+
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<!-- 头部操作菜单 -->
+				<form class="form-horizontal">
+					<div class="box-footer">
+
+					<!-- 	<button type="button" class="btn btn-primary" onclick="reload()">刷新</button>
+ -->
+					</div>
+				</form>
+
+				<!-- 列头 -->
+				<div class="box-body mailbox-messages">
+				<h3 align="center" >公告</h3>
+					<div id ="gonggao">
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- 编辑弹窗 -->
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width:820px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton"></div>
+		</div>
+	</div>
+</div>
+
+<!-- 提示弹窗 -->
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title" id="ModalLabel1"></h4>
+			</div>
+			<div class="modal-body" id="bodycontent1">
+				<!-- 在这里添加一些文本 -->
+			</div>
+			<div class="modal-footer" id="modalbutton1"></div>
+		</div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+var context="每位大使均可自主招募下级大使，每位大使对其以下三级大使享有管理权和管理津贴，每级大使的管理津贴均为下级大使总工资（含管理津贴）的20%---40%（由公司另外发放，不影响下级大使工资）。"
+	+"管理津贴比例划分依据是招募的直属下级大使人数，招募人数小于等于10人，管理津贴比例为20%；招募人数大于10人小于等于50人，管理津贴比例为30%；招募人数大于50人小于等于100人，管理津贴比例为35%；招募人数大于100人，管理津贴比例为40%。"
+	+"若下级大使周工资额连续三周低于10元，则视该下级大使为无效大使，视上级大使对该下级大使的管理为无效管理，无效管理人数占总人数的比例超过40%则取消上级大使的管理权限和管理津贴，请各位大使及时清除无效的下级大使，公司也会不定期清除无效大使。"
+	+"大使工资每天更新，每周周一发放。";
+$(function(){
+	var txt = getData();
+	if(txt){
+		$('#gonggao').html(txt);
+	}else{
+		$('#gonggao').html(context);
+	}
+});
+
+function getData(){
+	var txt;
+	$.ajax({
+		type:"POST",
+		url:ctx + "/agent/getNotice",
+		dataType:"json",
+		async: false,
+		data:"",
+		success:function(data){
+			if(data.success){
+				txt = data.obj.noNotice;
+			}
+		}
+	});
+	return txt;
+}
+
+/**
+ * 查询
+ */
+function search(){
+	$("#privatemodellist").dataTable().fnDraw(true);
+}
+
+/**
+ * 刷新
+ */
+function reload(){
+	window.location.reload();//刷新当前页面.
+}
+
+/**
+ * 打开新增窗口
+ */
+function openAdd(){
+	var count = "";
+	var gid = "";
+	var gclist = "";
+	count += "<table><tr><td><img class='ylt1' />"
+	+"<img class='ylt2'/><img class='ylt3'/>"
+	+"<img class='ylt4'/><img class='ylt5'/></td></tr></table>";
+	
+	count += "<table class='giftReal-t'>";
+	
+	//编辑框
+	count +="<tr><td></td><td colspan='3'><textarea id='compose-textarea' class='form-control'></textarea></td></tr>";
+
+	count += "</table><ul></ul>";
+	$("#ModalLabel").text("编辑公告");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button"  class="btn btn-primary">提交 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	
+	// $("#compose-textarea").wysihtml5();//为编辑框初始化   onchange='uploadM(this)'
+	var editors = CKEDITOR.replace('compose-textarea');
+	var dat=getData();
+	//console.log(dat);
+	editors.setData(dat);
+	$('#Modal').on('shown.bs.modal', function() {
+	    $('#modalbutton .btn-primary').on('click', function(event) {
+	    	event.preventDefault();
+	    	add(true, editors);
+	    });
+	});	
+	$('#Modal').on('hidden.bs.modal', function() {
+		$('#Modal').off();
+	});
+}
+
+
+
+/**
+ * 
+ * 
+ */
+function add(sign, editor){
+
+	var gireDescription = editor? editor.getData() : $("#compose-textarea").val();
+	
+	$.ajax({
+		type: "post",
+		url: ctx + "/agent/editNotice",
+		dataType: "json",
+		data: {"noNotice":gireDescription},
+		success: function(data) {
+		    if (data.success) {
+		    	$("#privatemodellist").dataTable().fnDraw(true);
+		    	$("#ModalLabel").text("提示");
+        		$("#bodycontent").html('<span>成功！</span>');
+        		$("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>');
+        		$('#Modal').modal({
+        		    keyboard: true
+        		});
+        		reload();
+		    }
+		}
+	});
+}
+
+/**
+ * 编辑
+ */
+function openEdit(gid,ggid){
+	var count = "";
+	var giftReal = "";//被复制的对象
+	var listimg = "";
+	var gclist = "";
+	$.ajax({
+        type: "post",
+        url: ctx + "/Giftreal/openAddByGireGiftid",
+        dataType: "json",
+        async: false,
+        data: {"gid": gid,"ggid":ggid},
+        success: function(data) {
+        	if (data.success) {
+        		giftReal = data.obj.giftReal;
+        		listimg = data.obj.listimg;
+        		gclist = data.obj.gclist2;
+        	}
+        }
+    });
+	
+	var image1,image2,image3,image4,image5;//上传空间是否可用
+	var imagesrc1="<div class='edit-img-box'><span>X</span><img class='ylt1' width='120'/></div>",
+	imagesrc2="<div class='edit-img-box'><span>X</span><img class='ylt2' width='120'/></div>",
+	imagesrc3="<div class='edit-img-box'><span>X</span><img class='ylt3' width='120'/></div>",
+	imagesrc4="<div class='edit-img-box'><span>X</span><img class='ylt4' width='120'/></div>",
+	imagesrc5="<div class='edit-img-box'><span>X</span><img class='ylt5' width='120'/></div>";//上传空间是否可用
+	var lanage1,lanage2,lanage3,lanage4,lanage5,lanage6,lanage7,lanage8;//语言下拉框
+	
+	var imgHtml = '';
+	for(var i = 0;i < listimg.length;i++){
+		if(listimg[i].grimSort == "1"){
+			image1 = "disabled";
+			imagesrc1 = "<div class='edit-img-box have'><span>X</span><img class='ylt1' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";			
+		}else if(listimg[i].grimSort == "2"){
+			image2 = "disabled";
+			imagesrc2 = "<div class='edit-img-box have'><span>X</span><img class='ylt2' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "3"){
+			image3 = "disabled";
+			imagesrc3 = "<div class='edit-img-box have'><span>X</span><img class='ylt3' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "4"){
+			image4 = "disabled";
+			imagesrc4 = "<div class='edit-img-box have'><span>X</span><img class='ylt4' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}else if(listimg[i].grimSort == "5"){
+			image5 = "disabled";
+			imagesrc5 = "<div class='edit-img-box have'><span>X</span><img class='ylt5' width='120' src='" + qiniu + listimg[i].grimPreview + "' gimgid='" + (listimg[i]? listimg[i].grimId:"") + "'/></div>";
+		}
+	}
+	imgHtml = imagesrc1 + imagesrc2 + imagesrc3 + imagesrc4 + imagesrc5;
+	switch(giftReal.gireLanage){
+		case "zh-cn":
+			lanage1 = "selected='selected'";
+		break;
+		case "zh-tw":
+			lanage2 = "selected='selected'";
+		break;
+		case "en-us":
+			lanage3 = "selected='selected'";
+		break;
+		case "de-de":
+			lanage4 = "selected='selected'";
+		break;
+		case "es-es":
+			lanage5 = "selected='selected'";
+		break;
+		case "ru-ru":
+			lanage6 = "selected='selected'";
+		break;
+		case "ja-jp":
+			lanage7 = "selected='selected'";
+		break;
+		case "ko-kr":
+			lanage8 = "selected='selected'";
+		break;
+		default:
+	}
+	
+	count += "<table><tr><td>" + imgHtml + "</td></tr></table>";
+	
+	count += "<table>";
+	count +="<tr><td>ID:</td><td>"+ ggid +"<input id='gireGiftid' type='hidden' value='"+ ggid +"'>"
+		+"<input id='gid' type='hidden' value='"+ gid +"'></td></tr>";
+	
+	count +="<tr><td>语言:</td><td><select id='gireLanage'>"
+		+"<option value='zh-cn' "+ lanage1 +">zh-cn</option>"
+		+"<option value='zh-tw' "+ lanage2 +">zh-tw</option>"
+		+"<option value='en-us' "+ lanage3 +">en-us</option>"
+		+"<option value='de-de' "+ lanage4 +">de-de</option>"
+		+"<option value='es-es' "+ lanage5 +">es-es</option>"
+		+"<option value='ru-ru' "+ lanage6 +">ru-ru</option>"
+		+"<option value='ja-jp' "+ lanage7 +">ja-jp</option>"
+		+"<option value='ko-kr' "+ lanage8 +">ko-kr</option>"
+		+"</select></td></tr>";
+
+	count +="<tr><td>类别:</td><td><select id='gireCategoryid'>";
+	if(null != gclist && gclist.length > 0){
+		for(var i = 0;i < gclist.length;i++ ){
+			var selected = "";
+			if(null != gclist && gclist[i].gicaId == giftReal.gireCategoryid 
+					&& gclist[i].gicaLanguage == giftReal.gireLanage){
+				selected = "selected='selected'";
+			}
+			count += "<option value=\""+ gclist[i].gicaId +"\" "+ selected +">"+ gclist[i].gicaName +"</option>";
+		}
+	}
+	count += "</select></td></tr>";
+	
+	count +="<tr><td>名称:</td><td><input type='text' id='gireName' value='"+ giftReal.gireName +"'/></td></tr>";
+	count +="<tr><td>默认赠言:</td><td><textarea id='gireGreeting'>"+giftReal.gireGreeting+"</textarea></td></tr>";
+	count +="<tr><td>材料:</td><td><input type='text' id='gireMaterial' value='"+ giftReal.gireMaterial +"'/></td></tr>";
+	count +="<tr><td>金币:</td><td><input type='text' id='gireGold' value='"+ giftReal.gireGold +"'/></td></tr>";
+	count +="<tr><td>排序:</td><td><input type='text' id='gireSort' value='"+ giftReal.gireSort +"'/></td></tr>";
+	var read ="";
+	if(null != giftReal.girePlatsource && $.trim(giftReal.girePlatsource).length > 0){
+		read = "readonly='readonly'";
+	}
+	count +="<tr><td>购买链接:</td><td><input type='text' id='girePlatsource' value='"+ giftReal.girePlatsource +"' "+ read +" />（第三方网站，便于后期采购）</td></tr>";
+	
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img1' onchange='upload(this,1)' "+ image1 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img2' onchange='upload(this,2)' "+ image2 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img3' onchange='upload(this,3)' "+ image3 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img4' onchange='upload(this,4)' "+ image4 +"/></td></tr>";
+	count +="<tr><td>礼物图片:</td><td><input type='file' id='img5' onchange='upload(this,5)' "+ image5 +"/></td></tr>";
+	//编辑框
+	count +="<tr><td>商品详情:</td><td><textarea id='compose-textarea' class='form-control'>"+ giftReal.gireDescription +"</textarea></td></tr>";
+
+	count +="<tr><td>活动推荐:</td><td colspan='3'><input type='checkbox' id='gireIsrecommend' " + (giftReal.gireIsrecommend==1?'checked="checked"':'') + "/></td></tr>";
+	
+	count += "</table><input type='file' id='inputs2' multiple='multiple' /><ul></ul>";
+	$("#ModalLabel").text("添加真实礼物");
+	$("#bodycontent").html(count);
+	$("#modalbutton").html('<button type="button" onclick="add(false)" class="btn btn-primary">添加 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	$('#Modal').modal({
+	    keyboard: true
+	});
+	// var editors = $("#compose-textarea").wysihtml5();//为编辑框初始化   onchange='uploadM(this)'
+	// var commands = new wysihtml5.Commands(editors);
+	var editors = CKEDITOR.replace('compose-textarea');
+
+	$('#Modal').on('shown.bs.modal', function() {		
+	    $('#modalbutton .btn-primary').on('click', function(event) {
+	    	event.preventDefault();
+	    	add(false, editors);
+	    });
+	    $('#Modal input[type="file"]').on('change', function(event) {	    	
+	    	uploadM(this, editors);
+	    	// console.log(1);
+	    });
+	});	
+	$('#Modal').on('hidden.bs.modal', function() {
+		$('#Modal').off();
+	});
+
+	$('.edit-img-box span').click(function() {
+		var $del = $(this);
+		var imgid = $(this).next('img').attr('gimgid')
+		var _index = $(this).next('img').attr('class').replace('ylt', '');
+		var $selBtn = $('#img' + _index);
+		if (imgid) {
+			$.ajax({
+				url: ctx + "/Giftreal/delImg",
+				type: 'post',
+				dataType: 'json',
+				data: {grimId: imgid},
+			})
+			.done(function() {
+				$del.parent().removeClass('have').find('img').removeAttr('src');
+				$selBtn.removeAttr('disabled');
+			})
+			.fail(function() {
+				layer.msg('删除图片失败');
+			});		
+		} else {
+			layer.msg('图片id不存在');
+		}
+	})
+}
+
+
+
+/**
+ * 七牛上传图片
+ */
+var Qiniu_uploadM = function(f, token, key, editors) {
+	var $inputObj = $(f);
+	var filesnum = f.files.length;
+	var files = f.files;
+
+	sendimg(files);
+
+	function sendimg(files, num, callback) {
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", Qiniu_UploadUrl, true);
+		var formData, startDate;
+		formData = new FormData();
+		if (key !== null && key !== undefined) formData.append("key", key[filesnum-1]);
+		formData.append("token", token);
+		formData.append("file", files[filesnum-1]);
+		var taking;
+		xhr.upload.addEventListener("progress", function(evt) {
+			if (evt.lengthComputable) {
+				var nowDate = new Date().getTime();
+				taking = nowDate - startDate;
+				var x = (evt.loaded) / 1024;
+				var y = taking / 1000;
+				var uploadSpeed = (x / y);
+				var formatSpeed;
+				if (uploadSpeed > 1024) {
+					formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+				} else {
+					formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+				}
+			}
+		}, false);
+		xhr.onreadystatechange = function(response) {
+			if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+				var blkRet = JSON.parse(xhr.responseText);
+				//$(obj).closest('.edit-img-box').addClass('have');
+				// debugger
+				var oldval = editors.getData();
+				oldval += '<p><img alt="图片加载" src="'+qiniu+blkRet.key+'" data-cke-saved-src="'+qiniu+blkRet.key+'"><br></p>';
+				editors.setData(oldval);
+				$('#compose-textarea').val(oldval);		
+				filesnum--;
+				if (filesnum < 1) {
+					callback && callback();
+				} else {
+					sendimg(files, num);
+				}
+			} else if (xhr.status != 200 && xhr.responseText) {
+				$("#errorbodycontent").html(xhr.responseText);
+				$('#errorModal').modal({
+					keyboard : true
+				});
+			}
+		};
+		startDate = new Date().getTime();
+		xhr.send(formData);
+	}
+	
+};
+
+/**
+ * 上传预览图
+ * obj 当前对象
+ * index 对应控件id
+ */
+function uploadM(inputobj, editors){
+	var that=$(inputobj);
+	var key=$(that)[0].files;
+	var token = "";
+	$.post(ctx+"/Image/uploadInit",{type:"R",imgNum:key.length},function(result){
+		 if(result.success){
+			var token = result.obj.upToken;
+			var key1=result.obj.img;
+			if ($(that).length > 0 && token != "") {
+				Qiniu_uploadM($(that)[0], token, key1, editors);
+			} else {
+				console && console.log("form input error");
+			}
+		 }
+	});
+}
+
+</script>
+

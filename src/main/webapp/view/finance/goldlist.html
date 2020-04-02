@@ -1,0 +1,255 @@
+<style>
+.table>tbody>tr>td.vertical-middle {vertical-align: middle}
+</style>
+
+<section class="content-header">
+	<h1>
+		<small>金币销售</small>
+	</h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>财务统计</li>
+		<li class="active">金币销售</li>
+	</ol>
+</section>
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<form class="form-horizontal">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">统计区间:</label>
+							<div class="col-sm-10">
+								<input type="text" id="starttime" class="startTime">至<input type="text" id="endtime" class="startTime">(备注：查询条件中的日期使用说明，开始日期为包含即“>=”，结束日期为不包含即“<”。)
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="departmentId" class="col-sm-2 control-label">部门：</label>
+							<div class="col-sm-10">
+								<select class="form-control" id="departmentId">
+									<option value="">-- 请选择 --</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<!-- /.box-body -->
+					<div class="box-footer">
+						<button type="button" id="search" class="btn btn-primary">查询</button>
+					</div>
+					<!-- /.box-footer -->
+				</form>
+				<!-- /.box-header -->
+				<div class="box-body mailbox-messages">
+					<table id="goldsumlistPC" class="table table-bordered table-hover text-center">
+						<thead>
+							<tr>
+								<th colspan="4">金币销售汇总</th>
+							</tr>
+							<tr>
+								<th>归属</th>
+								<th>支付方式</th>
+								<th>金币数 ( $ )</th>
+								<th>备注</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td rowspan="7" class="vertical-middle">APP</td>
+								<td>paypal</td>
+								<td id="paypal" class="val">0</td>
+								<td>Paypal支付</td>
+							</tr>
+							<tr>
+								<td>paypalcredit</td>
+								<td id="paypalcredit" class="val">0</td>
+								<td>Paypal信用卡支付</td>
+							</tr>
+							<tr>
+								<td>alipay</td>
+								<td id="alipay" class="val">0</td>
+								<td>支付宝支付</td>
+							</tr>
+							<tr>
+								<td>wechatpay</td>
+								<td id="wechatpay" class="val">0</td>
+								<td>微信支付</td>
+							</tr>
+							<tr>
+								<td>appstore</td>
+								<td id="appstore" class="val">0</td>
+								<td>appstore支付</td>
+							</tr>
+							<tr>
+								<td>CardPay</td>
+								<td id="CardPay" class="val">0</td>
+								<td>充值卡支付</td>
+							</tr>
+							<tr>
+								<td>APP合计</td>
+								<td id="APPTotal" class="val">0</td>
+								<td>APP合计</td>
+							</tr>
+
+							<tr>
+								<td rowspan="6" class="vertical-middle">PC</td>
+								<td>paypal</td>
+								<td id="paypal_pc" class="val">0</td>
+								<td>Paypal支付</td>
+							</tr>
+							<tr>
+								<td>paypalcredit</td>
+								<td id="paypalcredit_pc" class="val">0</td>
+								<td>Paypal信用卡支付</td>
+							</tr>
+							<tr>
+								<td>masapay</td>
+								<td id="masapay_pc" class="val">0</td>
+								<td>masapay支付</td>
+							</tr>
+							<tr>
+								<td>alipay</td>
+								<td id="alipay_pc" class="val">0</td>
+								<td>支付宝支付</td>
+							</tr>
+							<tr>
+								<td>weikePay</td>
+								<td id="weikePay_pc" class="val">0</td>
+								<td>微客支付</td>
+							</tr>
+							<tr>
+								<td>PC合计</td>
+								<td id="PCTotal" class="val">0</td>
+								<td>PC合计</td>
+							</tr>
+							<tr>
+								<td colspan="2">APP和PC合计</td>
+								<td id="appPCtotal" class="val">0</td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<!-- /.box-body -->
+			</div>
+			<!-- /.box -->
+		</div>
+		<!-- /.col -->
+	</div>
+</section>
+
+<script type="text/javascript">
+	$(function() {
+		var firstDay = firstDate("yyyy-MM-dd");
+		var now = new Date();
+		var nowdate = now.format("yyyy-MM-dd");
+
+		$('#starttime').val(firstDay);
+		$('#endtime').val(nowdate);
+		$('#starttime').datepicker({
+			format : 'yyyy-mm-dd'
+		});
+		$('#endtime').datepicker({
+			format : 'yyyy-mm-dd'
+		});
+		ajaxData();
+
+		$("#search").click(function() {
+			ajaxData();
+		})
+
+		//动态获取下拉框内容       放在fnDrawCallback外面可不清缓存,保留选择值
+		$.post(ctx + "/Promotion/departList", function(data) {
+			if (data.success) {
+				//每次选择后清空
+				$('#departmentId').html('<option value="">-- 请选择 --</option>');
+				$.each(data.obj, function(index, e) {
+					$('#departmentId').append(
+							'<option value="'+e.sydeId+'">' + e.sydeName
+									+ '</option>');
+				});
+			} else {
+				layer.msg('获取部门失败');
+			}
+		});
+
+		function format(id, data) {
+			if (data) {
+				$("#" + id).text(data);
+			} else {
+				$("#" + id).text("0");
+			}
+		}
+		function getNum(id) {
+			return Number($("#" + id).text());
+		}
+		function floatAdd(arg1, arg2) {
+			var r1, r2, m;
+			try {
+				r1 = arg1.toString().split(".")[1].length
+			} catch (e) {
+				r1 = 0
+			}
+			try {
+				r2 = arg2.toString().split(".")[1].length
+			} catch (e) {
+				r2 = 0
+			}
+			m = Math.pow(10, Math.max(r1, r2));
+			return (arg1 * m + arg2 * m) / m;
+		}
+		function getValue(arr) {
+			var valu = 0;
+			for (v in arr) {
+				valu = floatAdd(valu, arr[v]);
+			}
+			return valu;
+		}
+		function ajaxData() {
+			var starttime = $("#starttime").val();
+			var endtime = $("#endtime").val();
+			var departmentId = $("#departmentId").val();
+			var data = {
+				"starttime" : starttime,
+				"endtime" : endtime,
+				"departmentId" : departmentId
+			};
+			layer.load(1, {
+				shade : 0.3
+			});
+			$.post(ctx + "/order/getGoldListNew", data, function(reg) {
+				layer.closeAll();
+				//  console.log(reg)
+				$('.val').text(0);
+				var applist = reg.attributes.listapp;
+				var pclist = reg.attributes.listpc;
+
+				for (var i = 0; i < applist.length; i++) {
+					var rtype = applist[i].rechType;
+					var rechGoldreal = applist[i].rechGoldreal;
+					format(rtype, rechGoldreal);
+				}
+				for (var i = 0; i < pclist.length; i++) {
+					var rtype = pclist[i].rechType;
+					var rechGoldreal = pclist[i].rechGoldreal;
+					format(rtype + '_pc', rechGoldreal);
+				}
+				var arr = new Array(6);
+				arr.push(getNum('paypal'), getNum('paypalcredit'),
+						getNum('alipay'), getNum('wechatpay'),
+						getNum('appstore'), getNum('CardPay'));
+				var APPTotal = getValue(arr);
+				arr = new Array(4);
+				arr.push(getNum('paypal_pc'), getNum('paypalcredit_pc'),
+						getNum('alipay_pc'), getNum('weikePay_pc'),
+						getNum('masapay_pc'));
+				var PCTotal = getValue(arr);
+				$('#APPTotal').text(APPTotal);
+				$('#PCTotal').text(PCTotal);
+				$('#appPCtotal').text(floatAdd(APPTotal, PCTotal));
+			})
+		}
+
+	});
+</script>
+

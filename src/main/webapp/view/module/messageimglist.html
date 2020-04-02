@@ -1,0 +1,477 @@
+<section class="content-header">
+    <h1>私信IM图片管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>模块管理</li>
+        <li class="active">私信IM	图片管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          
+           <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">发件人：</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="sender" placeholder="" >
+                  </div>
+                </div>
+                
+                <div class="form-group">   
+                  <label for="sendDate" class="col-sm-2 control-label">收件人：</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="receiver">
+                  </div>             
+                </div>
+                
+                <div class="form-group">
+                  <label for="createDate" class="col-sm-2 control-label">发送时间：</label>
+                  <div class="col-sm-10">
+                    <input type="text"  value="" class="form-control pull-right" readonly id="sendtime">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="sendData" class="col-sm-2 control-label">状态：</label>
+                  <div class="col-sm-10">
+					<select name="example1_length" aria-controls="example1" id="state" class="form-control input-sm">
+	          		<option value="0">未删除</option>
+	          		<option value="1">已删除</option>
+	          		</select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="sendData" class="col-sm-2 control-label">图片类型：</label>
+                  <div class="col-sm-10">
+					<select name="example1_length" aria-controls="example1" id="type" class="form-control input-sm">
+	          		<option value="1">私信</option>
+	          		<option value="2">IM</option>
+	          		</select>
+                  </div>
+                </div>
+               
+                
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>
+              <button id="deletstate" type="button" onclick="batchdel()" class="btn btn-primary">删除</button>
+              </div>
+              <!-- /.box-footer -->
+            </form>
+          
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="messageimglist" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  <th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+                   <th>序号</th>
+                    <th>发件人</th>
+                    <th>发件人GaGaNo</th>
+                    <th>收件人</th>
+                    <th>收件人GaGaNo</th>
+                  <!--   <th>内容</th> -->
+                    <th>图片</th>
+                    <th>发送时间(UTC)</th>
+                    <th>删除状态</th>
+                   <!--  <th>删除时间</th> -->
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+
+
+<script type="text/javascript">
+$(function() {
+	$('#sendtime').daterangepicker({timePicker: true, timePickerIncrement: 30, format: 'YYYY-MM-DD HH:mm:ss', opens: "right"});
+	var date = new Date();
+	var lcdate = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" 00:00:00"
+	var now = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+	$("#sendtime").val(lcdate+" - "+now);
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+
+        $("#messageimglist").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": false,
+            "autoWidth": false,
+            "pageLength": 10,
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+            	var sender = $("#sender").val();
+            	var receiver = $("#receiver").val();
+            	var sendtime = $("#sendtime").val();
+            	var state = $("#state").val();
+            	var type = $("#type").val();
+            	
+            	aoData.push(
+            			{"name": "sender",  "value": sender},
+            			{"name": "receiver",  "value": receiver},
+            			{"name": "state",  "value": state},
+            			{"name": "type",  "value": type}
+            	);
+            	if(sendtime!=''){                	
+                	var tmp=sendtime.split(' - ');
+                	if(tmp.length==2){
+                		aoData.push({"name": "starttime",  "value": tmp[0]});
+                        aoData.push({"name": "endtime",  "value": tmp[1]});
+                	}
+                }
+                    //aoData=gagaidorname; 
+                /* var membNo = $("#membNo").val();
+                var content = $("#content").val();
+                var sendDate=$("#sendDate").val();
+                
+                aoData.push({"name": "membNo",  "value": membNo}); */
+                layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/massmessage/messageimglist",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "id",
+                "bSortable": false
+            },{
+                "data": null,
+                "bSortable": false
+            },{
+                "data": "sendname",
+                "bSortable": false
+            }, {
+                "data": "sendno",
+                "bSortable": false
+            }, {
+                "data": "readname",
+                "bSortable": false
+            }, {
+                "data": "readno",
+                "bSortable": false
+            },
+          /*   {
+                "data": "message",
+                "bSortable": false
+            }, */
+            {
+                "data": "filepath",
+                "bSortable": false
+            }, {
+                "data": "createdate",
+                "bSortable": false
+            }, {
+                "data": "isdelete",
+                "bSortable": false
+            }
+           /*  , {
+                "data": "meimAuditertime",
+                "bSortable": false
+            } */
+            ],
+             "columnDefs": [{
+                 "targets": 0,
+                 "data": "id",
+                 "render": function(data, type, full, meta) {
+                     return '<input type="checkbox" value="' + data + '" title="' + data + '" name="checkbox" />';
+                 }
+             },
+           /*   {
+                 "targets": 6,
+                 "data": "message",
+                 "render": function(data, type, full, meta) {
+                	 if(data==null||data==''){
+                		 return "";
+                	 }
+                     return data;
+                 }
+             }, */
+             {
+                 "targets": 6,
+                 "data": "filepath",
+                 "render": function(data, type, full, meta) {
+                	 return '<img style="width:100px;" alt="" src="' + data + '">';
+                 }
+             },{
+                 "targets": 7,
+                 "data": "createdate",
+                 "render": function(data, type, full, meta) {
+                	return data ? (new Date(data)).format('yyyy-MM-dd hh:mm:ss', true) : '';               	
+                 }
+             },{
+                 "targets": 8,
+                 "data": "isdelete",
+                 "render": function(data, type, full, meta) {
+                     if(data=="0"){
+                     	return "未删除";
+                     }else if(data=="1"){
+                    	 return "已删除";
+                     }else{
+                     	return data;
+                     }
+                 }
+             }
+           /*   ,{
+                "targets": 10,
+                "data": "meimAuditertime",
+                "render": function(data, type, full, meta) {
+                	return data ? (new Date(data)).format('yyyy-MM-dd hh:mm:ss', true) : '';
+                }
+            } */
+             ], 
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+            	$(".mailbox-messages input[type='checkbox']").iCheck({
+                    checkboxClass: 'icheckbox_flat-blue',
+                    radioClass: 'iradio_flat-blue'
+                });
+                $(".checkbox-toggle .fa").removeClass("fa-check-square-o").addClass('fa-square-o');
+                layer.closeAll();
+                /* if(!$(".Serial").html()){
+                    var th = '<th class="sorting_disabled Serial" rowspan="1" colspan="1" aria-label="序号">序号</th>';
+                    $(".sorting_asc").after(th);
+                }
+                $(".sorting_1").each(function(){
+                    var index = $(this).parent().index()+1;
+                    var td = '<td>'+index+'</td>';
+                    $(this).after(td)
+                })
+                if($(".dataTables_empty").html()){
+                	$(".dataTables_empty").attr("colspan","10")
+                } */
+            }
+        });
+        $(".checkbox-toggle").click(function() {
+            var clicks = $(this).data('clicks');
+            if (clicks) {
+                //$("#imgdata input[type='checkbox']").attr("checked",false);
+                //Uncheck all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+                $(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+            } else {
+                //$("#imgdata input[type='checkbox']").attr("checked",true);
+                //Check all checkboxes
+                $(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+                $(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+            }
+            $(this).data("clicks", !clicks);
+        });
+        
+        
+      //序号相关
+        var table = $('#messageimglist').DataTable();
+        table.on( 'order.dt search.dt', function () {
+        	//获取页信息
+        	//debugger
+        	var page=table.page.info();
+         	table.column(1, {}).nodes().each( function (cell, i) {
+                 cell.innerHTML =page.page*page.length+ i+1;
+             } );
+         } ).draw(); 
+    });
+});
+
+function search() {
+    $("#messageimglist").dataTable().fnDraw(true);
+    if($("#state").val()==1){
+    	  $("#deletstate").css('display','none');
+    }else{
+    	$("#deletstate").css('display','inline-block');
+    }
+}
+
+function refreshdata() {
+	$("#sender").val("");
+	$("#receiver").val("");
+	$("#starttime").val("");
+	$("#endtime").val("");
+	$("#content").val("");
+    $("#messagelist").dataTable().fnDraw(true);
+}
+
+//查看内容
+function lookcontent(content){
+	 $("#ModalLabel").text("查看内容");
+	 $("#bodycontent").html(content);
+	   $("#modalbutton").html('<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+	   $('#Modal').modal({
+		      keyboard: true
+	   });
+}
+//站内信
+function sentmail(id,type,fid){
+	  if(type==1){
+		   $("#ModalLabel").text("发站内信");
+		   $.ajax({
+				type : "post",
+				url : ctx+"/feedback/getmember",
+				dataType : "json",
+				data : {
+					"gagaid":id,
+					"fid":1
+				},
+				success : function(data) {
+					if(data.success){
+						$("#mailreceiver").val(data.obj.membNickname+"("+data.obj.membGagano+")");
+						$("#receivergagaid").val(data.obj.membGagaid);
+						$("#feedback").dataTable().fnDraw(false);
+					}
+				}
+			})
+		   //$("#mailsender").val('GaGaHi');
+		   $("#mailcontent").val('');
+		   var content = '<span>发件人：</span><input type="text" id="mailsender" value="GaGaHi"><br><br>'+
+		   '<span>收件人：</span><input type="text" readonly id="mailreceiver"><input type="hidden" id="receivergagaid"><br><br>'+
+		   '<span>内容：</span><span><textarea rows="3" cols="" id="mailcontent"></textarea></span>';
+		   $("#bodycontent").html(content);
+		   $("#modalbutton").html('<button type="button" onclick="sentmail('+id+',2)" class="btn btn-primary">发送  </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		   $('#Modal').modal({
+			      keyboard: true
+		   });
+	   }
+	  if(type==2){
+		  var content = $("#mailcontent").val();
+		  var gagaid = $("#receivergagaid").val();
+		  if(content==''){
+			  $("#errorbodycontent").html("请输入发送内容");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+			//$("#Modal").modal('hide');
+		  }else{
+			  //发送站内信
+			 $.ajax({
+					type : "post",
+					url : ctx+"/adminmember/sentmsg",
+					dataType : "json",
+					data : {
+						"gagaid":gagaid,
+						"content":content
+					},
+					success : function(data) {
+						$("#errorbodycontent").html("发送成功");
+						   $('#errorModal').modal({
+								keyboard : true
+							});
+						$("#Modal").modal('hide');
+					}
+				})
+		  }
+	  }
+}
+ 
+ //批量的还是女
+ function batchdel(){
+
+	    var id = "";
+	    var num = 0;
+	    var objs = $("#messageimglist div");
+	    for (var i = 0; i < objs.length; i++) {
+	        var obj = objs[i];
+	        var flag = $(obj).attr("aria-checked");
+	        if (flag == "true") {
+	            if (id.trim() != "") {
+	                num += 1;
+	                id += ","
+	            }
+	            id += $(obj).children("input").attr("value");
+	        }
+	    }
+	    if (id.trim() == "") {
+	    	$("#errorbodycontent").html("请选择需要操作的数据");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+	        return;
+	    }
+	    console.log(id);
+        if (!confirm("确认删除所选项吗？")) {
+            return;
+        }
+	    $.ajax({
+	        type: "post",
+	        url: ctx + "/massmessage/messageimgupdate",
+	        dataType: "json",
+	        data: {
+	            "ids": id
+	        },
+	        success: function(data) {
+	            if (data.success) {
+	                $("#messageimglist").dataTable().fnDraw(false);
+	            } else {
+	            	$("#errorbodycontent").html("操作失败");
+	       		   $('#errorModal').modal({
+	       				keyboard : true
+	       			});
+	            }
+	        }
+	    });
+ } 
+</script>
+

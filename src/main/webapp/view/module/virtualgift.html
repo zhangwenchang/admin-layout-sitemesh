@@ -1,0 +1,304 @@
+<style type="text/css">
+
+</style>
+<section class="content-header">
+	<h1>虚拟礼物记录管理<small></small></h1>
+	<ol class="breadcrumb">
+		<li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+		<li>模块管理</li>
+		<li class="active">虚拟礼物记录管理</li>
+	</ol>
+</section>
+<section class="content-main">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<form class="form-horizontal page-search-box">		
+				
+					<div class="box-body">
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">发件人:</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="purchasemember" placeholder="" aria-controls="example1">
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-2 control-label">收件人:</label>
+							<div class="col-sm-10">
+								<input type="text" class="form-control" id="receivemember" placeholder="" aria-controls="example1">
+							</div>
+						</div>
+					</div>
+							
+					<div class="box-footer">
+						<button type="button" class="btn btn-primary del-btn">删除</button>&nbsp;&nbsp;&nbsp;
+						<button type="button" class="btn btn-primary refresh-btn">刷新</button>&nbsp;&nbsp;&nbsp;						
+						<button type="button" class="btn btn-primary search-btn">查询</button>
+					</div>
+				</form>
+				<div class="box-body mailbox-messages">
+					<table id="datalist" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<th>序号</th>
+								<th><button class="btn btn-default btn-sm checkbox-toggle"><i class="fa fa-square-o"></i></button></th>
+								<th>订单号</th>
+								<th>类型</th>
+								<th>名称</th>
+								<th>礼物金币数</th>
+								<th>发送人</th>
+								<th>发送人ID</th>
+								<th>推广员</th>
+								<th>接收人</th>
+								<th>接收人ID</th>
+								<th>推广员</th>
+								<th>是否推广员</th>
+								<th>发送时间(UTC)</th>
+								<th>状态</th>
+								<!-- <th width="90">操作</th> -->
+							</tr>
+						</thead>
+						
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script type="text/javascript">
+$(function() {
+	console.log(1);
+	$.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js', '/plugins/daterangepicker/daterangepicker.js'], function() {
+				
+		var t = $("#datalist").dataTable({
+			"bStateSave": true,
+			"paging": true,
+			//"processing": true,
+			"serverSide": true,
+			"lengthChange": false,
+			"searching": false,
+			"ordering": true,
+			"info": true,
+			"autoWidth": false,
+			"pageLength": 10,
+			"fnServerData": function(sSource, aoData, fnCallback, oSettings) {				
+			 	var purchasemember = $("#purchasemember").val();
+			 	var receivemember = $("#receivemember").val();
+			 	if (purchasemember) {
+			 		aoData.push({"name":"purchasemember","value":purchasemember});
+			 	}
+			 	if (receivemember) {
+			 		aoData.push({"name":"receivemember","value":receivemember});
+			 	}
+	        	layer.load(1, {shade: 0.3});
+				oSettings.jqXHR = $.ajax({
+					"dataType": 'json',
+					"type": "POST",
+					"url": ctx + "/VirtualGiftRecord/list",
+					"data": aoData,
+					"success": fnCallback
+				});
+			},
+			"columns": [{
+				"data": "gvreId",
+				"bSortable": false
+				}, {
+				"data": "gvreId",
+				"bSortable": false
+				}, {
+				"data": "gvreId",
+				"bSortable": false
+				}, {
+				"data": "gvreType",
+				"bSortable": false
+				}, {
+				"data": "gvreGiftname",
+				"bSortable": false
+				}, {
+				"data": "giftvirtual.giviGold", //礼物原价
+				"bSortable": false
+				}, {
+				"data": "memberFrom.membNickname",
+				"bSortable": false
+				}, {
+				"data": "memberFrom.membGagano",
+				"bSortable": false
+				}, {
+				"data": "smp.sysUser.syusUsername",
+				"bSortable": false
+				}, {
+				"data": "memberTo.membNickname",
+				"bSortable": false
+				}, {
+				"data": "memberTo.membGagano",
+				"bSortable": false
+				}, {
+				"data": "smr.sysUser.syusUsername",
+				"bSortable": false
+				}, {
+				"data": "istgy",
+				"bSortable": false
+				}, {
+				"data": "gvreTime",
+				"bSortable": false
+				}, {
+				"data": "gvreState",
+				"bSortable": false
+				}/* ,  {
+				"data": "gvreId",
+				"bSortable": false
+			} */], 
+			"columnDefs": [
+				{
+					"targets": 1,
+					"render": function(data, type, full, meta) {
+						return '<input type="checkbox" value="' + data + '" title="' + data + '" name="withId" />';
+					}
+				},
+				{
+					"targets": 3,
+					"render": function(data, type, full, meta) {
+						return data == 1 ? "虚拟礼物":"翻译包";
+					}
+				},
+				{
+					"targets": 5,
+					"render": function(data, type, full, meta) {
+						if(null ==full.giftvirtual.giviGold ||""==full.giftvirtual.giviGold){
+							return 0;
+						}else{
+							return data;
+						}
+					}
+				},
+				{
+					"targets": 8,
+					"render": function(data, type, full, meta) {
+						if(null == full.smp || null == full.smp.sysUser || null == full.smp.sysUser.syusUsername){
+							return "";
+						}else{
+							return data;
+						}
+					}
+				},
+				{
+					"targets": 11,
+					"render": function(data, type, full, meta) {
+						if(null == full.smr || null == full.smr.sysUser || null == full.smr.sysUser.syusUsername){
+							return "";
+						}else{
+							return data;
+						}
+					}
+				},
+				{
+					"targets": 12,
+					"render": function(data, type, full, meta) {
+						return data == 2 ? "是":"否";
+					}
+				},
+				{
+					"targets": 13,
+					"render": function(data, type, full, meta) {
+						var dstr='';
+						if(data!=null){
+							dstr=new Date(data).format('yyyy-MM-dd hh:mm:ss');
+						}
+						return dstr;
+					}
+				},
+				{
+					"targets": 14,
+					"render": function(data, type, full, meta) {
+						return data == 1 ? "正常":"已删除";
+					}
+				}/* ,
+				{
+	                "targets": 15,
+	                "data": "grre_id",
+	                "render": function(data, type, full, meta) {
+	                	var lnks='<a href="javascript:edit('+data+', 1);">发货</a>';
+	                	lnks+='&nbsp;&nbsp;<a href="javascript:edit('+data+', 2);">到货</a><br>';
+	                	lnks+='<a href="javascript:edit('+data+', 3);">取消发货</a>';
+	                    return lnks;
+	                }
+            	} */
+			],
+			"fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数
+				$(".mailbox-messages input[type='checkbox']").iCheck({
+					checkboxClass: 'icheckbox_flat-blue',
+					radioClass: 'iradio_flat-blue'
+				});
+				layer.closeAll();
+				$("#tableData .fa").removeClass('fa-check-square-o').addClass('fa-square-o');
+			}
+		});
+
+		//序号相关 .draw()
+		var table = $('#datalist').DataTable();
+		table.on( 'order.dt search.dt', function () {
+			//获取页信息
+			//debugger
+			var page = table.page.info();
+			table.column(0, {}).nodes().each( function (cell, i) {
+				cell.innerHTML = page.page * page.length + i + 1;
+			});
+		});
+
+		$(".checkbox-toggle").click(function() {
+			var clicks = $(this).data('clicks');
+			if (clicks) {
+				$(".mailbox-messages input[type='checkbox']").iCheck("uncheck");
+				$(".fa", this).removeClass("fa-check-square-o").addClass('fa-square-o');
+			} else {
+				$(".mailbox-messages input[type='checkbox']").iCheck("check").add("checked");
+				$(".fa", this).removeClass("fa-square-o").addClass('fa-check-square-o');
+			}
+			$(this).data("clicks", !clicks);
+		});
+
+		$('.del-btn').click(function() {
+			var chk_value =[]; 
+			$('input[name="withId"]:checked').each(function(){ 
+				chk_value.push($(this).val()); 
+			}); 
+			if(chk_value.length==0){
+				$.msg("请选择要删除的礼物");
+			}else{    
+			    var delIndex = layer.confirm('确定要删除选定的礼物吗？', function() {			    	
+			      	doPost("VirtualGiftRecord/del", {"ids[]":chk_value},userDelHd,errorHd);
+			      	layer.close(delIndex);
+			    });		
+			}
+		});
+
+		$('.refresh-btn').click(function() {
+			$('#purchasemember').val('');
+			$('#receivemember').val('');
+			$("#datalist").dataTable().fnDraw(false);
+		});
+
+		$('.search-btn').click(function() {
+			$("#datalist").dataTable().fnDraw(true);			
+		});
+
+	});
+	
+});
+function userDelHd(data){
+		if(data.success){
+			$("#datalist").dataTable().fnDraw(false);
+		}else{
+			layer.msg(data.msg, {time: 1000});
+		}	
+	}
+	function errorHd(xreq){	 
+		layer.msg(xreq.statusText+"["+xreq.status+"]", {time: 1000});
+	}
+	function edit(id, type){
+		if (id && type) {
+			var newType = (type == 3? 0 : type);
+			doPost("RealgiftController/openEdit", {"id":id, "grreOrderstate": newType}, userDelHd, errorHd);
+		}		
+	}
+</script>

@@ -1,0 +1,951 @@
+
+<style type="text/css">
+.page-search-box .form-group {
+	width: 50%;
+	float: left;
+}
+
+.page-search-box .form-group .form-control {
+	height: 30px;
+}
+
+.jingque {
+	position: absolute;
+	top: 29px;
+	left: 15px;
+	font-size: 11px;
+	line-height: 11px;
+}
+
+.jingque input {
+	position: relative;
+	top: -2px;
+}
+
+.higher-group {
+	height: 30px;
+}
+
+.relative-top6 {
+	position: relative;
+	top: 6px;
+}
+
+.edit-member-ul li {
+	list-style-type: none;
+}
+
+.edit-member-ul li .labels {
+	display: inline-block;
+	width: 112px;
+}
+
+.edit-member-ul li input, .edit-member-ul li select {
+	width: 137px;
+	margin-right: 12px;
+}
+
+</style>
+<style>
+.clearfix:after{height: 0;overflow:hidden; clear: both;display: block;}
+.dataTables_wrapper { position: relative; }
+.dataTables_wrapper .dataTables_length { position: absolute; top: 2px; left: 80px;  }
+.modal .dataTables_wrapper .dataTables_length { position: relative; left: 0; top: 0; }
+.DTTT_button_copy, .DTTT_button_csv, .DTTT_button_pdf, .DTTT_button_print { display: none; }
+</style>
+<section class="content">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="box">
+				<form class="form-horizontal page-search-box" id="queryForm">
+					<div class="box-body">
+						<div class="form-group">
+								<label for="membNo" class="col-sm-3 control-label">表情包 :</label>
+								<div class="col-sm-9">
+									<select aria-controls="example1" id="id" class="form-control input-sm">
+										
+									</select>
+								</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">状态 :</label>
+							<div class="col-sm-9">
+								<select name="status" aria-controls="example1"
+									id="status" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="0">待上线</option>
+									<option value="1">上线</option>
+									<option value="2">下架</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">语言:</label>
+							<div class="col-sm-9">
+								<select name="langId" id="langId"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="zh-cn">中文</option>
+									<option value="en-us">英文</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">是否免费:</label>
+							<div class="col-sm-9">
+								<select name="langId" id="free"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="1">是</option>
+									<option value="0">否</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="membNo" class="col-sm-3 control-label">是否推荐:</label>
+							<div class="col-sm-9">
+								<select id="recommend"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="">不限</option>
+									<option value="1">是</option>
+									<option value="0">否</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="box-footer">
+						<button type="button" onclick="search()" class="btn btn-primary search-btn">查询</button>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-primary" onclick="addView()">添加</button>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-primary" id="refreshRedisBtn" onclick="refreshRedis()">同步缓存</button>
+					</div>
+				</form>
+
+				<!-- /.box-header -->
+				<div class="box-body mailbox-messages">
+					<table id="memberinfo" class="table table-bordered table-hover">
+						<thead>
+							<tr>
+								<!-- <th>序号</th> -->
+								<th>表情ID</th>
+								<th>名称</th>
+								<th>logo</th>
+								<th>展示图</th>
+								<th>是否免费</th>
+								<th>是否推荐</th>
+								<th>排序</th>
+								<th>价格</th>
+								<th>是否上线</th>
+								<th>语言</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+
+					</table>
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</div>
+
+		<!-- /.box -->
+	</div>
+	<!-- /.col -->
+	</div>
+	<!-- /.row -->
+</section>
+<!-- /.content -->
+</div>
+
+<!-- 禁用模态框（Modal） -->
+<!--列表数据弹框  -->
+<!-- <div class="modal fade" id="listModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body">
+            	在这里添加一些文本
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div>/.modal-content
+</div>/.modal
+</div> -->
+
+
+<!-- 更新弹窗 -->
+<div class="modal fade" id="emoticonModifyModal" tabindex="-1" user="dialog"
+	 aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" >添加表情包</h4>
+			</div>
+			<div class="modal-body" id="userAddModalCon">
+				<!-- 模态内容 -->
+				<form user="form">
+					<div class="box-body">
+						<div class="form-group">
+							<label for="userName">表情包ID：</label> <input type="text"
+								class="form-control" id="id" readonly="readonly">
+						</div>
+						<div class="form-group">
+							<label for="realName">语言：</label><select id="langId"
+									aria-controls="example1" class="form-control input-sm" readonly="readonly">
+									<option value="zh-cn">中文</option>
+									<option value="en-us">英文</option>
+								</select>
+						</div>
+						<div class="form-group">
+							<label for="realName">表情包名：</label> <input type="text"
+								class="form-control" id="name" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="realName">描述：</label> <textarea class="form-control" rows="2" id="description" maxlength="200"></textarea>
+						</div>
+						<div class="form-group">
+							<label for="banner">表情包logo：</label> <img id="logoImgModify" style="width:100px;" alt="" src=""><input type="file" id="logoImgFile"   style="width:200px" onchange="upload(this, $('#logoImgModify'), $('#logoImgModifyText'))"></input>
+							<input type="text"	class="form-control" id="logoImgModifyText" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">APPbanner：</label> <img id="bannerImgModify" style="width:100px;" alt="" src=""><input type="file" id="bannerImgFile"  style="width:200px" onchange="upload(this, $('#bannerImgModify'), $('#bannerImgModifyText'))"></input>
+							<input type="text"	class="form-control" id="bannerImgModifyText" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">APPbanner推荐：</label> <img id="bannerTjImgModify" style="width:100px;" alt="" src=""><input type="file" id="bannerTjImgFile"  style="width:200px" onchange="upload(this, $('#bannerTjImgModify'), $('#bannerTjImgModifyText'))"></input>
+							<input type="text"	class="form-control" id="bannerTjImgModifyText" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">PC表情商店：</label> <img id="bannerImgModifyPc" style="width:100px;" alt="" src=""><input type="file" id="bannerImgFilePc"  style="width:200px" onchange="upload(this, $('#bannerImgModifyPc'), $('#bannerImgModifyTextPc'))"></input>
+							<input type="text"	class="form-control" id="bannerImgModifyTextPc" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">PC给他惊喜表情TAB：</label> <img id="bannerTjImgModifyPc" style="width:100px;" alt="" src=""><input type="file" id="bannerTjImgFilePc"  style="width:200px" onchange="upload(this, $('#bannerTjImgModifyPc'), $('#bannerTjImgModifyTextPc'))"></input>
+							<input type="text"	class="form-control" id="bannerTjImgModifyTextPc" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="realName">价格：</label> <input type="text"
+								class="form-control" id="price" value="0" placeholder="免费为0">
+						</div>
+						<div class="form-group">
+							<label for="realName">推荐：</label><select id="recommend"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="1">是</option>
+									<option value="0" selected="selected">否</option>
+								</select>
+						</div>
+						<div class="form-group">
+							<label for="realName">排序：</label> <input type="text"
+								class="form-control" id="sort" value="0">
+						</div>
+						<div class="form-group">
+							<label for="realName">e_type：</label> <input type="text"
+								class="form-control" id="eType" >
+						</div>
+						<div class="form-group">
+							<label for="realName">ios_id：</label> <input type="text"
+								class="form-control" id="iosId" >
+						</div>
+						<div class="form-group">
+							<label for="realName">状态：</label><select id="status"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="0">待上线</option>
+									<option value="1">上线</option>
+									<option value="2">下架</option>
+								</select>
+						</div>
+					</div>
+					<!-- /.box-body -->
+
+					<div class="box-footer"></div>
+				</form>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"	field="closeModal">关闭</button>
+				<button type="button" class="btn btn-primary" id="emoticonModifySubmit">提交</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- 添加弹窗 -->
+<div class="modal fade" id="emoticonAddModal" tabindex="-1" user="dialog"
+	 aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title" >添加表情包</h4>
+			</div>
+			<div class="modal-body">
+				<!-- 模态内容 -->
+				<form>
+					<div class="box-body">
+						<div class="form-group">
+							<label for="userName">表情包ID：</label> <input type="text"
+								class="form-control" id="id" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="realName">语言：</label><select id="langId"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="zh-cn">中文</option>
+									<option value="en-us">英文</option>
+								</select>
+						</div>
+						<div class="form-group">
+							<label for="realName">表情包名：</label> <input type="text"
+								class="form-control" id="name" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="realName">描述：</label> <textarea class="form-control" rows="2" id="description" maxlength="200"></textarea>
+						</div>
+						<div class="form-group">
+							<label for="banner">表情包logo：</label> <img id="logoImgAdd" style="width:100px;" alt="" src=""><input type="file" id="logoImgFile"   style="width:200px" onchange="upload(this, $('#logoImgAdd'), $('#logoImgAddText'))"></input>
+							<input type="text"	class="form-control" id="logoImgAddText" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">APPbanner：</label> <img id="bannerImgAdd" style="width:100px;" alt="" src=""><input type="file" id="bannerImgFile"  style="width:200px" onchange="upload(this, $('#bannerImgAdd'), $('#bannerImgAddText'))"></input>
+							<input type="text"	class="form-control" id="bannerImgAddText" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">APPbanner推荐：</label> <img id="bannerTjImgAdd" style="width:100px;" alt="" src=""><input type="file" id="bannerTjImgFile"  style="width:200px" onchange="upload(this, $('#bannerTjImgAdd'), $('#bannerTjImgAddText'))"></input>
+							<input type="text"	class="form-control" id="bannerTjImgAddText" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">PC表情商店：</label> <img id="bannerImgAddPc" style="width:100px;" alt="" src=""><input type="file" id="bannerImgFilePc"  style="width:200px" onchange="upload(this, $('#bannerImgAddPc'), $('#bannerImgAddTextPc'))"></input>
+							<input type="text"	class="form-control" id="bannerImgAddTextPc" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">PC给他惊喜表情TAB：</label> <img id="bannerTjImgAddPc" style="width:100px;" alt="" src=""><input type="file" id="bannerTjImgFilePc"  style="width:200px" onchange="upload(this, $('#bannerTjImgAddPc'), $('#bannerTjImgAddTextPc'))"></input>
+							<input type="text"	class="form-control" id="bannerTjImgAddTextPc" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="realName">价格：</label> <input type="text"
+								class="form-control" id="price" value="0" placeholder="免费为0">
+						</div>
+						<div class="form-group">
+							<label for="realName">推荐：</label><select id="recommend"
+									aria-controls="example1" class="form-control input-sm">
+									<option value="1">是</option>
+									<option value="0" selected="selected">否</option>
+								</select>
+						</div>
+						<div class="form-group">
+							<label for="realName">排序：</label> <input type="text"
+								class="form-control" id="sort" value="0">
+						</div>
+						<div class="form-group">
+							<label for="realName">e_type：</label> <input type="text"
+								class="form-control" id="eType" >
+						</div>
+						<div class="form-group">
+							<label for="realName">ios_id：</label> <input type="text"
+								class="form-control" id="iosId" >
+						</div>
+					</div>
+				</form>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"	field="closeModal">关闭</button>
+				<button type="button" class="btn btn-primary" id="emoticonAddSubmit">提交</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+<!-- 添加素材弹窗 -->
+<div class="modal fade" id="detailAddModal" tabindex="-1" user="dialog"
+	aria-labelledby="detailAddModal" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 class="modal-title">添加表情素材</h4>
+			</div>
+			<div class="modal-body">
+				<!-- 模态内容 -->
+				<form>
+					<div class="box-body">
+						<div class="form-group">
+							<label for="realName">表情包ID：</label><input type="text"
+								class="form-control" id="emoticonId" readonly="readonly">
+						</div>
+						<div class="form-group">
+							<label for="realName">中文名：</label> <input type="text"
+								class="form-control" id="langZh" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="realName">英文名：</label> <input type="text"
+								class="form-control" id="langEn" placeholder="">
+						</div>
+						<div class="form-group">
+							<label for="banner">表情图片：</label> <img id="imgUrl" style="width:100px;" alt="" src=""><input type="file"  id="imgUrlFile"  style="width:200px" onchange="upload(this, $('#imgUrl'))"></input>
+						</div>
+					</div>
+				</form>
+				<!-- /模态内容 -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal"	field="closeModal">关闭</button>
+				<button type="button" class="btn btn-primary" id="detailAddSubmit">提交</button>
+			</div>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+</div>
+</div>
+<script>
+	$(function() {
+		$.ajax({
+			url : ctx + "/emoticon/getAll",
+			success : function(data) {
+				if (data.success) {
+					var _html = '<option value="">-不限-</option>';
+					var _head = '<option value="';
+					var _end = '</option>';
+					var _list = data.obj;
+					for(var i=0;i<_list.length;i++){
+						var _e = _list[i];
+						
+						_html += _head;
+						_html += _e.id;
+						_html += '">';
+						_html += _e.name;
+						_html += _end;
+					}
+					$("#queryForm").find("#id").html(_html)
+				}
+			}
+		});
+		$.addFields([
+					'/plugins/datatables/dataTables.bootstrap.min.js',
+					'/plugins/iCheck/icheck.min.js',
+			        '/plugins/datatables/extensions/TableTools/js/dataTables.tableTools.min.js',     
+					'/plugins/datepicker/datepicker3.css',
+					'/plugins/datepicker/bootstrap-datepicker.js',
+					'/plugins/daterangepicker/daterangepicker-bs3.css',
+					'/plugins/daterangepicker/daterangepicker.js' ],
+					function() {
+					var tabs = $("#memberinfo").dataTable({
+								//"bProcessing": true,
+								// "bServerSide": true,
+								"bStateSave" : true, //保存客户端搜索条件等状态
+								"paging" : false, //是否开启本地分页
+								//"processing": true,   正在处理
+								"serverSide" : true, //加载就请求后台
+								"lengthChange" : false, //是否允许用户修改每页显示条数
+								"searching" : false, //是否启用本地搜索
+								"ordering" : true, //是否排序
+								"info" : true, //是否显示左下角表格信息
+								"autoWidth" : false, //自适应宽度
+								"pageLength" : 10,
+								//"ajax" : ctx+"/adminmember/notauditedimgList",
+								"fnServerData" : function(
+										sSource, aoData,
+										fnCallback, oSettings) { //从服务器返回数据
+									var membNickname = $(
+											"#membNickname")
+											.val();
+									var ischeck = $("#nolike")
+											.is(':checked');
+									var nolike = "";
+									if (ischeck) {
+										nolike = 1
+									}
+									var queryForm = $("#queryForm");
+									var _id = queryForm.find("#id").val();
+									var _name = queryForm.find("#name").val();
+									var _status = queryForm.find("#status").val();
+									var _langId = queryForm.find("#langId").val();
+									var _free = queryForm.find("#free").val();
+									aoData.push(
+												{"name" : "id","value" : _id},
+												{"name" : "name","value" : _name},
+												{"name" : "status","value" : _status},
+												{"name" : "langId","value" : _langId},
+												{"name" : "free","value" : _free},
+												{"name" : "recommend","value" : queryForm.find("#recommend").val()}
+												)
+													layer.load(1, {
+														shade : 0.3
+													}); //加遮罩层
+													oSettings.jqXHR = $.ajax({
+														"dataType" : 'json',
+														"type" : "post",
+														"url" : ctx + "/emoticon/list",
+														"data" : aoData,
+														"success" : fnCallback
+													});
+												},
+												"columns" : [
+															/* {"data": "序号","bSortable": false ,"render": function ( data, type, full, meta ) {
+																	 return '';
+															}}, */
+															{"data": "id","bSortable": false},
+															{"data": "name","bSortable": false },
+															{"data": "logo","bSortable": false,"render": function ( data, type, full, meta ) {
+																	 return '<img style="width:100px;" alt="" src="'+data+'" />';
+															}},
+															{"data": "null","bSortable": false,"render": function ( data, type, full, meta ) {
+																 var _detailList = full.detailList;
+																 var _table = '<table>';
+																 var _len = _detailList.length;
+																 var _tr = "<tr>";
+																 
+																/*  for(var i=0;i<_len;i++){
+																	 var _detail = _detailList[i];
+																	 _tr += ("<td><img style='width:50px;' alt='' src='"+_detail.imgUrl+"' /></td>");
+																 }
+																 _tr += "</tr>"; */
+																 
+																 if(_len==0){
+																	 _tr += "</tr>";
+																 }else{
+																	 for(var i=1;i<=_len;i++){
+																		 var _detail = _detailList[i-1];
+																		 _tr += ("<td><img style='width:50px;' alt='' src='"+_detail.imgUrl+"' /></td>");
+																		 
+																		 if(i%5==0 && i!=_len){
+																			 _tr += "</tr><tr>";
+																		 }else if(i%5==0 && i==_len){
+																			 _tr += "</tr>";
+																		 }
+																	 }
+																 }
+																 _table += _tr;
+																 _table += '</table>';
+																 return _table;
+															}},
+															{"data": "freeEmoticon","bSortable": false,"render": function ( data, type, full, meta ) {
+																	if("1" == data){
+																		return "是";
+																	}else{
+																		return "否";
+																	}
+															}},
+															{"data": "recommend","bSortable": false,"render": function ( data, type, full, meta ) {
+																if("1" == data){
+																	return "是";
+																}else{
+																	return "否";
+																}
+															}},
+															{"data": "sort","bSortable": false},
+															{"data": "price","bSortable": false},
+															{"data": "status","bSortable": false,"render": function ( data, type, full, meta ) {
+																if("0" == data){
+																	return "待上线";
+																}else if("1" == data){
+																	return "已上线";
+																}else if("2" == data){
+																	return "已下架";
+																}
+															}},
+															{"data": "langId","bSortable": false},
+															{"data": "操作","bSortable": false,"render": function ( data, type, full, meta ) {
+																	 return '<a href="javascript:void(0)" onclick="detailAddView('+ full.id +')">追加素材</a> |<a href="javascript:void(0)" onclick="modifyView('+ full.id +',\''+ full.langId +'\')">编辑</a> | <a href="javascript:void(0)" onclick="deleteView('+ full.id +',\''+ full.langId +'\')">删除</a>';
+															}}
+														],
+												"columnDefs" : [
+														],
+												"fnDrawCallback" : function(oSettings) {//这个应该是重绘的回调函数
+													layer.closeAll();													
+												}
+											});
+							//序号相关
+							/* var table = $('#memberinfo').DataTable();
+							table.on('order.dt search.dt',function() {
+								//获取页信息
+								var page = table.page.info();
+								table.column(0, {}).nodes().each(function(cell, i) {
+									cell.innerHTML = page.page* page.length + i+ 1;
+								});
+							}).draw(); */
+
+						})
+						
+		//保存				
+		$("#emoticonAddSubmit").click(function(){
+			var _emoticonAddModal = $("#emoticonAddModal");
+			var _id = _emoticonAddModal.find("#id").val();
+			var _langId = _emoticonAddModal.find("#langId").val();
+			var _name = _emoticonAddModal.find("#name").val();
+			var _logo = _emoticonAddModal.find("#logoImgAddText").val();
+			var _banner = _emoticonAddModal.find("#bannerImgAddText").val();
+			var _bannerTj = _emoticonAddModal.find("#bannerTjImgAddText").val();
+			var _recommend = _emoticonAddModal.find("#recommend").val();
+			var _price = _emoticonAddModal.find("#price").val();
+			var _sort = _emoticonAddModal.find("#sort").val();
+			var _description = _emoticonAddModal.find("#description").val();
+			var _eType = _emoticonAddModal.find("#eType").val();
+			var _iosId = _emoticonAddModal.find("#iosId").val();
+			var _bannerPc = _emoticonAddModal.find("#bannerImgAddTextPc").val();
+			var _bannerTjPc = _emoticonAddModal.find("#bannerTjImgAddTextPc").val();
+			var data = {};
+			data["id"]= _id;
+			data["langId"]= _langId;
+			data["name"]= _name;
+			data["logo"]= _logo;
+			data["banner"]= _banner;
+			data["bannerTj"]= _bannerTj;
+			data["recommend"]=_recommend;
+			data["price"]= _price;
+			data["sort"]= _sort;
+			data["eType"]=_eType;
+			data["iosId"]= _iosId;
+			data["description"]= _description;
+			data["bannerPc"]= _bannerPc;
+			data["bannerTjPc"]= _bannerTjPc;
+			$.ajax({
+				url : ctx+ "/emoticon/save",
+				type : 'post',
+				dataType : "json",
+				data : data,
+				success : function(data) {
+					$('#emoticonAddModal').modal("hide");
+					if (data.success) {
+						alert("操作成功");
+						search();
+					}else{
+						alert("操作失败");
+					}
+				}
+			})
+		})
+		//更新				
+		$("#emoticonModifySubmit").click(function(){
+			var _emoticonModifyModal = $("#emoticonModifyModal");
+			var _id = _emoticonModifyModal.find("#id").val();
+			var _langId = _emoticonModifyModal.find("#langId").val();
+			var _name = _emoticonModifyModal.find("#name").val();
+			var _logo = _emoticonModifyModal.find("#logoImgModifyText").val();
+			var _banner = _emoticonModifyModal.find("#bannerImgModifyText").val();
+			var _bannerTj = _emoticonModifyModal.find("#bannerTjImgModifyText").val();
+			var _recommend = _emoticonModifyModal.find("#recommend").val();
+			var _price = _emoticonModifyModal.find("#price").val();
+			var _sort = _emoticonModifyModal.find("#sort").val();
+			var _eType = _emoticonModifyModal.find("#eType").val();
+			var _iosId = _emoticonModifyModal.find("#iosId").val();
+			var _status = _emoticonModifyModal.find("#status").val();
+			var _description = _emoticonModifyModal.find("#description").val();
+			var _bannerPc = _emoticonModifyModal.find("#bannerImgModifyTextPc").val();
+			var _bannerTjPc = _emoticonModifyModal.find("#bannerTjImgModifyTextPc").val();
+			var data = {};
+			data["id"]= _id;
+			data["langId"]= _langId;
+			data["name"]= _name;
+			data["logo"]= _logo;
+			data["banner"]= _banner;
+			data["bannerTj"]= _bannerTj;
+			data["recommend"]=_recommend;
+			data["price"]= _price;
+			data["sort"]= _sort;
+			data["eType"]=_eType;
+			data["iosId"]= _iosId;
+			data["status"]= _status;
+			data["description"]= _description;
+			data["bannerPc"]= _bannerPc;
+			data["bannerTjPc"]= _bannerTjPc;
+			$.ajax({
+				url : ctx+ "/emoticon/modify",
+				dataType : "json",
+				type : 'post',
+				data : data,
+				success : function(data) {
+					$('#emoticonModifyModal').modal("hide");
+					if (data.success) {
+						alert("操作成功");
+						search();
+					}else{
+						alert("操作失败");
+					}
+				}
+			})
+		})
+		$("#detailAddSubmit").click(function(){
+			var data = {};
+			var saveForm = $("#detailAddModal");
+			var _emoticonId = saveForm.find("#emoticonId").val();
+			var _langEn = saveForm.find("#langEn").val();
+			var _langZh = saveForm.find("#langZh").val();
+			var _imgUrl = saveForm.find("#imgUrl").attr("src");
+			data["emoticonId"]= _emoticonId;
+			data["langEn"]= _langEn;
+			data["langZh"]= _langZh;
+			data["imgUrl"]= _imgUrl;
+			$.ajax({
+				url : ctx+ "/emoticon/detail/save",
+				dataType : "json",
+				type : 'post',
+				data : data,
+				success : function(data) {
+					$('#detailAddModal').modal("hide");
+					if (data.success) {
+						alert("操作成功");
+						search();
+					}else{
+						alert("操作失败");
+					}
+				}
+			})
+		})
+		
+		$('#emoticonAddModal').on('hide.bs.modal', function () {
+		  	$(this).find("#id").val('');
+		  	$(this).find("#name").val('');
+		  	$(this).find("#description").val('');
+		  	$(this).find("#logoImgAdd").attr("src","");
+		  	$(this).find("#bannerImgAdd").attr("src","");
+		  	$(this).find("#bannerImgAddPc").attr("src","");
+		  	$(this).find("#bannerTjImgAdd").attr("src","");
+		  	$(this).find("#bannerTjImgAddPc").attr("src","");
+		  	$(this).find("#logoImgAddText").val("");
+		  	$(this).find("#logoImgAddTextPc").val("");
+		  	$(this).find("#bannerImgAddText").val("");
+		  	$(this).find("#bannerImgAddTextPc").val("");
+		  	$(this).find("#bannerTjImgAddText").val("");
+		  	$(this).find("#bannerTjImgAddTextPc").val("");
+		  	$(this).find("#price").val(0);
+		  	$(this).find("#recommend").val(0);
+		  	$(this).find("#sort").val('');
+		  	$(this).find("#logoImgFile").val('');
+		  	$(this).find("#bannerImgFile").val('');
+		  	$(this).find("#bannerImgFilePc").val('');
+		  	$(this).find("#bannerTjImgFile").val('');
+		  	$(this).find("#bannerTjImgFilePc").val('');
+		  	$(this).find("#eType").val('');
+		  	$(this).find("#iosId").val('');
+		})
+		$('#detailAddModal').on('hide.bs.modal', function () {
+		  	$(this).find("#emoticonId").val('');
+		  	$(this).find("#langZh").val('');
+		  	$(this).find("#langEn").val('');
+		  	$(this).find("#imgUrl").attr("src","");
+		  	$(this).find("#imgUrlFile").val('');
+		})
+		$('#emoticonModifyModal').on('hide.bs.modal', function () {
+		  	$(this).find("#id").val('');
+		  	$(this).find("#name").val('');
+		  	$(this).find("#description").val('');
+		  	$(this).find("#logoImgModify").attr("src","");
+		  	$(this).find("#bannerImgModify").attr("src","");
+		  	$(this).find("#bannerImgModifyPc").attr("src","");
+		  	$(this).find("#bannerTjImgModify").attr("src","");
+		  	$(this).find("#bannerTjImgModifyPc").attr("src","");
+		  	
+		  	$(this).find("#logoImgModifyText").val("");
+		  	$(this).find("#bannerImgModifyText").val("");
+		  	$(this).find("#bannerImgModifyTextPc").val("");
+		  	$(this).find("#bannerTjImgModifyText").val("");
+		  	$(this).find("#bannerTjImgModifyTextPc").val("");
+		  	
+		  	$(this).find("#price").val(0);
+		  	$(this).find("#recommend").val(0);
+		  	$(this).find("#sort").val('');
+		  	$(this).find("#logoImgModify").val('');
+		  	$(this).find("#bannerImgModify").val('');
+		  	$(this).find("#bannerImgModifyPc").val('');
+		  	$(this).find("#bannerTjImgModify").val('');
+		  	$(this).find("#bannerTjImgModifyPc").val('');
+		  	$(this).find("#eType").val('');
+		  	$(this).find("#iosId").val('');
+		})
+		
+	});
+	
+	function search() {
+		// $("#memberinfo").dataTable();
+		$("#memberinfo").dataTable().fnDraw(true);
+	}
+	
+	/**
+	 * 新增窗口
+	 */
+	function addView(){
+		$('#emoticonAddModal').modal({
+		    keyboard: true
+		});
+	}
+	/**
+	 * 更新窗口
+	 */
+	 function modifyView(id, langId){
+			$.ajax({
+				url : ctx + "/emoticon/getById",
+				type : 'post',
+				data : {
+					"id" : id,
+					"langId" : langId,
+				},
+				success : function(data) {
+					if (data.success) {
+						var _obj = data.obj;
+						var _modifyModal = $("#emoticonModifyModal");
+						_modifyModal.find("#id").val(_obj.id);
+						_modifyModal.find("#langId").val(_obj.langId);
+						_modifyModal.find("#name").val(_obj.name);
+						_modifyModal.find("#logoImgModify").attr("src",_obj.logo);
+						_modifyModal.find("#logoImgModifyText").val(_obj.logo);
+						
+						_modifyModal.find("#bannerImgModify").attr("src",_obj.banner);
+						_modifyModal.find("#bannerImgModifyText").val(_obj.banner);
+						_modifyModal.find("#bannerImgModifyPc").attr("src",_obj.bannerPc);
+						_modifyModal.find("#bannerImgModifyTextPc").val(_obj.bannerPc);
+						
+						_modifyModal.find("#bannerTjImgModify").attr("src",_obj.bannerTj);
+						_modifyModal.find("#bannerTjImgModifyText").val(_obj.bannerTj);
+						_modifyModal.find("#bannerTjImgModifyPc").attr("src",_obj.bannerTjPc);
+						_modifyModal.find("#bannerTjImgModifyTextPc").val(_obj.bannerTjPc);
+						
+						_modifyModal.find("#recommend").val(_obj.recommend);
+						_modifyModal.find("#price").val(_obj.price);
+						_modifyModal.find("#status").val(_obj.status);
+						_modifyModal.find("#sort").val(_obj.sort);
+						_modifyModal.find("#eType").val(_obj.eType);
+						_modifyModal.find("#iosId").val(_obj.iosId);
+						_modifyModal.find("#description").val(_obj.description);
+						$('#emoticonModifyModal').modal({
+						    keyboard: true
+						});
+					}else{
+						alert("操作失败");
+					}
+				}
+			});
+		}
+	/**
+	 * 删除窗口
+	 */
+	function deleteView(id,langId){
+		if (!confirm("确认删除此会员相关信息吗？")) {
+			return;
+		}
+		$.ajax({
+			url : ctx + "/emoticon/delete",
+			type : 'post',
+			data : {
+				"id" : id,
+				"langId" : langId,
+			},
+			success : function(data) {
+				if (data.success) {
+					alert("操作成功");
+					search();
+				}else{
+					alert("操作失败");
+				}
+			}
+		});
+	}
+	function refreshRedis(){
+		$("#refreshRedisBtn").attr("disabled", true);
+		$.ajax({
+			url : ctx + "/emoticon/refreshCache",
+			success : function(data) {
+				if (data.success) {
+					alert("操作成功");
+				}else{
+					alert("操作失败");
+				}
+				$("#refreshRedisBtn").attr("disabled", false);
+			}
+		});
+	}
+	/**
+	 * 追加素材窗口
+	 */
+	function detailAddView(emoticonId){
+		var detailAddModal = $("#detailAddModal");
+		detailAddModal.find("#emoticonId").val(emoticonId);
+		$('#detailAddModal').modal({
+		    keyboard: true
+		});
+	}
+	
+	/**
+	 * 七牛上传图片
+	 */
+	//var Qiniu_UploadUrl = "http://up.qiniu.com";
+	var Qiniu_UploadUrl = "https://upload.qiniup.com";
+	var Qiniu_upload = function(f, token, key, callback) {
+		var xhr = new XMLHttpRequest();
+		xhr.open("post", Qiniu_UploadUrl, true);
+		var formData, startDate;
+		formData = new FormData();
+		if (key !== null && key !== undefined) formData.append("key", key);
+		formData.append("token", token);
+		formData.append("file", f);
+		var taking;
+		xhr.upload.addEventListener("progress", function(evt) {
+			if (evt.lengthComputable) {
+				var nowDate = new Date().getTime();
+				taking = nowDate - startDate;
+				var x = (evt.loaded) / 1024;
+				var y = taking / 1000;
+				var uploadSpeed = (x / y);
+				var formatSpeed;
+				if (uploadSpeed > 1024) {
+					formatSpeed = (uploadSpeed / 1024).toFixed(2) + "Mb\/s";
+				} else {
+					formatSpeed = uploadSpeed.toFixed(2) + "Kb\/s";
+				}
+			}
+		}, false);
+		xhr.onreadystatechange = function(response) {
+			if (xhr.readyState == 4 && xhr.status == 200 && xhr.responseText != "") {
+				var blkRet = JSON.parse(xhr.responseText);
+				if(callback){
+					callback(qiniu+blkRet.key);
+				}
+			} else if (xhr.status != 200 && xhr.responseText) {
+				alert("上传失败!");
+			}
+		};
+		startDate = new Date().getTime();
+		xhr.send(formData);
+	};
+	/**
+	 * 上传预览图
+	 * obj 当前对象
+	 * index 对应控件id
+	 */
+	function upload(obj, imgSrcObj, imgTextObj){
+		var that=obj;
+		var key=$(that).val();
+		var token = "";
+		$.post(ctx+"/Image/uploadInit",{type:"R",imgNum:1},function(result){
+			 if(result.success){
+				token = result.obj.upToken;
+				key=result.obj.img;
+				if ($(that).length > 0 && token != "") {
+					Qiniu_upload($(that)[0].files[0], token,key,function(fileUrl){
+						imgSrcObj.attr('src',fileUrl);
+						imgTextObj.val(fileUrl);
+					});
+				} else {
+					console && console.log("form input error");
+				}
+			 }
+		});
+	}
+</script>
+</body>
+</html>

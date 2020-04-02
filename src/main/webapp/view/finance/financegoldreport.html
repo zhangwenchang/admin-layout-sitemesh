@@ -1,0 +1,170 @@
+<section class="content-header">
+    <h1>财务收入分布<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>财务统计</li>
+        <li class="active">财务收入分布</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+          
+           <form class="form-horizontal">
+              <div class="box-body">
+                
+                <div class="form-group">
+                  <label for="membNo" class="col-sm-2 control-label">统计区间:</label>
+                  <div class="col-sm-10">
+                    <input type="text" id="starttime">至<input type="text" id="endtime">
+                  </div>
+                </div>
+                
+              </div>
+              <!-- /.box-body -->
+              <div class="box-footer">
+               <button type="button" onclick="search()" class="btn btn-primary">查询</button>
+               </div>
+              <!-- /.box-footer -->
+            </form>
+          
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="goldsumlist1" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>充值总额 ( $ )</th>
+                    <th>比例</th>
+                    <th>支付方式</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+           <div class="box">
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="goldsumlist2" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                  	<th>消费总额 ( $ )</th>
+                    <th>比例</th>
+                    <th>消费类型</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<script type="text/javascript">
+$(function() {
+	var firstDay = firstDate("yyyy-MM-dd");
+	var now = new Date();
+	var nowdate = now.format("yyyy-MM-dd")
+	
+	$('#starttime').val(firstDay);
+	$('#endtime').val(nowdate);
+	 $('#starttime').datepicker({format: 'yyyy-mm-dd'});
+	  $('#endtime').datepicker({format: 'yyyy-mm-dd'});
+	
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        $("#goldsumlist1").dataTable({
+        	"bStateSave": true, 
+        	"paging": false,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": false,
+            "autoWidth": false,
+            "pageLength":10,
+	        //"ajax" : ctx+"/adminmember/notauditedimgList",
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	var starttime = $("#starttime").val();
+	        	var endtime = $("#endtime").val();
+	        	aoData.push(
+	        			{"name":"starttime","value":starttime},
+	        			{"name":"endtime","value":endtime}
+	        			)
+	        	//aoData=gagaidorname; */
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/order/rechargegoldsum",
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "rechGoldreal","bSortable": false },
+				{"data": "proportion","bSortable": false },
+				{"data": "rechType","bSortable": false}
+	        ], 
+	         "columnDefs": [],
+            
+            "fnDrawCallback": function(oSettings) { //这个应该是重绘的回调函数               
+                layer.closeAll();               
+            }
+	    });
+        
+        
+        
+        $('#goldsumlist2').DataTable({
+        	"bStateSave": true, 
+        	"paging": false,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": false,
+            "autoWidth": false,
+            "pageLength":10,
+	        //"ajax" : ctx+"/adminmember/notauditedimgList",
+	        "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+	        	var starttime = $("#starttime").val();
+	        	var endtime = $("#endtime").val();
+	        	aoData.push(
+	        			{"name":"starttime","value":starttime},
+	        			{"name":"endtime","value":endtime}
+	        			)
+	        	//aoData=gagaidorname; */
+	            oSettings.jqXHR = $.ajax( {
+	              "dataType": 'json',
+	              "type": "POST",
+	              "url": ctx+"/order/consumgoldsum",
+	              "data": aoData,
+	              "success": fnCallback
+	            } );
+	          },
+	        "columns": [
+				{"data": "consgoldreal","bSortable": false },
+				{"data": "proportion","bSortable": false },
+				{"data": "dctycode","bSortable": false}
+	        ], 
+	         "columnDefs": []
+          });
+        
+    });
+});
+
+
+//查询
+function search(){
+	$("#goldsumlist1").dataTable().fnDraw(true);
+	$("#goldsumlist2").dataTable().fnDraw(true);
+}
+</script>
+

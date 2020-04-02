@@ -1,0 +1,318 @@
+<section class="content-header">
+    <h1>广告分类管理<small></small></h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>主页</a></li>
+        <li>广告管理</li>
+        <li class="active">广告分类管理</li>
+    </ol>
+</section>
+<section class="content-main">
+    <div class="row">
+      <div class="col-xs-12">
+          <div class="box">
+              <div class="box-header">
+              <button type="button" onclick="addcategory(1)" class="btn btn-primary">添加</button>
+              </div>
+              
+              <!-- /.box-header -->
+              <div class="box-body mailbox-messages">
+                <table id="category" class="table table-bordered table-hover">
+                  <thead>
+                  <tr>
+                    <th>广告分类名称</th>
+                    <th>广告分类编码</th>
+                    <th>广告分类描述</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                  </tr>
+                  </thead>
+                  
+                </table>
+              </div>
+              <!-- /.box-body -->
+            </div>
+           
+          <!-- /.box -->
+      </div>
+      <!-- /.col -->
+    </div>   
+</section>
+
+<div class="modal fade" id="Modal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="ModalLabel">
+            </h4>
+         </div>
+         <div class="modal-body" id="bodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer" id="modalbutton">
+            
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" 
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" 
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title">
+           		 提示
+            </h4>
+         </div>
+         <div class="modal-body" id="errorbodycontent">
+            	<!-- 在这里添加一些文本 -->
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+</div>
+
+
+<script type="text/javascript">
+$(function() {
+    $.addFields(['/plugins/datatables/jquery.dataTables.min.js', '/plugins/datatables/dataTables.bootstrap.min.js', '/plugins/iCheck/icheck.min.js'], function() {
+        console.log(1);
+
+        $("#category").dataTable({
+            "bStateSave": true,
+            "paging": true,
+            //"processing": true,
+            "serverSide": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "pageLength": 10,
+            //"ajax" : ctx+"/adminmember/notauditedimgList",
+            "fnServerData": function(sSource, aoData, fnCallback, oSettings) {
+                    //aoData=gagaidorname;
+                    layer.load(1, {shade: 0.3});
+                oSettings.jqXHR = $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": ctx + "/adcategory/adcategorylist",
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "columns": [{
+                "data": "categoryname",
+                "bSortable": false
+            }, {
+                "data": "categorycode",
+                "bSortable": false
+            }, {
+                "data": "categorymemo",
+                "bSortable": false
+            }, {
+                "data": "createtime",
+                "bSortable": false,"bVisible":false
+            }, {
+                "data": "categoryid",
+                "bSortable": false
+            }],
+            "columnDefs": [{
+                "targets": 1,
+                "data": "categorycode",
+                "render": function(data, type, full, meta) {
+                	 if (data == ""||data==null) {
+                         return "";
+                     } else {
+                         return data;
+                     }
+                }
+            }, {
+                "targets": 2,
+                "data": "categorymemo",
+                "render": function(data, type, full, meta) {
+                    if (data == ""||data==null) {
+                        return "";
+                    } else {
+                        return data;
+                    }
+                }
+            }, {
+                "targets": 3,
+                "data": "createtime",
+                "render": function(data, type, full, meta) {
+                	if(data==""||data==null){
+                		return "";
+                	}else{
+                		var date = new Date(data);
+        	    	    return date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+" "+date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
+                	}
+                }
+            }, {
+                "targets": 4,
+                "data": "categoryid",
+                "render": function(data, type, full, meta) {
+                	var html='<a href="javascript:void(0)" onclick="editcategory('+data+',1)">编辑</a> <a href="javascript:void(0)" onclick="delcategory('+data+')">删除</a>';
+			 	 	return html;
+                }
+            } ], 
+            "fnDrawCallback": function(oSettings) {
+              layer.closeAll();
+            }
+        });
+    });
+});
+
+/**
+ * 删除分类
+ */
+function delcategory(id){
+	$.post(ctx+"/adcategory/deladcategory",{caid:id},function(result){
+		 if(result.success){
+			 $("#errorbodycontent").html("删除成功");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+			 $("#category").dataTable().fnDraw(false)
+			 //alert('<spring:message code="ihome.member.text.forgetpwd.emailsentsuccess"/>'); 
+		 }else{
+			 $("#errorbodycontent").html(result.msg);
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		 }
+	});
+}
+
+//编辑分类
+function editcategory(id,type){
+	if(type==1){
+		   $("#ModalLabel").text("编辑分类");
+		   $("#mailcontent").val('');
+		   var content = '<span>分类名称：</span><input type="text" id="caname" ><br><br>'+
+		   '<span>分类编码：</span><input type="text" id="cacode"><br><br>'+
+		   '<span>分类描述：</span><span><textarea  rows="3" cols="" class="vertical-top" id="caremark"></textarea></span>';
+		   $("#bodycontent").html(content);
+		   $("#modalbutton").html('<button type="button" onclick="editcategory('+id+',2)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		   $.ajax({
+				type : "post",
+				url : ctx+"/adcategory/editadcategory",
+				dataType : "json",
+				data : {
+					"caid":id,
+				},
+				success : function(data) {
+					if(data.success){
+						$("#caname").val(data.obj.categoryname);
+						$("#cacode").val(data.obj.categorycode);
+						$("#caremark").val(data.obj.categorymemo);
+					}
+				}
+			})
+		   //$("#mailsender").val('GaGaHi');
+		   $('#Modal').modal({
+			      keyboard: true
+		   });
+	   }
+	  if(type==2){
+		  var name = $("#caname").val();
+		  var code = $("#cacode").val();
+		  var remark = $("#caremark").val();
+		  if(name==''){
+			  $("#errorbodycontent").html("请输入分类名称");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		  }else{
+			  $.ajax({
+					type : "post",
+					url : ctx+"/adcategory/updateadcategory",
+					dataType : "json",
+					data : {
+						"caid":id,
+						"name":name,
+						"code":code,
+						"remark":remark
+					},
+					success : function(data) {
+						if(data.success){
+							$("#category").dataTable().fnDraw(false)
+							$("#Modal").modal('hide');
+						}else{
+							$("#errorbodycontent").html(data.msg);
+							   $('#errorModal').modal({
+									keyboard : true
+								});
+						}
+					}
+				})
+		  }
+	  }
+}
+
+//添加
+function addcategory(type) {
+	if(type==1){
+		   $("#ModalLabel").text("编辑分类");
+		   $("#mailcontent").val('');
+		   var content = '<span>分类名称：</span><input type="text" id="caname" ><br><br>'+
+		   '<span>分类编码：</span><input type="text" id="cacode"><br><br>'+
+		   '<span>分类描述：</span><span><textarea class="vertical-top" rows="3" cols="" id="caremark"></textarea></span>';
+		   $("#bodycontent").html(content);
+		   $("#modalbutton").html('<button type="button" onclick="addcategory(2)" class="btn btn-primary">保存 </button><button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+		   //$("#mailsender").val('GaGaHi');
+		   $('#Modal').modal({
+			      keyboard: true
+		   });
+	   }
+	  if(type==2){
+		  var name = $("#caname").val();
+		  var code = $("#cacode").val();
+		  var remark = $("#caremark").val();
+		  if(name==''){
+			  $("#errorbodycontent").html("请输入分类名称");
+			   $('#errorModal').modal({
+					keyboard : true
+				});
+		  }else{
+			  $.ajax({
+					type : "post",
+					url : ctx+"/adcategory/addadcategory",
+					dataType : "json",
+					data : {
+						"name":name,
+						"code":code,
+						"remark":remark
+					},
+					success : function(data) {
+						if(data.success){
+							$("#category").dataTable().fnDraw(false)
+							$("#Modal").modal('hide');
+						}else{
+							$("#errorbodycontent").html(data.msg);
+							   $('#errorModal').modal({
+									keyboard : true
+								});
+						}
+					}
+				})
+		  }
+	  }
+}
+
+function search() {
+    $("#category").dataTable().fnDraw(false);
+}
+</script>
+

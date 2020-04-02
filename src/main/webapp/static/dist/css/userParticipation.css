@@ -1,0 +1,136 @@
+.user-participation .title-border{
+    border-bottom: 1px solid gainsboro;
+
+    padding: 20px;
+}
+.user-participation .title-content{
+    overflow:hidden;
+}
+.user-participation .title-content-left{
+    float:left;
+}
+.user-participation .title-content-right{
+    float:right;
+}
+
+.user-participation .title-content-right .select-value{
+    width: 180px;
+    height: 27px;
+    vertical-align: top;
+}
+
+.user-participation .title-content-right span{
+    margin-left: 20px;
+}
+.user-participation .blue{
+    color:#337ab7;
+}
+
+.user-participation .exportBtn{
+    cursor: pointer;
+}
+
+.user-participation .ul-li .blue-bg{
+    background: #337ab7;
+    color: #fff;
+    border: 1px solid #337ab7;
+}
+.user-participation .blue-text{
+    border-radius: 4px;
+    padding: 1px 9px;
+}
+
+
+
+/*访问页面*/
+.user-participation .right-top{
+    padding: 30px 30px 0px 30px;
+}
+
+.user-participation .ul-li{
+    display: inline-block;
+    list-style: none;
+    overflow: hidden;
+    margin-left: -35px;
+    vertical-align: middle;
+}
+
+.user-participation .right-model .ul-li{
+    margin-left: 19px;
+    vertical-align: top;
+}
+
+
+
+.user-participation .ul-li li{
+    float: left;
+    text-align: center;
+    border: 1px solid gainsboro;
+    padding: 10px 24px;
+    background: white;
+
+}
+
+.user-participation .right-model .ul-li li{
+    padding: 2px 23px;
+}
+
+
+.user-participation .ul-li .border-none{
+    border-left: none;
+    border-right: none;
+}
+
+.user-participation .right-top span{
+    font-size: 18px;
+    margin-left: 10px;
+}
+
+.user-participation .btn-btn{
+    background: #337ab7;
+    color: #fff;
+    padding: 4px 20px;
+    border-radius: 5px;
+}
+
+.user-participation .attention{
+    background: gainsboro;
+    padding:18px 15px;
+}
+
+.user-participation .input-float{
+    overflow: hidden;
+}
+
+.user-participation .input-float input{
+    width: 180px;
+}
+
+
+.user-participation .float-left{
+    float: left;
+}
+
+.user-participation .float-right{
+    float: right;
+}
+.user-participation .attention-bottom{
+    margin-top: 20px;
+}
+
+.user-participation .span-btn{
+    padding: 13px 19px;
+    background: lightgray;
+    border-radius: 7px;
+    margin-top: 10px;
+}
+
+.user-participation .div-bg{
+    background-color: #ecf0f5;
+    width: 106%;
+    height: 22px;
+    margin: 0 auto;
+    margin-left: -20px;
+    margin-top: 50px;
+    margin-bottom: 12px;
+}
