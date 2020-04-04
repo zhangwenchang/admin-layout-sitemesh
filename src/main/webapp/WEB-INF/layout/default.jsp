@@ -26,7 +26,7 @@
 
     <header class="main-header">
         <!-- Logo -->
-        <a href="welcome.html" class="logo">
+        <a href="${ctx}/" class="logo">
             <!-- mini logo for sidebar mini 50x50 pixels -->
             <span class="logo-mini"><b>G</b></span>
             <!-- logo for regular state and mobile devices -->
